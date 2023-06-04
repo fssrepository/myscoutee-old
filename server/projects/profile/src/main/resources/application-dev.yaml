@@ -1,0 +1,40 @@
+management:
+  health:
+    show-details: "always"
+  endpoints:
+    web:
+      base-path: "/"
+      exposure:
+        include: "health,shutdown,prometheus"
+      path-mapping:
+        health: "health"
+        shutdown: "shutdown"
+        prometheus: "metrics"
+
+config:
+  adminUser: ${ADMIN_USER:myscoutee@gmail.com}
+
+fcm:
+  url: "https://fcm.googleapis.com/fcm/send"
+  apiKey: "AAAAG3Mpsps:APA91bGHmlddqM17gjNjbeLfKtKWqBoYJ-dqbLpw5FI8EAikazsg_V-sXAsV1iXotM7ldjO-teoSCzjtfvpUX7eYj8PzR7GG8HrBvX6uVdGN7fR8ekXglj9LAB8H-KaKGrm-YBjNHgig"
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      #authentication-database: ${MONGODB_AUTHENTICATION_DATABASE:admin}
+      username: ${MONGODB_USERNAME:guest}
+      password: ${MONGODB_PASSWORD:guest}
+      database: ${MONGODB_DATABASE:myscoutee_db}
+
+#logging:
+#  level:
+#    org.springframework.data.mongodb.core.MongoTemplate: DEBUG

@@ -1,0 +1,38 @@
+package com.raxim.myscoutee.algo;
+
+import java.util.Iterator;
+
+import com.raxim.myscoutee.algo.dto.Group;
+import com.raxim.myscoutee.algo.dto.Range;
+
+public class GroupSet implements Iterable<Group> {
+
+    private final NodeRepository nodeRepository;
+    private final Range range;
+
+    public GroupSet(final NodeRepository nodeRepository, final Range range) {
+        this.nodeRepository = nodeRepository;
+
+        int minGroupSize = range.getMin() < 2 ? 2 : range.getMin();
+        int maxGroupSize = range.getMax();
+        this.range = new Range(minGroupSize, maxGroupSize);
+    }
+
+    @Override
+    public Iterator<Group> iterator() {
+        return new GroupSetIterator(this);
+    }
+
+    public NodeRepository getNodeRepository() {
+        return nodeRepository;
+    }
+
+    public Range getRange() {
+        return range;
+    }
+
+    @Override
+    public String toString() {
+        return this.nodeRepository.getNodeForest().toString();
+    }
+}
