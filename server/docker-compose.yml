@@ -70,13 +70,6 @@ services:
       MONGODB_HOST: "mongodb"
       MONGODB_USERNAME: "guest"
       MONGODB_PASSWORD: "guest"
-      NEO4J_USERNAME: "neo4j"
-      NEO4J_PASSWORD: "Retep1Ob2"
-      NEO4J_DATABASE: "neo4j"
-      NEO4J_URI: "bolt://neo4j:7687"
-      BOOTSTRAP_SERVERS: "kafka:9092"
-      SCHEMA_REGISRY_URL: "http://schemaregistry:8081"
-      QUEUE_HOST: "rabbitmq"
       ADMIN_USER: "myscoutee@gmail.com"
     volumes:
       - ./data/profile/img:/tmp/img
