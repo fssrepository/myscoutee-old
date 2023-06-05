@@ -1,13 +1,18 @@
 package com.raxim.myscoutee.profile.repository.mongo;
 
-import com.raxim.myscoutee.common.FileUtil;
-import com.raxim.myscoutee.profile.data.document.mongo.Car;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.data.rest.core.annotation.*;
+import org.springframework.data.rest.core.annotation.HandleAfterCreate;
+import org.springframework.data.rest.core.annotation.HandleAfterDelete;
+import org.springframework.data.rest.core.annotation.HandleAfterSave;
+import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
+import org.springframework.data.rest.core.annotation.HandleBeforeDelete;
+import org.springframework.data.rest.core.annotation.HandleBeforeSave;
+import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import com.raxim.myscoutee.common.FileUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.Car;
 
 @Component
 @RepositoryEventHandler(Car.class)
