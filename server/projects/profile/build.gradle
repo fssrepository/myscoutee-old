@@ -13,7 +13,14 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.google.firebase:firebase-admin:7.1.1'
+
+	implementation 'com.querydsl:querydsl-mongodb'
+	implementation 'com.querydsl:querydsl-apt'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.data:spring-data-rest-webmvc:4.1.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

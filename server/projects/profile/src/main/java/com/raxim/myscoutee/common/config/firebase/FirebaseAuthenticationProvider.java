@@ -1,22 +1,23 @@
-package com.raxim.myscoutee.common.config.firebase
+package com.raxim.myscoutee.common.config.firebase;
 
-import org.springframework.security.authentication.AuthenticationProvider
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.AuthenticationException
-import org.springframework.stereotype.Component
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Component;
 
 @Component
-class FirebaseAuthenticationProvider : AuthenticationProvider {
+public class FirebaseAuthenticationProvider implements AuthenticationProvider {
 
-    override fun supports(authentication: Class<*>?): Boolean {
-        return FirebaseAuthenticationToken::class.java.isAssignableFrom(authentication)
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return FirebaseAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    @Throws(AuthenticationException::class)
-    override fun authenticate(authentication: Authentication): Authentication? {
-        if (!supports(authentication.javaClass)) {
-            return null
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        if (!supports(authentication.getClass())) {
+            return null;
         }
-        return authentication as FirebaseAuthenticationToken
+        return (FirebaseAuthenticationToken) authentication;
     }
 }

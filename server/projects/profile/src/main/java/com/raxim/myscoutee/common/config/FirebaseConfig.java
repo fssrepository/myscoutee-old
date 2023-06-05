@@ -1,25 +1,29 @@
-package com.raxim.myscoutee.common.config
+package com.raxim.myscoutee.common.config;
 
-import com.google.auth.oauth2.GoogleCredentials
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
-import org.springframework.context.annotation.Configuration
-import javax.annotation.PostConstruct
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
-class FirebaseConfig {
+public class FirebaseConfig {
 
     @PostConstruct
-    fun init() {
+    public void init() {
+        try {
+            InputStream serviceAccount = FirebaseConfig.class.getResourceAsStream("/myscoutee-firebase-adminsdk-242c8-2aa0246e44.json");
 
-        val serviceAccount =
-            FirebaseConfig::class.java.getResourceAsStream("/myscoutee-firebase-adminsdk-242c8-2aa0246e44.json")
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
 
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build()
-
-        FirebaseApp.initializeApp(options)
-
+            FirebaseApp.initializeApp(options);
+        } catch (IOException e) {
+            // Handle the exception
+        }
     }
 }
