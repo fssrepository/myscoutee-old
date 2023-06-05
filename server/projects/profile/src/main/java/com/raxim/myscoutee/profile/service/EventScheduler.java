@@ -1,19 +1,25 @@
 package com.raxim.myscoutee.profile.service;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
-import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
-import com.raxim.myscoutee.exception.InvalidScheduleSettingsException;
-import com.raxim.myscoutee.profile.data.document.mongo.ScheduleSetting;
-import com.raxim.myscoutee.profile.data.dto.internal.Bound;
-import com.raxim.myscoutee.profile.generator.GroupGenerator;
-import com.raxim.myscoutee.profile.repository.mongo.ScheduleSettingRepository;
-import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
+import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
+import com.raxim.myscoutee.exception.InvalidScheduleSettingsException;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.ScheduleSetting;
+import com.raxim.myscoutee.profile.data.dto.internal.BoundDto;
+import com.raxim.myscoutee.profile.generator.GroupGenerator;
+import com.raxim.myscoutee.profile.repository.mongo.ScheduleSettingRepository;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 
 @Service
 public class EventScheduler {
@@ -24,8 +30,8 @@ public class EventScheduler {
     private final JsonConverterService jsonConverterService;
 
     public EventScheduler(UserRepository userRepository, GroupGenerator groupGenerator,
-                          ScheduleSettingRepository scheduleSettingRepository, EventService eventService,
-                          JsonConverterService jsonConverterService) {
+            ScheduleSettingRepository scheduleSettingRepository, EventService eventService,
+            JsonConverterService jsonConverterService) {
         this.userRepository = userRepository;
         this.groupGenerator = groupGenerator;
         this.scheduleSettingRepository = scheduleSettingRepository;
@@ -35,30 +41,46 @@ public class EventScheduler {
 
     @Scheduled(cron = "0 0 3 * * MON")
     public void autoGenerateRooms() {
-        generateEvents();
+        try {
+            generateEvents();
+        } catch (FirebaseMessagingException | InvalidScheduleSettingsException e) {
+            e.printStackTrace();
+        }
     }
 
     @Scheduled(cron = "0 0 2 * * MON")
     public void autoTopicRegistration() {
-        topicRegistration("1900-01-01");
+        try {
+            topicRegistration("1900-01-01");
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void topicRegistration(String lastTime) {
+    public void topicRegistration(String lastTime) throws FirebaseMessagingException {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        userRepository.findDeviceWithProfileStatusAll(lastTime, new String[]{"A"}).forEach(topic -> {
+        userRepository.findDeviceWithProfileStatusAll(lastTime, new String[] { "A" }).forEach(topic -> {
             String topicName = topic.getName().replace(" ", "_");
-            FirebaseMessaging.getInstance().subscribeToTopic(topic.getTokens(), topicName);
+            try {
+                FirebaseMessaging.getInstance().subscribeToTopic(topic.getTokens(), topicName);
+            } catch (FirebaseMessagingException e) {
+                e.printStackTrace();
+            }
             System.out.printf("%d tokens were subscribed successfully from %s%n",
-                    topic.getTokens().length, topic.getName());
+                    topic.getTokens().size(), topic.getName());
         });
 
-        userRepository.findDeviceWithProfileStatusAll(lastTime, new String[]{"I", "F", "S", "P"}).forEach(topic -> {
+        userRepository.findDeviceWithProfileStatusAll(lastTime, new String[] { "I", "F", "S", "P" }).forEach(topic -> {
             String topicName = topic.getName().replace(" ", "_");
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(topic.getTokens(), topicName);
+            try {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(topic.getTokens(), topicName);
+            } catch (FirebaseMessagingException e) {
+                e.printStackTrace();
+            }
             System.out.printf("%d tokens were unsubscribed successfully from %s%n",
-                    topic.getTokens().length, topic.getName());
+                    topic.getTokens().size(), topic.getName());
         });
 
         // Only for testing!
@@ -75,7 +97,7 @@ public class EventScheduler {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    public void generateEvents() {
+    public void generateEvents() throws InvalidScheduleSettingsException, FirebaseMessagingException {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -85,7 +107,7 @@ public class EventScheduler {
             throw new InvalidScheduleSettingsException();
         }
 
-        Bound bound = jsonConverterService.jsonToObject(scheduleSetting.getFlags(), Bound.class);
+        BoundDto bound = jsonConverterService.jsonToObject(scheduleSetting.getFlags(), BoundDto.class);
 
         if (bound == null) {
             throw new InvalidScheduleSettingsException();

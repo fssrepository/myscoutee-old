@@ -13,6 +13,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Link;
 import com.raxim.myscoutee.profile.data.dto.rest.Reward;
 
 @Repository
+public
 interface LinkRepository extends MongoRepository<Link, UUID> {
 
         @Query("{key: ?0}")

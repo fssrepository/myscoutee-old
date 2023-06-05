@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-interface JobRepository extends MongoRepository<Job, UUID> {
+public interface JobRepository extends MongoRepository<Job, UUID> {
 
     @Aggregation(pipeline = {
         "{\n" +

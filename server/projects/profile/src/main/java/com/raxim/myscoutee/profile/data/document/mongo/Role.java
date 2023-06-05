@@ -17,6 +17,12 @@ public class Role {
         this.id = UUID.randomUUID();
     }
     
+    public Role(UUID id, UUID profileId, String role) {
+        this.id = id;
+        this.profileId = profileId;
+        this.role = role;
+    }
+
     public Role(UUID profileId, String role) {
         this.id = UUID.randomUUID();
         this.profileId = profileId;

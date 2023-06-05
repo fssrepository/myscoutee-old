@@ -39,6 +39,15 @@ public class User {
         this.profiles = new HashSet<>();
     }
 
+    public User(UUID id, String email, Date createdDate, UUID group, Profile profile, Set<Profile> profiles) {
+        this.id = id;
+        this.email = email;
+        this.createdDate = createdDate;
+        this.group = group;
+        this.profile = profile;
+        this.profiles = profiles;
+    }
+
     public UUID getId() {
         return id;
     }

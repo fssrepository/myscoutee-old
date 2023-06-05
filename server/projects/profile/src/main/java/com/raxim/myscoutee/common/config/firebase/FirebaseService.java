@@ -1,17 +1,28 @@
 package com.raxim.myscoutee.common.config.firebase;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.raxim.myscoutee.common.config.ConfigProperties;
-import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.document.mongo.Role;
-import com.raxim.myscoutee.profile.data.document.mongo.User;
-import com.raxim.myscoutee.profile.repository.mongo.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import com.google.firebase.auth.FirebaseAuth;
+import com.raxim.myscoutee.common.config.ConfigProperties;
+import com.raxim.myscoutee.profile.data.document.mongo.Group;
+import com.raxim.myscoutee.profile.data.document.mongo.Link;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.Role;
+import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
+import com.raxim.myscoutee.profile.repository.mongo.LinkRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.RoleRepository;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 
 @Service
 public class FirebaseService {
@@ -28,8 +39,7 @@ public class FirebaseService {
             RoleRepository roleRepository,
             GroupRepository groupRepository,
             ConfigProperties config,
-            LinkRepository linkRepository
-    ) {
+            LinkRepository linkRepository) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -39,9 +49,9 @@ public class FirebaseService {
     }
 
     public FirebaseTokenHolder parseToken(String firebaseToken) {
-        require(firebaseToken != null && !firebaseToken.isBlank(), "FirebaseTokenBlank");
         try {
-            com.google.firebase.auth.FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(firebaseToken);
+            com.google.firebase.auth.FirebaseToken decodedToken = FirebaseAuth.getInstance()
+                    .verifyIdToken(firebaseToken);
             return new FirebaseTokenHolder(decodedToken);
         } catch (Exception e) {
             throw new FirebaseTokenInvalidException(e.getMessage());
@@ -57,7 +67,7 @@ public class FirebaseService {
             if (config.getAdminUser().equals(username)) {
                 List<Group> groups = this.groupRepository.findSystemGroups();
                 List<Profile> profiles = groups.stream()
-                        .map(group -> new Profile(group.getId()))
+                        .map(lGroup -> new Profile(lGroup.getId()))
                         .toList();
 
                 profileSaved = this.profileRepository.saveAll(profiles);
@@ -71,7 +81,7 @@ public class FirebaseService {
             } else {
                 List<Group> groups = new ArrayList<>(this.groupRepository.findSystemGroups());
                 List<Profile> profiles = groups.stream()
-                        .map(group -> new Profile(group.getId()))
+                        .map(lGroup -> new Profile(lGroup.getId()))
                         .toList();
 
                 profileSaved = this.profileRepository.saveAll(profiles);
@@ -94,13 +104,14 @@ public class FirebaseService {
                     new Date(),
                     group.getId(),
                     profile,
-                    new HashSet<>(profileSaved)
-            );
+                    new HashSet<>(profileSaved));
             user = this.userRepository.save(userToSave);
         }
 
         if (xLink != null) {
-            this.linkRepository.findByKey(UUID.fromString(xLink)).ifPresent(link -> {
+            Optional<Link> oLink = this.linkRepository.findByKey(UUID.fromString(xLink));
+            if (oLink.isPresent()) {
+                Link link = oLink.get();
                 List<String> usedBy = link.getUsedBys().stream()
                         .filter(u -> u.equals(username))
                         .toList();
@@ -111,13 +122,15 @@ public class FirebaseService {
                         if (optionalGroup.isPresent()) {
                             Group group = optionalGroup.get();
                             Profile profile = new Profile(group.getId());
-                            Profile profileSaved = this.profileRepository.save(profile);
+                            Profile lProfileSaved = this.profileRepository.save(profile);
 
-                            Role role = new Role(UUID.randomUUID(), profileSaved.getId(), "ROLE_USER");
+                            Role role = new Role(UUID.randomUUID(), lProfileSaved.getId(), "ROLE_USER");
                             this.roleRepository.save(role);
 
                             user.getProfiles().add(profile);
-                            User userNew = user.withGroup(group.getId()).withProfile(profile);
+
+                            User userNew = new User(user.getId(), user.getEmail(), user.getCreatedDate(), group.getId(),
+                                    profile, user.getProfiles());
                             this.userRepository.save(userNew);
                         }
                     } else {
@@ -127,7 +140,8 @@ public class FirebaseService {
                     link.getUsedBys().add(username);
                     this.linkRepository.save(link);
                 }
-            });
+            }
+            ;
         }
 
         List<Role> roles = user.getProfile() != null

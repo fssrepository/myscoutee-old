@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-interface IdeaRepository extends MongoRepository<Idea, UUID> {
+public interface IdeaRepository extends MongoRepository<Idea, UUID> {
 
     @Aggregation(pipeline = {
         "{\n" +

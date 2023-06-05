@@ -38,7 +38,7 @@ public class FileUtil {
     }
 
     public static Pair<String, String> uuidToPath(String fileName, boolean isWrite) {
-        String[] dirs = {rootPath, "permanent"};
+        String[] dirs = { rootPath, "permanent" };
         String[] fileNameParts = fileName.split("-");
         String[] pathParts = new String[dirs.length + fileNameParts.length + 1];
         System.arraycopy(dirs, 0, pathParts, 0, dirs.length);
@@ -62,7 +62,7 @@ public class FileUtil {
     }
 
     public static Pair<String, String> tempToPath(String fileName, boolean isWrite) {
-        String[] dirs = {rootPath, "uploaded"};
+        String[] dirs = { rootPath, "uploaded" };
         String[] pathParts = new String[dirs.length + 1];
         System.arraycopy(dirs, 0, pathParts, 0, dirs.length);
         pathParts[pathParts.length - 1] = "";
@@ -93,20 +93,24 @@ public class FileUtil {
         }
     }
 
-    public static void delete(String fileName, String sub) throws IOException {
-        Pair<String,String> sep1TmpDir = FileUtil.tempToPath(fileName, false);
+    public static void delete(String fileName, String sub) {
+        Pair<String, String> sep1TmpDir = FileUtil.tempToPath(fileName, false);
         String sep1 = sep1TmpDir.getKey();
         String tmpDir = sep1TmpDir.getValue();
         File tmpFile = new File(tmpDir + sep1 + "_" + fileName + sub);
 
         if (tmpFile.exists()) {
-            Pair<String,String> sep2FullDir = FileUtil.uuidToPath(fileName, true);
+            Pair<String, String> sep2FullDir = FileUtil.uuidToPath(fileName, true);
             String sep2 = sep2FullDir.getKey();
             String fullDir = sep2FullDir.getValue();
             File sourceFile = tmpFile;
-            Files.copy(sourceFile.toPath(), new File(fullDir + sep2 + "_" + fileName + sub).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-                    
+            try {
+                Files.copy(sourceFile.toPath(), new File(fullDir + sep2 + "_" + fileName + sub).toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                System.out.println("File not foud to delete!");
+            }
+
             sourceFile.delete();
         }
     }

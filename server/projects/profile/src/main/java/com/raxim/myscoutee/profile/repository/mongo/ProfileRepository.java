@@ -19,6 +19,7 @@ import com.raxim.myscoutee.profile.data.dto.rest.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.User;
 
 @RepositoryRestResource(collectionResourceRel = "profiles", path = "profiles")
+public
 interface ProfileRepository extends MongoRepository<com.raxim.myscoutee.profile.data.document.mongo.Profile, UUID>,
                 QuerydslPredicateExecutor<com.raxim.myscoutee.profile.data.document.mongo.Profile> {
 

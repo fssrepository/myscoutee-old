@@ -6,9 +6,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.UUID;
 
-@RepositoryRestResource(
-    collectionResourceRel = "feedbacks",
-    path = "feedbacks"
-)
+@RepositoryRestResource(collectionResourceRel = "feedbacks", path = "feedbacks")
 interface FeedbackRepository extends MongoRepository<Feedback, UUID>,
-    QuerydslPredicateExecutor<Feedback>
+        QuerydslPredicateExecutor<Feedback> {
+
+}

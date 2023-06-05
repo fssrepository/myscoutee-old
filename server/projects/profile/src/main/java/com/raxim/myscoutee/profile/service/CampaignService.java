@@ -1,9 +1,18 @@
 package com.raxim.myscoutee.profile.service;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.raxim.myscoutee.common.Pair;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Idea;
 import com.raxim.myscoutee.profile.data.document.mongo.Job;
-import com.raxim.myscoutee.profile.data.document.mongo.Promotion;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Slot;
 import com.raxim.myscoutee.profile.data.dto.rest.Promotion;
@@ -14,14 +23,6 @@ import com.raxim.myscoutee.profile.repository.mongo.IdeaRepository;
 import com.raxim.myscoutee.profile.repository.mongo.JobRepository;
 import com.raxim.myscoutee.profile.repository.mongo.MemberRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
-import com.raxim.myscoutee.profile.service.EventService;
-
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class CampaignService {
@@ -56,12 +57,15 @@ public class CampaignService {
         return refIds != null && refIds.length > 0 ? this.eventService.getAllActiveEvents(refIds) : List.of();
     }
 
-    public Optional<Pair<Promotion, Boolean>> getPromotion(Promotion promotion, Profile profile, boolean isUpdate,
+    public Optional<Pair<com.raxim.myscoutee.profile.data.document.mongo.Promotion, Boolean>> getPromotion(
+            com.raxim.myscoutee.profile.data.document.mongo.Promotion promotion, Profile profile, boolean isUpdate,
             boolean isEvent) {
-        Optional<Promotion> promotionRes = promotion.getId() != null
-                ? this.promotionRepository.findById(promotion.getId()) : Optional.empty();
+        Optional<com.raxim.myscoutee.profile.data.document.mongo.Promotion> promotionRes = promotion.getId() != null
+                ? this.promotionRepository.findById(promotion.getId())
+                : Optional.empty();
 
-        Promotion currPromotion = isEvent ? promotionRes.get() : promotion;
+        com.raxim.myscoutee.profile.data.document.mongo.Promotion currPromotion = isEvent ? promotionRes.get()
+                : promotion;
 
         Group group = currPromotion.getGroup() != null && !currPromotion.getGroup().isSystem()
                 ? this.groupRepository.findById(currPromotion.getGroup().getId()).get()
@@ -70,7 +74,7 @@ public class CampaignService {
         Optional<Event> template = this.eventRepository.findById(currPromotion.getItem().getId());
 
         if (promotionRes.isPresent()) {
-            Promotion oldPromotion = promotionRes.get();
+            com.raxim.myscoutee.profile.data.document.mongo.Promotion oldPromotion = promotionRes.get();
             Promotion upPromotion = oldPromotion.copy(template.get(), group, currPromotion.getSlots(),
                     currPromotion.getName(), currPromotion.getRange());
             return Optional.of(new Pair<>(upPromotion, promotionRes.get().getItem().getId() != template.get().getId()));

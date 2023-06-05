@@ -1,15 +1,18 @@
 package com.raxim.myscoutee.common.config.firebase;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class FirebaseFilter extends OncePerRequestFilter {
     private final FirebaseService firebaseService;
@@ -23,8 +26,7 @@ public class FirebaseFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
         String xAuth = request.getHeader(AUTH_FIREBASE);
         if (xAuth == null || xAuth.isBlank()) {
             filterChain.doFilter(request, response);
@@ -38,7 +40,8 @@ public class FirebaseFilter extends OncePerRequestFilter {
                     String xLink = request.getHeader(AUTH_LINK);
 
                     UserDetails userDetails = firebaseService.loadUserByUsername(holder.getEmail(), xLink);
-                    Authentication auth = new FirebaseAuthenticationToken(userDetails, holder, userDetails.getAuthorities());
+                    Authentication auth = new FirebaseAuthenticationToken(userDetails, holder,
+                            userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(auth);
 
                     authSet.remove(xAuth);

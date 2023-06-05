@@ -14,7 +14,7 @@ import com.mongodb.client.model.geojson.Point;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 
 @Repository
-interface GroupRepository extends MongoRepository<Group, UUID>,
+public interface GroupRepository extends MongoRepository<Group, UUID>,
                 QuerydslPredicateExecutor<Group> {
 
         @Query("{system: true}")

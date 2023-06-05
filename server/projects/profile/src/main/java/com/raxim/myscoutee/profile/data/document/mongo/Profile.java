@@ -104,6 +104,10 @@ public class Profile {
     @JsonIgnore
     private LocalDateTime lastLogin;
 
+    public Profile(UUID uuid) {
+        this.id = uuid;
+    }
+
     public Profile() {
         this.id = UUID.randomUUID();
     }

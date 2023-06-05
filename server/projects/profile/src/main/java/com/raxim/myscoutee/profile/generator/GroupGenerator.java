@@ -1,21 +1,33 @@
 package com.raxim.myscoutee.profile.generator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
 import com.raxim.myscoutee.algo.BGroupSet;
 import com.raxim.myscoutee.algo.NodeRepository;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Group;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
+import com.raxim.myscoutee.profile.data.document.mongo.Neo4jLike;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.dto.internal.Bound;
+import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
+import com.raxim.myscoutee.profile.data.dto.internal.BoundDto;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
-import org.springframework.stereotype.Service;
-import java.util.*;
 
 @Service
-public class GroupGenerator implements IGenerator<Bound, Profile> {
-    private static final String RANDOM_GROUP = "RANDOM_GROUP";
+public class GroupGenerator implements IGenerator<BoundDto, Profile> {
+    public static final String RANDOM_GROUP = "RANDOM_GROUP";
 
     private final ScheduleRepository scheduleRepository;
     private final LikeRepository likeRepository;
@@ -28,14 +40,14 @@ public class GroupGenerator implements IGenerator<Bound, Profile> {
     }
 
     @Override
-    public List<Set<Profile>> generate(Bound flags) {
+    public List<Set<Profile>> generate(BoundDto flags) {
         Optional<Schedule> schedule = scheduleRepository.findByKey(RANDOM_GROUP);
         Date lastRunningTime = schedule.map(Schedule::getLastRunDate).orElse(new Date());
 
-        List<LikeBoth> likesBoth = likeRepository.findBothAll(lastRunningTime.toString(), 1.5);
+        List<Neo4jLike> likesBoth = likeRepository.findBothAll(lastRunningTime.toString(), 1.5);
 
         List<Edge> edges = new ArrayList<>();
-        for (LikeBoth likeBoth : likesBoth) {
+        for (Neo4jLike likeBoth : likesBoth) {
             Node fromNode = new Node(likeBoth.getFrom().getId().toString(), likeBoth.getFrom().getGender());
             Node toNode = new Node(likeBoth.getTo().getId().toString(), likeBoth.getTo().getGender());
             long weight = (long) ((1 / (2 / likeBoth.getRate())) * likeBoth.getDistance());
@@ -50,21 +62,21 @@ public class GroupGenerator implements IGenerator<Bound, Profile> {
         BGroupSet groupSet = new BGroupSet(nodeRepository, range, Arrays.asList("m", "w"));
 
         Map<String, Profile> nodeMap = new HashMap<>();
-        for (LikeBoth likeBoth : likesBoth) {
+        for (Neo4jLike likeBoth : likesBoth) {
             nodeMap.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
             nodeMap.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
         }
         nodes.putAll(nodeMap);
 
-        List<Group> groups = groupSet.map(Group::getNodes);
         List<Set<Profile>> result = new ArrayList<>();
-        for (Group group : groups) {
+        for (Group group : groupSet) {
             Set<Profile> profileSet = new HashSet<>();
             for (Node node : group.getNodes()) {
                 Profile profile = nodes.get(node.getId());
                 profileSet.add(profile);
             }
             result.add(profileSet);
+
         }
         return result;
     }

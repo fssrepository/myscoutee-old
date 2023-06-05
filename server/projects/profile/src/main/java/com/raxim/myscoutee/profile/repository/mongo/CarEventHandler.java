@@ -27,8 +27,8 @@ public class CarEventHandler {
         if (car.getImages() != null) {
             car.getImages().forEach(img -> {
                 String fileName = img.getName();
-                delete(fileName);
-                delete(fileName, "_orig");
+                FileUtil.delete(fileName, "");
+                FileUtil.delete(fileName, "_orig");
             });
         }
 
@@ -43,17 +43,5 @@ public class CarEventHandler {
     @HandleAfterDelete
     public void handleAfterDelete(Car car) {
         logger.info("Handle Car After Delete ....");
-    }
-
-    private void delete(String fileName) {
-        // Implement the delete logic for the given fileName
-        // Assuming the implementation is in the FileUtil class
-        FileUtil.deleteFile(fileName);
-    }
-
-    private void delete(String fileName, String suffix) {
-        // Implement the delete logic for the given fileName with the specified suffix
-        // Assuming the implementation is in the FileUtil class
-        FileUtil.deleteFile(fileName + suffix);
     }
 }

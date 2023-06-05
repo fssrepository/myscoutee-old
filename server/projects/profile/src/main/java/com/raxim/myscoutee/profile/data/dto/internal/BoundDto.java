@@ -1,10 +1,10 @@
 package com.raxim.myscoutee.profile.data.dto.internal;
 
-public class Bound {
+public class BoundDto {
     private final int minGroupSize;
     private final int maxGroupSize;
 
-    public Bound(int minGroupSize, int maxGroupSize) {
+    public BoundDto(int minGroupSize, int maxGroupSize) {
         this.minGroupSize = minGroupSize;
         this.maxGroupSize = maxGroupSize;
     }

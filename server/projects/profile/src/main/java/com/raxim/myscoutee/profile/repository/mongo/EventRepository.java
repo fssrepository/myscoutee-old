@@ -59,7 +59,7 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
                                         "        }\n" +
                                         "    }"
         })
-        List<Event> findEventsByStatus(UUID group, int limit, String[] offset, String status);
+        List<com.raxim.myscoutee.profile.data.dto.rest.Event> findEventsByStatus(UUID group, int limit, String[] offset, String status);
 
         @Aggregation(pipeline = {
                         "{ \n" +
@@ -180,7 +180,7 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
                                         "        }\n" +
                                         "}"
         })
-        List<Event> findEventDown(UUID currentId, int limit, int step, String format, String[] eventStatus,
+        List<com.raxim.myscoutee.profile.data.dto.rest.Event> findEventDown(UUID currentId, int limit, int step, String format, String[] eventStatus,
                         String[] offset, String status);
 
         @Aggregation(pipeline = {
@@ -252,7 +252,7 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
                                         "        }\n" +
                                         "}"
         })
-        List<Event> findEventUp(UUID currentId, int limit, int step, String format, String[] eventStatus,
+        List<com.raxim.myscoutee.profile.data.dto.rest.Event> findEventUp(UUID currentId, int limit, int step, String format, String[] eventStatus,
                         String[] offset, String status);
 
         @Aggregation(pipeline = {
@@ -339,7 +339,7 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
                                         "    }\n" +
                                         "}"
         })
-        public List<Event> findEventByMonth(UUID currentId, int limit, int step, String format,
+        public List<com.raxim.myscoutee.profile.data.dto.rest.Event> findEventByMonth(UUID currentId, int limit, int step, String format,
                         @Param("evtStatus") String[] eventStatus, @Param("until") Object until,
                         @Param("offset") String[] offset, @Param("status") String status);
 

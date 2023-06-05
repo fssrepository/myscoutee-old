@@ -8,5 +8,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.UUID;
 
 @RepositoryRestResource(collectionResourceRel = "members", path = "members")
-interface MemberRepository extends MongoRepository<Member, UUID>, QuerydslPredicateExecutor<Member> {
+public interface MemberRepository extends MongoRepository<Member, UUID>, QuerydslPredicateExecutor<Member> {
 }
