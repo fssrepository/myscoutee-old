@@ -34,6 +34,8 @@ import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.MemberRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
+import com.raxim.myscoutee.profile.util.EventUtil;
+import com.raxim.myscoutee.profile.util.JsonUtil;
 
 @Service
 public class EventService {
@@ -45,7 +47,7 @@ public class EventService {
 
     public EventService(EventRepository eventRepository,
             EventItemRepository eventItemRepository,
-            PromotionRepository promotionRepository, 
+            PromotionRepository promotionRepository,
             MemberRepository memberRepository,
             ObjectMapper objectMapper) {
         this.eventRepository = eventRepository;
@@ -69,7 +71,7 @@ public class EventService {
 
     public List<EventDTO> getEvents(String step, Integer direction, String[] tOffset,
             UUID profileId, String[] status) {
-        List<EventItemDTO> events = Collections.emptyList();
+        List<EventDTO> events = Collections.emptyList();
 
         if (step == null || step.equals("d")) {
             if (direction == 1) {
@@ -81,8 +83,8 @@ public class EventService {
             if (step.equals("w")) {
                 events = eventRepository.findEventDown(profileId, 20, 5, "%Y %U", status, tOffset, "A");
             } else if (step.equals("m")) {
-                LocalDateTime from = LocalDateTime.parse(tOffset[0], DateTimeFormatter.ISO_DATE_TIME)
-                        .with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+                LocalDateTime from = LocalDate.parse(tOffset[0], DateTimeFormatter.ISO_DATE_TIME)
+                        .withDayOfMonth(1).atStartOfDay();
                 LocalDateTime until = from.plusMonths(1);
 
                 events = eventRepository.findEventByMonth(profileId, 20, 5, "%Y-%m", status,
@@ -115,10 +117,11 @@ public class EventService {
         Optional<Event> eventRes = eventRepository.findById(eventId);
 
         if (eventRes.isPresent()) {
-            Event event = eventRes.get().cloneBy(profile);
-            memberRepository.saveAll(event.getInfo().getMembers());
-            eventItemRepository.saveAll(event.getItems());
-            Event savedEvent = eventRepository.save(event);
+            Event clonedEvent = EventUtil.cloneBy(eventRes.get(), profile, null, false, objectMapper);
+
+            memberRepository.saveAll(clonedEvent.getInfo().getMembers());
+            eventItemRepository.saveAll(clonedEvent.getItems());
+            Event savedEvent = eventRepository.save(clonedEvent);
             return Optional.of(savedEvent);
         } else {
             return Optional.empty();
@@ -134,15 +137,23 @@ public class EventService {
             Event event = eventRes.get();
             List<EventItem> items = event.getItems().stream()
                     .filter(item -> !"pr".equals(item.getType()) && !"D".equals(item.getStatus()))
-                    .map(item -> item.withId(UUID.randomUUID()))
+                    .map(item -> {
+                        EventItem eventItem = JsonUtil.clone(item, objectMapper);
+                        eventItem.setId(UUID.randomUUID());
+                        return eventItem;
+                    })
                     .collect(Collectors.toList());
             event.setItems(eventItemRepository.saveAll(items));
 
             event.getInfo().setMembers(new HashSet<>());
 
-            Event newEvent = event.withId(UUID.randomUUID()).withStatus("U").withRef(event).withCreatedDate(new Date());
+            Event clonedEvent = JsonUtil.clone(event, objectMapper);
+            clonedEvent.setId(UUID.randomUUID());
+            clonedEvent.setStatus("U");
+            clonedEvent.setRef(event);
+            clonedEvent.setCreatedDate(new Date());
 
-            Event savedEvent = eventRepository.save(newEvent);
+            Event savedEvent = eventRepository.save(clonedEvent);
 
             LocalDate groupKey = savedEvent.getInfo().getRange().getStart().toLocalDate();
             Long sortKey = savedEvent.getInfo().getRange().getStart().toInstant(ZoneOffset.UTC).toEpochMilli();
@@ -181,8 +192,13 @@ public class EventService {
             }
         } else {
             if (!isUpdate) {
-                Event event = new Event(eventItem, eventItem.getPosition(), profile.getGroup(),
-                        status, profile.getId(), new Date());
+                Event event = new Event();
+                event.setInfo(eventItem);
+                event.setPosition(eventItem.getPosition());
+                event.setGroup(profile.getGroup());
+                event.setStatus(status);
+                event.setCreatedBy(profile.getId());
+                event.setCreatedDate(new Date());
                 return Optional.of(event);
             } else {
                 return Optional.empty();
@@ -203,17 +219,20 @@ public class EventService {
         event.getItems().sort(Comparator.comparing(item -> item.getRange().getStart()));
         event.setPositions(event.getItems().stream().map(EventItem::getPosition).collect(Collectors.toList()));
 
-        event = event.shiftBy(pEventItem);
+        event = EventUtil.shiftBy(event, pEventItem, objectMapper);
 
         List<EventItem> eventItems = eventItemRepository.saveAll(event.getItems());
-        event = event.withItems(eventItems);
+
+        event = JsonUtil.clone(event, objectMapper);
+        event.setItems(eventItems);
+
         event = eventRepository.save(event);
         eventItem = eventItems.stream()
                 .filter(item -> item.getId().equals(pEventItem.getId()))
                 .findFirst()
                 .orElse(null);
 
-        return Optional.of(new Pair<>(event, eventItem));
+        return Optional.of(Pair.of(event, eventItem));
     }
 
     public void saveEvents(List<Set<Profile>> groups) {
@@ -230,16 +249,27 @@ public class EventService {
                     LocalDateTime toDT = fromDT.plusHours(3);
                     RangeLocal range = new RangeLocal(fromDT, toDT);
 
-                    return new EventItem("g", "l", "Generated Event!", "Generated Event for strangers!",
-                            new HashSet<>(members), range);
+                    EventItem eventItem = new EventItem();
+                    eventItem.setType("g");
+                    eventItem.setCategory("l");
+                    eventItem.setName("Generated Event!");
+                    eventItem.setDesc("Generated Event for strangers!");
+                    eventItem.setMembers(new HashSet<>(members));
+                    eventItem.setRange(range);
+                    return eventItem;
                 })
                 .collect(Collectors.toList());
 
         List<EventItem> eventItemsSaved = eventItemRepository.saveAll(eventItems);
 
         List<Event> events = eventItemsSaved.stream()
-                .map(eventItemSaved -> new Event(eventItemSaved,
-                        new ArrayList<>(Collections.singletonList(eventItemSaved)), "A"))
+                .map(eventItemSaved -> {
+                    Event event = new Event();
+                    event.setInfo(eventItemSaved);
+                    event.setItems(new ArrayList<>(Collections.singletonList(eventItemSaved)));
+                    event.setStatus("A");
+                    return event;
+                })
                 .collect(Collectors.toList());
 
         eventRepository.saveAll(events);

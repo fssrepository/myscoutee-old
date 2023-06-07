@@ -37,6 +37,15 @@ public class EventDTO {
     @JsonProperty(value = "role")
     private String role;
 
+    public EventDTO() {
+    }
+
+    public EventDTO(Event event, Object groupKey, Object sortKey) {
+        this.event = event;
+        this.groupKey = groupKey;
+        this.sortKey = sortKey;
+    }
+
     public Event getEvent() {
         return event;
     }

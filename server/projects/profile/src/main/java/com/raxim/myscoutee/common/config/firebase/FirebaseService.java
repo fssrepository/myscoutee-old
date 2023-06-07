@@ -123,7 +123,7 @@ public class FirebaseService {
                 if (usedBy.isEmpty()) {
                     switch (link.getType()) {
                         case "g":
-                            Optional<Group> optionalGroup = this.groupRepository.findById(link.getRefId());
+                            Optional<GroupAlgo> optionalGroup = this.groupRepository.findById(link.getRefId());
                             if (optionalGroup.isPresent()) {
                                 Profile profile = new Profile();
                                 profile.setGroup(optionalGroup.get().getId());

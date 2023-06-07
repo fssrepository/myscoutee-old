@@ -7,16 +7,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.raxim.myscoutee.algo.dto.Group;
+import com.raxim.myscoutee.algo.dto.GroupAlgo;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.exception.NodeTypeMissingError;
 
-public class BGroupSetIterator implements Iterator<Group> {
+public class BGroupSetIterator implements Iterator<GroupAlgo> {
     private ConcurrentMap<String, LinkedBlockingDeque<Node>> nodesByType;
     private volatile int partition = -1;
-    private Group currGroup = null;
+    private GroupAlgo currGroup = null;
 
-    private Group bGroup = new Group(new ArrayList<>());
+    private GroupAlgo bGroup = new GroupAlgo(new ArrayList<>());
 
     private final BGroupSet bGroupSet;
     private final GroupSetIterator groupSetIterator;
@@ -29,7 +29,7 @@ public class BGroupSetIterator implements Iterator<Group> {
 
     @Override
     public boolean hasNext() {
-        bGroup = new Group(new ArrayList<>());
+        bGroup = new GroupAlgo(new ArrayList<>());
 
         List<String> types = bGroupSet.getTypes();
         if (types == null || types.size() < 2)
@@ -107,7 +107,7 @@ public class BGroupSetIterator implements Iterator<Group> {
     }
 
     @Override
-    public Group next() {
+    public GroupAlgo next() {
         return bGroup;
     }
 }

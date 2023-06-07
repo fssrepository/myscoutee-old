@@ -6,7 +6,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.UUID;
+
+import org.bson.BsonBinary;
+import org.bson.BsonBinarySubType;
+import org.bson.UuidRepresentation;
 
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 
@@ -66,5 +71,12 @@ public class CommonUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String asUUID(String string) {
+        byte[] bytes = Base64.getDecoder().decode(string);
+        UUID uuid = new BsonBinary(BsonBinarySubType.UUID_LEGACY, bytes)
+                .asUuid(UuidRepresentation.JAVA_LEGACY);
+        return uuid.toString();
     }
 }

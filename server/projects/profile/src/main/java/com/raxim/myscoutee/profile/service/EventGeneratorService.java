@@ -66,7 +66,7 @@ public class EventGeneratorService {
         nodes.putAll(nodeMap);
 
         List<Set<Profile>> profileList = new ArrayList<>();
-        for(Group group : groupSet) {
+        for(com.raxim.myscoutee.algo.dto.Group group : groupSet) {
             
             Set<Profile> profilesByGroup = group.getNodes().stream().map(node -> node.stream().map(id -> nodes.get(id.getId())).collect(Collectors.toSet()))
             profileList.add(profilesByGroup);

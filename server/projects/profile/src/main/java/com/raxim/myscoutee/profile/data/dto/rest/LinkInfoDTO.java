@@ -11,6 +11,9 @@ public class LinkInfoDTO {
     @JsonProperty(value = "msg")
     private String msg;
 
+    public LinkInfoDTO() {
+    }
+
     public LinkInfoDTO(String title, String msg) {
         this.title = title;
         this.msg = msg;

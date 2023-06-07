@@ -7,19 +7,19 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import com.raxim.myscoutee.algo.dto.Group;
+import com.raxim.myscoutee.algo.dto.GroupAlgo;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.NodeInfo;
 import com.raxim.myscoutee.algo.dto.WeightNode;
 
-public class GroupSetIterator implements Iterator<Group> {
+public class GroupSetIterator implements Iterator<GroupAlgo> {
 
     private final PriorityQueue<NodeInfo> nodeTree = new PriorityQueue<>(
             Comparator.comparing(NodeInfo::getWeight).reversed().thenComparing(NodeInfo::getId));
     private final Set<String> visited = new HashSet<>();
 
     private boolean isCollect = false;
-    private Group group = new Group(new ArrayList<>());
+    private GroupAlgo group = new GroupAlgo(new ArrayList<>());
     private volatile int partition = -1;
     
     private final GroupSet groupSet;
@@ -84,10 +84,10 @@ public class GroupSetIterator implements Iterator<Group> {
     }
 
     @Override
-    public Group next() {
+    public GroupAlgo next() {
 
         if (!isCollect) {
-            group = new Group(new ArrayList<>());
+            group = new GroupAlgo(new ArrayList<>());
             group.setPartition(partition);
         }
 

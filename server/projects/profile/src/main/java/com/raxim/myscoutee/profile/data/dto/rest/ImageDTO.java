@@ -6,6 +6,13 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 public class ImageDTO {
     private String name;
 
+    public ImageDTO() {
+    }
+
+    public ImageDTO(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

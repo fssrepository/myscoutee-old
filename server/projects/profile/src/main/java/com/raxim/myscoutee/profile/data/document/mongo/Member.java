@@ -44,6 +44,12 @@ public class Member {
     @JsonIgnore
     private UUID eventRef;
 
+    public Member(Profile profile, String status, String role) {
+        this.profile = profile;
+        this.status = status;
+        this.role = role;
+    }
+
     public Member() {
     }
 

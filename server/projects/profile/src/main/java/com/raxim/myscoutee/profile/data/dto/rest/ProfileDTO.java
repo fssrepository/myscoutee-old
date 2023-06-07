@@ -28,6 +28,9 @@ public class ProfileDTO {
     @JsonProperty(value = "role")
     private String role;
 
+    public ProfileDTO() {
+    }
+
     public ProfileDTO(Profile profile) {
         this.profile = profile;
     }

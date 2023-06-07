@@ -2,10 +2,10 @@ package com.raxim.myscoutee.algo;
 
 import java.util.Iterator;
 
-import com.raxim.myscoutee.algo.dto.Group;
+import com.raxim.myscoutee.algo.dto.GroupAlgo;
 import com.raxim.myscoutee.algo.dto.Range;
 
-public class GroupSet implements Iterable<Group> {
+public class GroupSet implements Iterable<GroupAlgo> {
 
     private final NodeRepository nodeRepository;
     private final Range range;
@@ -19,7 +19,7 @@ public class GroupSet implements Iterable<Group> {
     }
 
     @Override
-    public Iterator<Group> iterator() {
+    public Iterator<GroupAlgo> iterator() {
         return new GroupSetIterator(this);
     }
 
