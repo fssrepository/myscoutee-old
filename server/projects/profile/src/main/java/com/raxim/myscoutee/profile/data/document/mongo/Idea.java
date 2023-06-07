@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.UUID;
 
 @QueryEntity
 @Document(collection = "ideas")
 public class Idea {
-
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -27,8 +27,6 @@ public class Idea {
 
     @JsonIgnore
     private UUID createdBy;
-
-    // Getter and Setter methods for each field
 
     public UUID getId() {
         return id;

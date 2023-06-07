@@ -9,8 +9,6 @@ public class FormOption {
     @JsonProperty(value = "viewValue")
     private String viewValue;
 
-    // Getter and Setter methods for each field
-
     public String getValue() {
         return value;
     }

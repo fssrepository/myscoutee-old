@@ -1,38 +1,19 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.querydsl.core.annotations.QueryEntity;
+import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.querydsl.core.annotations.QueryEntity;
-import com.raxim.myscoutee.common.data.converter.GeoJsonPointDeserializer;
-
-/*
- *  1)  the first event in the list
-        it contains the url of signal also
-        if first event is not added yet, it shows the form in the popup instead of the list
-        open dialog in list feature, if there is no element
-        routing hasFirst feature - if isFirst - than the popup *ngIf shows other elements - like signal url field
-
-    2) if you change dateFrom of general than every other item's date will slip
-    3)  Accepted (A) (by Organizer), Published/Promotion/Pending (P),
-        Inactive (I), Template (T), Under Review (U), Reviewed/Recommended (R), Rejected/Deleted (D)
-        Cancelled (C)
-        auto publish when general has been added
-        inactive means, just edited locally, before being published
-        when accepted by organizer, create chat room
-        accept form needs to have chat url
- */
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @QueryEntity
 @Document(collection = "events")
@@ -41,6 +22,13 @@ public class Event {
     @JsonProperty(value = "key")
     private UUID id;
 
+    // the first event in the list
+    //it contains the url of signal also
+    //if first event is not added yet, it shows the form in the popup instead of the list
+    //open dialog in list feature, if there is no element
+    //routing hasFirst feature - if isFirst - than the popup *ngIf shows other elements - like signal url field
+
+    //if you change dateFrom of general than every other item's date will slip
     @JsonIgnore
     private EventItem info;
 
@@ -52,19 +40,32 @@ public class Event {
     @JsonIgnore
     private List<Feedback> feedbacks;
 
+    @JsonIgnore
     private int cnt;
 
+    // should be filtered by group
     @JsonIgnore
     private UUID group;
 
+    @JsonIgnore
     private GeoJsonPoint position;
 
+    // cloned from
     @DBRef
     @JsonIgnore
     private Event ref;
 
+    // Accepted (A) (by Organizer), Published/Promotion/Pending (P),
+    // Inactive (I), Template (T), Under Review (U), Reviewed/Recommended (R), Rejected/Deleted (D)
+    // Cancelled (C)
+    // auto publish when general has been added
+    // inactive means, just edited locally, before being published
+    // when accepted by organizer, create chat room
+    // accept form needs to have chat url
+    @JsonProperty(value = "status")
     private String status;
 
+    //idea, job, event for template
     @JsonIgnore
     private String type;
 
@@ -77,14 +78,8 @@ public class Event {
 
     @JsonDeserialize(using = GeoJsonPointDeserializer.class)
     @JsonIgnore
+    @JsonProperty(value = "positions")
     private List<GeoJsonPoint> positions;
-
-    public Event() {
-        this.id = UUID.randomUUID();
-        this.items = new ArrayList<>();
-        this.feedbacks = new ArrayList<>();
-        this.positions = new ArrayList<>();
-    }
 
     public UUID getId() {
         return id;

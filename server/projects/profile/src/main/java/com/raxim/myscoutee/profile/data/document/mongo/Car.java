@@ -6,9 +6,7 @@ import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @QueryEntity
 @Document(collection = "cars")
@@ -43,12 +41,6 @@ public class Car {
 
     @JsonIgnore
     private String status;
-
-    public Car() {
-        this.id = UUID.randomUUID();
-        this.createdDate = new Date();
-        this.status = "A";
-    }
 
     public UUID getId() {
         return id;

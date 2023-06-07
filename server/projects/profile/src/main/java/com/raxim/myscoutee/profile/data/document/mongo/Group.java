@@ -14,12 +14,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.querydsl.core.annotations.QueryEntity;
-import com.raxim.myscoutee.common.data.converter.GeoJsonPointDeserializer;
+import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 
 @QueryEntity
 @Document(collection = "groups")
 public class Group {
-
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -27,9 +26,11 @@ public class Group {
     @JsonProperty(value = "name")
     private String name;
 
+    // dating/team building
     @JsonProperty(value = "type")
     private String type;
 
+    // public, private
     @JsonProperty(value = "visibility")
     private String visibility;
 
@@ -37,7 +38,7 @@ public class Group {
     private List<Image> images;
 
     @JsonProperty(value = "system")
-    private Boolean system;
+    private Boolean system = false;
 
     @JsonProperty(value = "desc")
     private String desc;
@@ -50,10 +51,9 @@ public class Group {
     @JsonIgnore
     private Date createdDate;
 
+    // profileId
     @JsonIgnore
     private UUID createdBy;
-
-    // Getter and Setter methods for each field
 
     public UUID getId() {
         return id;

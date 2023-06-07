@@ -19,12 +19,16 @@ public class Promotion {
     @JsonProperty(value = "name")
     private String name;
 
+    // job, idea, event
     @JsonProperty(value = "type")
     private String type;
 
+    // advertise date from, to
     @JsonProperty(value = "range")
     private RangeLocal range;
 
+    // select template
+    //@DBRef
     @JsonProperty(value = "item")
     private Event item;
 
@@ -35,6 +39,7 @@ public class Promotion {
     @JsonIgnore
     private List<Event> events;
 
+    // accordion item by slot
     @JsonProperty(value = "slots")
     private Set<Slot> slots;
 
@@ -50,13 +55,6 @@ public class Promotion {
 
     @JsonProperty(value = "createdBy")
     private UUID createdBy;
-
-    public Promotion() {
-        this.id = UUID.randomUUID();
-        this.events = new ArrayList<>();
-        this.slots = new HashSet<>();
-        this.createdDate = new Date();
-    }
 
     public UUID getId() {
         return id;
@@ -140,10 +138,6 @@ public class Promotion {
 
     public Date getCreatedDate() {
         return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
     }
 
     public UUID getCreatedBy() {

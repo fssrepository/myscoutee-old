@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
+// saving shortest path result from neo4j
 @Document(collection = "paths")
 public class Path {
     @Id
@@ -19,23 +20,12 @@ public class Path {
     @JsonProperty(value = "to")
     private UUID to;
 
+    // ref - like happened on idea, job, or promotion event
     @JsonIgnore
     private UUID ref;
 
     @JsonProperty(value = "distance")
     private Long distance;
-
-    public Path() {
-        this.id = UUID.randomUUID();
-    }
-
-    public Path(UUID from, UUID to, UUID ref, Long distance) {
-        this.id = UUID.randomUUID();
-        this.from = from;
-        this.to = to;
-        this.ref = ref;
-        this.distance = distance;
-    }
 
     public UUID getId() {
         return id;

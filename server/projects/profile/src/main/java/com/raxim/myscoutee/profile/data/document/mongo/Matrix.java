@@ -13,9 +13,12 @@ public class Matrix {
     private Position pos;
 
     public Matrix() {
-        this.scale = 1.0;
-        this.angle = 0.0;
-        this.pos = new Position();
+    }
+
+    public Matrix(Double scale, Double angle, Position pos) {
+        this.scale = scale;
+        this.angle = angle;
+        this.pos = pos;
     }
 
     public Double getScale() {

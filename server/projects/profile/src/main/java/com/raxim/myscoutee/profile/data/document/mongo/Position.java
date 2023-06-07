@@ -5,8 +5,11 @@ public class Position {
     private Integer y;
 
     public Position() {
-        this.x = 0;
-        this.y = 0;
+    }
+
+    public Position(Integer x, Integer y) {
+        this.x = x;
+        this.y = y;
     }
 
     public Integer getX() {

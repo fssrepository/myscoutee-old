@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,10 +12,9 @@ import java.util.UUID;
 
 @Document(collection = "links")
 public class Link {
-
     @Id
     @JsonIgnore
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @JsonProperty(value = "key")
     private UUID key;
@@ -26,20 +26,17 @@ public class Link {
     private String type;
 
     @JsonIgnore
-    private Set<String> usedBys;
+    private Set<String> usedBys = new HashSet<>();
 
     @JsonIgnore
-    private Date createdDate;
+    private Date createdDate = new Date();
 
+    // profileId
     @JsonIgnore
     private UUID createdBy;
 
     public Link() {
-        this.usedBys = new HashSet<>();
-        this.createdDate = new Date();
     }
-
-    // Getter and Setter methods for each field
 
     public UUID getId() {
         return id;

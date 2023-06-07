@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Document(collection = "forms")
 public class Form {
+
     @Id
     @JsonProperty(value = "id")
     private UUID id = UUID.randomUUID();
@@ -18,8 +19,6 @@ public class Form {
 
     @JsonProperty(value = "items")
     private List<FormItem> items;
-
-    // Getter and Setter methods for each field
 
     public UUID getId() {
         return id;

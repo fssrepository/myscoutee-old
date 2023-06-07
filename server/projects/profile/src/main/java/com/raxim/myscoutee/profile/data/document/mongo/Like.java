@@ -6,14 +6,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 import java.util.UUID;
 
-/*
- * 1) in queries there are more rows, and it will be the average, taking care of the "double" flag also
- *    20*(20-abs(rate1-rate2)) + profile difference
- */
-
+// single rate only
 @Document(collection = "likes")
 public class Like {
 
@@ -21,6 +18,7 @@ public class Like {
     @JsonProperty(value = "id")
     private UUID id;
 
+    // double, single rate
     @JsonProperty(value = "double")
     private Boolean isDouble;
 
@@ -43,13 +41,15 @@ public class Like {
     @JsonProperty(value = "createdDate")
     private Date createdDate;
 
+    // in queries there are more rows, and it will be the average, taking care of the "double" flag also
     @JsonProperty(value = "distance")
-    private Long distance;
+    private Long distance; // 20*(20-abs(rate1-rate2)) + profile difference
 
+    // ref - like happened on idea, job, or promotion event
     @JsonIgnore
     private UUID ref;
 
-    // Getter and Setter methods for each field
+    // Getters and Setters
 
     public UUID getId() {
         return id;
@@ -59,7 +59,7 @@ public class Like {
         this.id = id;
     }
 
-    public Boolean isDouble() {
+    public Boolean getDouble() {
         return isDouble;
     }
 

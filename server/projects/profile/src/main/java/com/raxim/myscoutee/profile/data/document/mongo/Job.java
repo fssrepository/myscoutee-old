@@ -5,16 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.UUID;
 
 @QueryEntity
 @Document(collection = "jobs")
 public class Job {
-
     @Id
     @JsonProperty(value = "key")
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @JsonProperty(value = "name")
     private String name;
@@ -23,12 +23,10 @@ public class Job {
     private String desc;
 
     @JsonIgnore
-    private Date createdDate;
+    private Date createdDate = new Date();
 
     @JsonIgnore
     private UUID createdBy;
-
-    // Getter and Setter methods for each field
 
     public UUID getId() {
         return id;

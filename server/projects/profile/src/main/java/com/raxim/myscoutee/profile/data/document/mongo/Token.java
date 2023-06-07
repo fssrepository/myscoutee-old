@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.UUID;
 
 @QueryEntity
@@ -15,14 +16,11 @@ public class Token {
     private UUID id;
 
     @JsonIgnore
+    @JsonProperty(value = "deviceKey")
     private String deviceKey;
 
     @JsonIgnore
     private UUID uuid;
-
-    public Token() {
-        this.id = UUID.randomUUID();
-    }
 
     public UUID getId() {
         return id;
@@ -32,21 +30,15 @@ public class Token {
         this.id = id;
     }
 
-    @JsonProperty(value = "deviceKey")
     public String getDeviceKey() {
         return deviceKey;
     }
 
-    @JsonProperty(value = "deviceKey")
     public void setDeviceKey(String deviceKey) {
         this.deviceKey = deviceKey;
     }
 
     public UUID getUuid() {
         return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
     }
 }

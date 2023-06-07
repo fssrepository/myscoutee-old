@@ -1,21 +1,24 @@
 package com.raxim.myscoutee.common.config;
 
-import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationProvider;
-import com.raxim.myscoutee.common.config.firebase.FirebaseFilter;
-import com.raxim.myscoutee.common.config.firebase.FirebaseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationProvider;
+import com.raxim.myscoutee.common.config.firebase.FirebaseFilter;
+import com.raxim.myscoutee.common.config.firebase.FirebaseService;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
+
     private final FirebaseService firebaseService;
     private final FirebaseAuthenticationProvider firebaseProvider;
 
@@ -24,24 +27,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.firebaseProvider = firebaseProvider;
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/favicon.ico", "/messages", "/calc/**");
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web
+                .ignoring()
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico");
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    @Autowired
+    protected void registerProvider(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(firebaseProvider);
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.addFilterAt(tokenAuthorizationFilter(), BasicAuthenticationFilter.class)
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-                .httpBasic().disable()
-                .csrf().disable();
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class)
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .csrf(csrf -> csrf.disable());
+        return http.build();
     }
 
     private FirebaseFilter tokenAuthorizationFilter() {
@@ -49,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+    SecurityEvaluationContextExtension securityEvaluationContextExtension() {
         return new SecurityEvaluationContextExtension();
     }
 }

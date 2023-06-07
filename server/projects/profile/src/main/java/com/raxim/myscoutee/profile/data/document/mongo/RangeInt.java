@@ -9,14 +9,6 @@ public class RangeInt {
     @JsonProperty(value = "max")
     private int max;
 
-    public RangeInt() {
-    }
-
-    public RangeInt(int min, int max) {
-        this.min = min;
-        this.max = max;
-    }
-
     public int getMin() {
         return min;
     }

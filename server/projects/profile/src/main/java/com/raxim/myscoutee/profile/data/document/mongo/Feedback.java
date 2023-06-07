@@ -10,12 +10,12 @@ import java.util.Date;
 import java.util.UUID;
 
 /*
-    1)  panel background coloring depends on rate
-*/
-
+ * 1) panel coloring depends on rate.
+ */
 @QueryEntity
 @Document(collection = "feedbacks")
 public class Feedback {
+
     @Id
     @JsonProperty(value = "key")
     private UUID id = UUID.randomUUID();
@@ -28,8 +28,6 @@ public class Feedback {
 
     @JsonIgnore
     private Date createdDate = new Date();
-
-    // Getter and Setter methods for each field
 
     public UUID getId() {
         return id;

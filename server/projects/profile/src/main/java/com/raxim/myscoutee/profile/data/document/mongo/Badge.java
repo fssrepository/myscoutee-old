@@ -31,10 +31,6 @@ public class Badge {
     @JsonIgnore
     private LocalDateTime dateSeen;
 
-    public Badge() {
-        this.id = UUID.randomUUID();
-    }
-
     public UUID getId() {
         return id;
     }

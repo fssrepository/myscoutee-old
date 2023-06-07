@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,11 +22,6 @@ public class Setting {
 
     @JsonProperty(value = "items")
     private List<FormItem> items;
-
-    public Setting() {
-        this.id = UUID.randomUUID();
-        this.items = Collections.emptyList();
-    }
 
     public UUID getId() {
         return id;
@@ -47,10 +41,6 @@ public class Setting {
 
     public UUID getProfile() {
         return profile;
-    }
-
-    public void setProfile(UUID profile) {
-        this.profile = profile;
     }
 
     public List<FormItem> getItems() {

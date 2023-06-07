@@ -1,27 +1,23 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
-/*
-    1)  it can be array, object etc. -> dynamic form
-*/
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FormItem {
     @JsonProperty(value = "name")
     private String name;
 
+    // date steps = ds
     @JsonProperty(value = "type")
     private String type;
 
+    // it can be array, object etc. -> dynamic form
     @JsonProperty(value = "data")
     private Object data;
 
     @JsonProperty(value = "options")
     private List<FormOption> options;
-
-    // Getter and Setter methods for each field
 
     public String getName() {
         return name;

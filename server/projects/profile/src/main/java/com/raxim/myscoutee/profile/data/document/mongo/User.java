@@ -5,14 +5,10 @@ import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-/*
-    1) active group/profile
-*/
 
 @QueryEntity
 @Document(collection = "users")
@@ -34,20 +30,6 @@ public class User {
     @JsonIgnore
     private Set<Profile> profiles;
 
-    public User() {
-        this.id = UUID.randomUUID();
-        this.profiles = new HashSet<>();
-    }
-
-    public User(UUID id, String email, Date createdDate, UUID group, Profile profile, Set<Profile> profiles) {
-        this.id = id;
-        this.email = email;
-        this.createdDate = createdDate;
-        this.group = group;
-        this.profile = profile;
-        this.profiles = profiles;
-    }
-
     public UUID getId() {
         return id;
     }
@@ -58,10 +40,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Date getCreatedDate() {

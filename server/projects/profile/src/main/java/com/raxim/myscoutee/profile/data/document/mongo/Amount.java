@@ -18,10 +18,6 @@ public class Amount {
     @JsonProperty(value = "currency")
     private String currency;
 
-    public Amount() {
-        this.id = UUID.randomUUID();
-    }
-
     public UUID getId() {
         return id;
     }

@@ -1,28 +1,16 @@
 package com.raxim.myscoutee.common.config.firebase;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.raxim.myscoutee.common.config.ConfigProperties;
-import com.raxim.myscoutee.profile.data.document.mongo.Group;
-import com.raxim.myscoutee.profile.data.document.mongo.Link;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Role;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
-import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
-import com.raxim.myscoutee.profile.repository.mongo.LinkRepository;
-import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.RoleRepository;
-import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
+import com.raxim.myscoutee.profile.repository.mongo.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 public class FirebaseService {
@@ -39,23 +27,14 @@ public class FirebaseService {
             RoleRepository roleRepository,
             GroupRepository groupRepository,
             ConfigProperties config,
-            LinkRepository linkRepository) {
+            LinkRepository linkRepository
+    ) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.groupRepository = groupRepository;
         this.config = config;
         this.linkRepository = linkRepository;
-    }
-
-    public FirebaseTokenHolder parseToken(String firebaseToken) {
-        try {
-            com.google.firebase.auth.FirebaseToken decodedToken = FirebaseAuth.getInstance()
-                    .verifyIdToken(firebaseToken);
-            return new FirebaseTokenHolder(decodedToken);
-        } catch (Exception e) {
-            throw new FirebaseTokenInvalidException(e.getMessage());
-        }
     }
 
     public UserDetails loadUserByUsername(String username, String xLink) {
@@ -66,87 +45,82 @@ public class FirebaseService {
             Group group;
             if (config.getAdminUser().equals(username)) {
                 List<Group> groups = this.groupRepository.findSystemGroups();
-                List<Profile> profiles = groups.stream()
-                        .map(lGroup -> new Profile(lGroup.getId()))
-                        .toList();
+                List<Profile> profiles = new ArrayList<>();
+                for (Group grp : groups) {
+                    Profile profile = new Profile();
+                    profile.setGroup(grp.getId());
+                    profiles.add(profile);
+                }
 
                 profileSaved = this.profileRepository.saveAll(profiles);
 
-                List<Role> roles = profileSaved.stream()
-                        .map(profile -> new Role(UUID.randomUUID(), profile.getId(), "ROLE_ADMIN"))
-                        .toList();
+                List<Role> roles = new ArrayList<>();
+                for (Profile profile : profileSaved) {
+                    Role role = new Role(UUID.randomUUID(), profile.getId(), "ROLE_ADMIN");
+                    roles.add(role);
+                }
 
                 this.roleRepository.saveAll(roles);
+
                 group = groups.stream().filter(g -> g.getType().equals("b")).findFirst().orElse(null);
             } else {
                 List<Group> groups = new ArrayList<>(this.groupRepository.findSystemGroups());
-                List<Profile> profiles = groups.stream()
-                        .map(lGroup -> new Profile(lGroup.getId()))
-                        .toList();
+
+                List<Profile> profiles = new ArrayList<>();
+                for (Group grp : groups) {
+                    Profile profile = new Profile();
+                    profile.setGroup(grp.getId());
+                    profiles.add(profile);
+                }
 
                 profileSaved = this.profileRepository.saveAll(profiles);
 
-                List<Role> roles = profileSaved.stream()
-                        .map(profile -> new Role(UUID.randomUUID(), profile.getId(), "ROLE_USER"))
-                        .toList();
+                List<Role> roles = new ArrayList<>();
+                for (Profile profile : profileSaved) {
+                    Role role = new Role(UUID.randomUUID(), profile.getId(), "ROLE_USER");
+                    roles.add(role);
+                }
                 this.roleRepository.saveAll(roles);
 
                 group = groups.stream().filter(g -> g.getType().equals("d")).findFirst().orElse(null);
             }
 
-            Profile profile = profileSaved.stream()
-                    .filter(p -> Objects.equals(p.getGroup(), group.getId()))
-                    .findFirst().orElse(null);
-
-            User userToSave = new User(
-                    UUID.randomUUID(),
-                    username,
-                    new Date(),
-                    group.getId(),
-                    profile,
-                    new HashSet<>(profileSaved));
+            Profile profile = profileSaved.stream().filter(p -> Objects.equals(p.getGroup(), group.getId())).findFirst().orElse(null);
+            User userToSave = new User(UUID.randomUUID(), username, new Date(), group.getId(), profile, new HashSet<>(profileSaved));
             user = this.userRepository.save(userToSave);
         }
 
         if (xLink != null) {
-            Optional<Link> oLink = this.linkRepository.findByKey(UUID.fromString(xLink));
-            if (oLink.isPresent()) {
-                Link link = oLink.get();
-                List<String> usedBy = link.getUsedBys().stream()
-                        .filter(u -> u.equals(username))
-                        .toList();
-
+            this.linkRepository.findByKey(UUID.fromString(xLink)).ifPresent(link -> {
+                List<String> usedBy = link.getUsedBys().stream().filter(u -> Objects.equals(u, username)).collect(Collectors.toList());
                 if (usedBy.isEmpty()) {
-                    if ("g".equals(link.getType())) {
-                        Optional<Group> optionalGroup = this.groupRepository.findById(link.getRefId());
-                        if (optionalGroup.isPresent()) {
-                            Group group = optionalGroup.get();
-                            Profile profile = new Profile(group.getId());
-                            Profile lProfileSaved = this.profileRepository.save(profile);
+                    switch (link.getType()) {
+                        case "g":
+                            Optional<Group> optionalGroup = this.groupRepository.findById(link.getRefId());
+                            if (optionalGroup.isPresent()) {
+                                Profile profile = new Profile();
+                                profile.setGroup(optionalGroup.get().getId());
+                                Profile profileSaved = this.profileRepository.save(profile);
 
-                            Role role = new Role(UUID.randomUUID(), lProfileSaved.getId(), "ROLE_USER");
-                            this.roleRepository.save(role);
+                                Role role = new Role(UUID.randomUUID(), profileSaved.getId(), "ROLE_USER");
+                                this.roleRepository.save(role);
 
-                            user.getProfiles().add(profile);
-
-                            User userNew = new User(user.getId(), user.getEmail(), user.getCreatedDate(), group.getId(),
-                                    profile, user.getProfiles());
-                            this.userRepository.save(userNew);
-                        }
-                    } else {
-                        // Handle other types of links
+                                user.getProfiles().add(profile);
+                                User userNew = user.withGroup(optionalGroup.get().getId()).withProfile(profile);
+                                this.userRepository.save(userNew);
+                            }
+                            break;
+                        default:
+                            break;
                     }
 
                     link.getUsedBys().add(username);
                     this.linkRepository.save(link);
                 }
-            }
-            ;
+            });
         }
 
-        List<Role> roles = user.getProfile() != null
-                ? this.roleRepository.findRoleByProfile(user.getProfile().getId())
-                : List.of();
+        List<Role> roles = user.getProfile() != null ? this.roleRepository.findRoleByProfile(user.getProfile().getId()) : Collections.emptyList();
 
         return new FirebasePrincipal(user, roles);
     }

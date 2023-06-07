@@ -9,15 +9,14 @@ import org.springframework.stereotype.Component;
 public class FirebaseAuthenticationProvider implements AuthenticationProvider {
 
     @Override
-    public boolean supports(Class<?> authentication) {
-        return FirebaseAuthenticationToken.class.isAssignableFrom(authentication);
-    }
-
-    @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (!supports(authentication.getClass())) {
+        if(!supports(authentication.getClass())) {
             return null;
         }
-        return (FirebaseAuthenticationToken) authentication;
+        return authentication;
+    }
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return FirebaseAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

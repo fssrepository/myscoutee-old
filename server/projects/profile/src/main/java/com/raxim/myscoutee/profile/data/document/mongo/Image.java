@@ -10,7 +10,11 @@ public class Image {
     private Matrix matrix;
 
     public Image() {
-        this.matrix = new Matrix();
+    }
+
+    public Image(String name, Matrix matrix) {
+        this.name = name;
+        this.matrix = matrix;
     }
 
     public String getName() {

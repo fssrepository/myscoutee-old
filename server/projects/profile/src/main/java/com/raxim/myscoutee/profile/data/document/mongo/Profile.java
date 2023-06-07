@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.querydsl.core.annotations.QueryEntity;
-import com.raxim.myscoutee.common.data.converter.GeoJsonPointDeserializer;
+import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
@@ -18,100 +18,88 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/*
- * 1)   https://blog.alessandrorosa.com/2017/geojson-serialization-spring-mongodb/
- * 2)   P (pending), F (friends only), I (invisible), A (All), S (suspended), D (deleted - group leave)
- */
-
 @QueryEntity
 @Document(collection = "profiles")
 public class Profile {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
-
+    
     @JsonProperty(value = "firstName")
     private String firstName;
-
+    
     @JsonProperty(value = "gender")
     private String gender;
-
+    
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonProperty(value = "birthday")
     private Date birthday;
-
+    
     @JsonProperty(value = "smoker")
     private Boolean smoker;
-
+    
     @JsonProperty(value = "marital")
     private String marital;
-
+    
     @JsonProperty(value = "hasChild")
     private Boolean hasChild;
-
+    
     @JsonProperty(value = "height")
     private Integer height;
-
+    
     @JsonProperty(value = "physique")
     private String physique;
-
+    
     @JsonProperty(value = "languages")
     private List<String> languages;
-
+    
     @JsonProperty(value = "religion")
     private String religion;
-
+    
     @JsonProperty(value = "profession")
     private String profession;
-
+    
     @JsonProperty(value = "images")
     private List<Image> images;
-
+    
     @JsonProperty(value = "voice")
     private String voice;
-
+    
     @JsonProperty(value = "desc")
     private String desc;
-
+    
     @JsonProperty(value = "website")
     private String website;
-
+    
     @DBRef
     @JsonIgnore
     private List<Car> cars;
-
+    
     @DBRef
     @JsonIgnore
     private List<School> schools;
-
+    
     @GeoSpatialIndexed(name = "position", type = GeoSpatialIndexType.GEO_2DSPHERE)
     @JsonDeserialize(using = GeoJsonPointDeserializer.class)
     @JsonIgnore
     private GeoJsonPoint position;
-
+    
     @JsonProperty(value = "status")
-    private String status;
-
+    private String status = "I"; //P (pending), F (friends only), I (invisible), A (All), S (suspended), D (deleted - group leave)
+    
     @JsonIgnore
     private Date createdDate;
-
+    
     @JsonIgnore
     private UUID group;
-
+    
     @JsonIgnore
     private int score;
-
+    
     @JsonIgnore
     private LocalDateTime lastLogin;
 
-    public Profile(UUID uuid) {
-        this.id = uuid;
-    }
-
-    public Profile() {
-        this.id = UUID.randomUUID();
-    }
-
+    // Getters and Setters
     public UUID getId() {
         return id;
     }

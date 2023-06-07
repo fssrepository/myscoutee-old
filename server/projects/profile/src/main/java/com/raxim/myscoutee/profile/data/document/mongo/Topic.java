@@ -1,19 +1,14 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import java.util.Collections;
-import java.util.List;
-
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Document
 public class Topic {
     private String name;
-
     private List<String> tokens;
-
-    public Topic() {
-        this.tokens = Collections.emptyList();
-    }
 
     public String getName() {
         return name;
