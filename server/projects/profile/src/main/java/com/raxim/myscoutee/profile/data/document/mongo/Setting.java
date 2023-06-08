@@ -43,6 +43,10 @@ public class Setting {
         return profile;
     }
 
+    public void setProfile(UUID profile) {
+        this.profile = profile;
+    }
+
     public List<FormItem> getItems() {
         return items;
     }

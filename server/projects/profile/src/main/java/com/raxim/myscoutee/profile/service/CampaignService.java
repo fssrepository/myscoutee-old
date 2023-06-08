@@ -23,6 +23,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Promotion;
 import com.raxim.myscoutee.profile.data.document.mongo.Slot;
 import com.raxim.myscoutee.profile.data.dto.rest.IdeaDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.JobDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.PromotionDTO;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
 @Service
@@ -58,7 +59,7 @@ public class CampaignService {
         this.objectMapper = objectMapper;
     }
 
-    public List<Promotion> getPromotions(UUID profileId, Integer step, Object[] tOffset) {
+    public List<PromotionDTO> getPromotions(UUID profileId, Integer step, Object[] tOffset) {
         return this.promotionRepository.findPromotionsByProfile(profileId, 20, step != null ? step : 5, tOffset);
     }
 

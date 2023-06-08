@@ -17,14 +17,16 @@ import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Car;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.School;
+import com.raxim.myscoutee.profile.data.dto.rest.CarDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileStatusDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
 import com.raxim.myscoutee.profile.util.ProfileUtil;
 
 //val reqGroupId = UUID.fromString(groupId)
 //if (profile.group == reqGroupId) {
 /*val role = this.roleRepository.findRoleByProfileAndGroup(adminEmail, groupId = reqGroupId)
-    .firstOrNull { role -> role.group.id == reqGroupId && role.role == "ROLE_ADMIN" && role.status == "A" }*/
+    .firstOrNull { role -> role.group.id == reqGroupId && role.role == FirebaseService.ROLE_ADMIN && role.status == "A" }*/
 //}
 
 @Service
@@ -127,7 +129,7 @@ public class ProfileService {
         return profileDTO;
     }
 
-    public List<Car> getCars(UUID profileId, Integer step, Object[] tOffset) {
+    public List<CarDTO> getCars(UUID profileId, Integer step, Object[] tOffset) {
         int pageSize = 20;
         int defaultStep = 5;
 
@@ -142,7 +144,7 @@ public class ProfileService {
         return this.profileRepository.findCarByProfile(profileId, carId);
     }
 
-    public List<School> getSchools(UUID profileId, Integer step, Object[] tOffset) {
+    public List<SchoolDTO> getSchools(UUID profileId, Integer step, Object[] tOffset) {
         int pageSize = 20;
         int defaultStep = 5;
 
@@ -158,7 +160,7 @@ public class ProfileService {
         return this.profileRepository.findSchoolByProfile(profileId, schoolId);
     }
 
-    public Car addCar(UUID profileId, UUID carId, com.raxim.myscoutee.profile.data.document.mongo.Car newCar) {
+    public CarDTO addCar(UUID profileId, UUID carId, com.raxim.myscoutee.profile.data.document.mongo.Car newCar) {
         return this.profileRepository.findById(profileId).map(profile -> {
             com.raxim.myscoutee.profile.data.document.mongo.Car car;
             if (carId != null) {
@@ -179,7 +181,7 @@ public class ProfileService {
         }).orElse(null);
     }
 
-    public List<School> saveSchools(UUID profileId,
+    public List<SchoolDTO> saveSchools(UUID profileId,
             List<com.raxim.myscoutee.profile.data.document.mongo.School> schools) {
         return this.profileRepository.findById(profileId).map(profile -> {
             for (com.raxim.myscoutee.profile.data.document.mongo.School school : schools) {
@@ -191,7 +193,7 @@ public class ProfileService {
             }
             this.profileRepository.save(profile);
 
-            return profile.getSchools().stream().map(school -> new School(school)).toList();
+            return profile.getSchools().stream().map(school -> new SchoolDTO(school)).toList();
         }).orElse(Collections.emptyList());
     }
 }

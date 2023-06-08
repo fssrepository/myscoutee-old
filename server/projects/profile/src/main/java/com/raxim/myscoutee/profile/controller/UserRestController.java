@@ -17,13 +17,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.config.properties.ConfigProperties;
+import com.raxim.myscoutee.common.util.JsonUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.Badge;
+import com.raxim.myscoutee.profile.data.document.mongo.Form;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Setting;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
 
 @RepositoryRestController
 @RequestMapping("user")
@@ -34,13 +40,15 @@ public class UserRestController {
     private final SettingRepository settingRepository;
     private final FormRepository formRepository;
     private final ConfigProperties config;
+    private final ObjectMapper objectMapper;
 
     public UserRestController(ProfileRepository profileRepository,
             UserRepository userRepository,
             LikeRepository likeRepository,
             SettingRepository settingRepository,
             FormRepository formRepository,
-            ConfigProperties config) {
+            ConfigProperties config,
+            ObjectMapper objectMapper) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
@@ -50,7 +58,7 @@ public class UserRestController {
     }
 
     @PostMapping()
-    public ResponseEntity<User> saveUser(Authentication auth, @RequestPart Group group) {
+    public ResponseEntity<UserDTO> saveUser(Authentication auth, @RequestPart Group group) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         User user = principal.getUser();
 
@@ -71,35 +79,35 @@ public class UserRestController {
         User userSaved = userRepository.save(userToSave);
 
         boolean adminUser = config.getAdminUser().equals(auth.getName());
-        List<Group> groups = userRepository.findAllGroupsByEmail(auth.getName()).stream()
+        List<GroupDTO> groups = userRepository.findAllGroupsByEmail(auth.getName()).stream()
                 .filter(g -> g.getRole().equals("ROLE_USER") || (adminUser && g.getGroup().getType().equals("b")))
                 .toList();
 
-        List<Like> likes = likeRepository.newLikesByProfile(
+        List<Badge> likes = likeRepository.newLikesByProfile(
                 profile.getId(), profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        return ResponseEntity.ok(new User(userSaved, groups, likes));
+        return ResponseEntity.ok(new UserDTO(userSaved, groups, likes));
     }
 
     @GetMapping()
-    public ResponseEntity<User> getUser(Authentication auth) {
+    public ResponseEntity<UserDTO> getUser(Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         User user = principal.getUser();
         Profile profile = user.getProfile();
         UUID profileId = profile.getId();
 
         boolean adminUser = config.getAdminUser().equals(auth.getName());
-        List<Group> groups = userRepository.findAllGroupsByEmail(auth.getName()).stream()
+        List<GroupDTO> groups = userRepository.findAllGroupsByEmail(auth.getName()).stream()
                 .filter(g -> g.getRole().equals("ROLE_USER") || (adminUser && g.getGroup().getType().equals("b")))
                 .toList();
 
         profile.setLastLogin(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
         profileRepository.save(profile);
 
-        List<Like> likes = likeRepository.newLikesByProfile(
+        List<Badge> likes = likeRepository.newLikesByProfile(
                 profileId, profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        return ResponseEntity.ok(new User(user, groups, likes));
+        return ResponseEntity.ok(new UserDTO(user, groups, likes));
     }
 
     @GetMapping("/settings")
@@ -114,7 +122,12 @@ public class UserRestController {
             Optional<Form> form = formRepository.findFormByKey(key);
             if (form.isPresent()) {
                 Form sForm = form.get();
-                Setting settingToSave = new Setting(UUID.randomUUID(), key, profileId, sForm.getItems());
+                
+                Setting settingToSave = new Setting();
+                settingToSave.setId(UUID.randomUUID());
+                settingToSave.setKey(key);
+                settingToSave.setProfile(profileId);
+                settingToSave.setItems(sForm.getItems());
                 Setting settingSaved = settingRepository.save(settingToSave);
                 return ResponseEntity.ok(settingSaved);
             } else {
@@ -130,12 +143,13 @@ public class UserRestController {
             @RequestBody Setting setting) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         User user = principal.getUser();
-        String profileId = user.getProfile().getId();
+        UUID profileId = user.getProfile().getId();
 
         Setting dbSetting = settingRepository.findSettingByProfileAndKey(profileId, key);
         if (dbSetting != null) {
-            Setting settingToSave = dbSetting.copy(setting.getItems());
-            Setting settingsSaved = settingRepository.save(settingToSave);
+            Setting clonedSetting = JsonUtil.clone(dbSetting, objectMapper);
+            clonedSetting.setItems(setting.getItems());
+            Setting settingsSaved = settingRepository.save(clonedSetting);
             return ResponseEntity.ok(settingsSaved);
         } else {
             return ResponseEntity.badRequest().build();

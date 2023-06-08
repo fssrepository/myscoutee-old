@@ -2,6 +2,7 @@ package com.raxim.myscoutee.profile.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 import com.raxim.myscoutee.profile.data.document.mongo.Slot;
+import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 
 public class EventUtil {
     public static final String EVENT_TYPE_PRIVATE = "pr";
@@ -164,6 +166,14 @@ public class EventUtil {
         clonedEvent.setRef(ref);
 
         return clonedEvent;
+    }
+
+    public static EventDTO transform(Event event) {
+        LocalDateTime eventStart = event.getInfo().getRange().getStart();
+        LocalDate groupKey = eventStart != null ? eventStart.toLocalDate() : null;
+        Long sortKey = eventStart != null ? eventStart.toInstant(ZoneOffset.UTC).toEpochMilli() : null;
+
+        return new EventDTO(event, groupKey, sortKey);
     }
 
 }

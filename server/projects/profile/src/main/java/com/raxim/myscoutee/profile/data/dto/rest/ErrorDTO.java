@@ -12,6 +12,14 @@ public class ErrorDTO {
     @JsonProperty(value = "value")
     private String value;
 
+    public ErrorDTO(Integer key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public ErrorDTO() {
+    }
+
     public Integer getKey() {
         return key;
     }

@@ -8,11 +8,15 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.bson.BsonBinary;
 import org.bson.BsonBinarySubType;
 import org.bson.UuidRepresentation;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 
 public class CommonUtil {
@@ -20,7 +24,7 @@ public class CommonUtil {
     public static final String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
             "Nov", "Dec" };
 
-    private static final String dateRegex = "((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[\\s\\S]*(?:(?:1|2)[0-9]{3}))[\\s\\S]?[\u2010-\u2015\\-]?[\\s\\S]?((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)?[\\s\\S]*(?:(?:1|2)[0-9]{3}))?[\\s\\S]?";
+    public static final Pattern dateRegex = Pattern.compile("((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[\\s\\S]*(?:(?:1|2)[0-9]{3}))[\\s\\S]?[\u2010-\u2015\\-]?[\\s\\S]?((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)?[\\s\\S]*(?:(?:1|2)[0-9]{3}))?[\\s\\S]?");
 
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .appendPattern("MMM yyyy")
@@ -78,5 +82,9 @@ public class CommonUtil {
         UUID uuid = new BsonBinary(BsonBinarySubType.UUID_LEGACY, bytes)
                 .asUuid(UuidRepresentation.JAVA_LEGACY);
         return uuid.toString();
+    }
+
+    public static Point point(GeoJsonPoint point) {
+        return new Point(new Position(point.getCoordinates()));
     }
 }

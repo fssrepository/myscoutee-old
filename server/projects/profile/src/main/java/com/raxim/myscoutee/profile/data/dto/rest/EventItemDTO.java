@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 
 @JsonRootName("eventItem")
 public class EventItemDTO {
@@ -43,6 +44,11 @@ public class EventItemDTO {
 
     @JsonProperty(value = "role")
     private String role;
+
+    public EventItemDTO(EventItem item, Object groupKey) {
+        this.item = item;
+        this.groupKey = groupKey;
+    }
 
     public EventItemDTO() {
     }

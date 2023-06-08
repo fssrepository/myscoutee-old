@@ -37,6 +37,13 @@ public class School {
     @JsonIgnore
     private String status;
 
+    public School(RangeLocal range) {
+        this.range = range;
+    }
+
+    public School() {
+    }
+
     public UUID getId() {
         return id;
     }

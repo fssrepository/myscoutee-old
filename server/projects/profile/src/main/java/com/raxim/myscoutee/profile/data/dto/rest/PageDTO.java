@@ -23,6 +23,35 @@ public class PageDTO<T> {
     @JsonProperty(value = "role")
     private Object role;
 
+    public PageDTO(List<T> values, List<Object> offset, Integer scroll, Object step) {
+        this.values = values;
+        this.offset = offset;
+        this.scroll = scroll;
+        this.step = step;
+    }
+
+    public PageDTO(List<T> values, List<Object> offset, Integer scroll) {
+        this.values = values;
+        this.offset = offset;
+        this.scroll = scroll;
+    }
+
+    public PageDTO(List<T> values, List<Object> offset, Integer scroll, Object step, Object role) {
+        this.values = values;
+        this.offset = offset;
+        this.scroll = scroll;
+        this.step = step;
+        this.role = role;
+    }
+
+    public PageDTO(List<T> values, List<Object> offset) {
+        this.values = values;
+        this.offset = offset;
+    }
+
+    public PageDTO() {
+    }
+
     public List<T> getValues() {
         return values;
     }

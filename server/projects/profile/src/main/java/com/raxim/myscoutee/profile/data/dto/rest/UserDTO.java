@@ -18,6 +18,12 @@ public class UserDTO {
     @JsonProperty(value = "likes")
     private List<Badge> likes;
 
+    public UserDTO(User user, List<GroupDTO> groups, List<Badge> likes) {
+        this.user = user;
+        this.groups = groups;
+        this.likes = likes;
+    }
+
     public UserDTO() {
         // Default constructor
     }

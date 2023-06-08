@@ -15,6 +15,10 @@ public class PromotionDTO {
     @JsonIgnore
     private List<Object> offset;
 
+    public PromotionDTO(Promotion promotion) {
+        this.promotion = promotion;
+    }
+
     public Promotion getPromotion() {
         return promotion;
     }

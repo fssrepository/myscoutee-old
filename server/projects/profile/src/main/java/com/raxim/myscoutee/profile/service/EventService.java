@@ -166,6 +166,10 @@ public class EventService {
         }
     }
 
+    public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status) {
+        return getEvent(eventItem, profile, status, null, false);
+    }
+
     public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status,
             UUID eventId, boolean isUpdate) {
         Optional<Event> eventRes = eventId != null ? eventRepository.findById(eventId) : Optional.empty();
