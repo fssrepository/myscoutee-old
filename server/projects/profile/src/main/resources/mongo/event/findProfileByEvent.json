@@ -1,0 +1,95 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            'info.members' : { \$elemMatch: { 'profile.\$id': ?0, 'status': :#{#status} } }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ '\$info.range.start', { \$toDate: :#{#offset[0]}} ] },\n" +
+            "                    {\$gt: [ '\$createdDate', { \$toDate: :#{#offset[1]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'profiles',\n" +
+            "            let: { p_id: '\$info.members.profile.\$id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$in: [\n" +
+            "                                '\$_id',\n" +
+            "                                '\$\$p_id'\n" +
+            "                            ]\n" +
+            "                        }\n" +
+            "                    }\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'profiles',\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: { path: '\$profiles' }\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$profiles._id',\n" +
+            "            'createdDate': {\n" +
+            "                \$min: '\$createdDate'\n" +
+            "            },\n" +
+            "            'startDate': {\n" +
+            "                \$max: '\$info.range.start'\n" +
+            "            },\n" +
+            "            data: { '\$first': '\$profiles' },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: {\n" +
+            "                \$and: [\n" +
+            "                   {\$ne: [ '\$_id', ?0 ] },\n" +
+            "                   {\$gt: [ '\$data.createdDate', { \$toDate: :#{#offset[2]} }] }\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'startDate': 1, 'createdDate': 1, 'data.createdDate': -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'groupKey': {\n" +
+            "                \$dateToString: {\n" +
+            "                    format: '%Y-%m-%d',\n" +
+            "                    date: '\$startDate'\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'profile': '\$data'}, { groupKey: '\$groupKey', offset: ['\$startDate', '\$createdDate', '\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

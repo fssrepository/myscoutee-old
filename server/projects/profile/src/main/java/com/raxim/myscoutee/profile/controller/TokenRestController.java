@@ -1,9 +1,5 @@
 package com.raxim.myscoutee.profile.controller;
 
-import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
-import com.raxim.myscoutee.profile.data.document.mongo.Token;
-import com.raxim.myscoutee.profile.data.document.mongo.User;
-import com.raxim.myscoutee.profile.repository.mongo.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +9,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
+import com.raxim.myscoutee.common.util.JsonUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.Token;
+import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.repository.mongo.TokenRepository;
+
 @RestController
 @RequestMapping("tokens")
 public class TokenRestController {
 
     private final TokenRepository tokenRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public TokenRestController(TokenRepository tokenRepository) {
+    public TokenRestController(TokenRepository tokenRepository, ObjectMapper objectMapper) {
         this.tokenRepository = tokenRepository;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("")
@@ -31,7 +36,8 @@ public class TokenRestController {
         if (tokenObj == null) {
             FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
             User user = principal.getUser();
-            Token tokenToSave = token.copy(user.getId());
+            Token tokenToSave = JsonUtil.clone(token, objectMapper);
+            tokenToSave.setId(user.getId());
             tokenObj = tokenRepository.save(tokenToSave);
         }
 

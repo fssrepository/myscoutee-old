@@ -1,0 +1,65 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: {\n" +
+            "                \$and: [\n" +
+            "                    { \$eq: ['\$group', ?1] },\n" +
+            "                    { \$ne: ['\$_id', ?0 ] },\n" +
+            "                    {\n" +
+            "                        \$or: [\n" +
+            "                            { \$eq: ['\$status', 'A' ] },\n" +
+            "                            { \$eq: ['\$status', 'F' ] },\n" +
+            "                            { \$eq: ['\$status', 'P' ] },\n" +
+            "                        ]\n" +
+            "                    },\n" +
+            "                ]\n" +
+            "                    \n" +
+            "            }\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'roles',\n" +
+            "            let: { 'p_id': '\$_id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: { \$eq: ['\$\$p_id', '\$profileId'] }\n" +
+            "                    },\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'role'\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$role'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$gt: [ {\$ifNull: [ '\$createdDate', ISODate()]}, { \$toDate: :#{#offset[0]} }],\n" +
+            "            }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            createdDate: -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?2 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            newRoot: { \n" +
+            "                \$mergeObjects: [{profile: \$\$ROOT}, { role: '\$role.role', offset: [\$createdDate] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

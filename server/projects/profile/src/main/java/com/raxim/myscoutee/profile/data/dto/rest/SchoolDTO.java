@@ -18,6 +18,10 @@ public class SchoolDTO {
     @JsonIgnore
     private List<Object> offset;
 
+    public SchoolDTO(School school) {
+        this.school = school;
+    }
+
     public School getSchool() {
         return school;
     }

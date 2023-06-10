@@ -1,13 +1,15 @@
 package com.raxim.myscoutee.profile.controller;
 
-import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
-import com.raxim.myscoutee.profile.service.EventScheduler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.raxim.myscoutee.exception.InvalidScheduleSettingsException;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
+import com.raxim.myscoutee.profile.service.EventScheduler;
 
 @RepositoryRestController
 @RequestMapping("calc")
@@ -23,13 +25,21 @@ public class CalcRestController {
 
     @GetMapping("/priority_none/{lastTime}")
     public ResponseEntity<Void> calcPriorityNone(@PathVariable String lastTime) {
-        eventScheduler.generateEvents();
+        try {
+            eventScheduler.generateEvents();
+        } catch (FirebaseMessagingException | InvalidScheduleSettingsException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/messaging/{lastTime}")
     public ResponseEntity<Void> registerMessaging(@PathVariable String lastTime) {
-        eventScheduler.topicRegistration(lastTime);
+        try {
+            eventScheduler.topicRegistration(lastTime);
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.ok().build();
     }
 }

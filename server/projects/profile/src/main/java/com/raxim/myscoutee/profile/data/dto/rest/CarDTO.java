@@ -16,6 +16,10 @@ public class CarDTO {
     @JsonIgnore
     private List<Object> offset;
 
+    public CarDTO(Car car) {
+        this.car = car;
+    }
+
     public Car getCar() {
         return car;
     }

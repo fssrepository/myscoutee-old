@@ -13,12 +13,20 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.config.properties.ConfigProperties;
+import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
+import com.raxim.myscoutee.profile.data.document.mongo.Link;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Role;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
+import com.raxim.myscoutee.profile.repository.mongo.LinkRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.RoleRepository;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 
 @Service
 public class FirebaseService {
@@ -31,6 +39,7 @@ public class FirebaseService {
     private final GroupRepository groupRepository;
     private final ConfigProperties config;
     private final LinkRepository linkRepository;
+    private final ObjectMapper objectMapper;
 
     public FirebaseService(
             ProfileRepository profileRepository,
@@ -38,13 +47,15 @@ public class FirebaseService {
             RoleRepository roleRepository,
             GroupRepository groupRepository,
             ConfigProperties config,
-            LinkRepository linkRepository) {
+            LinkRepository linkRepository,
+            ObjectMapper objectMapper) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.groupRepository = groupRepository;
         this.config = config;
         this.linkRepository = linkRepository;
+        this.objectMapper = objectMapper;
     }
 
     public UserDetails loadUserByUsername(String username, String xLink) {
@@ -117,23 +128,29 @@ public class FirebaseService {
         }
 
         if (xLink != null) {
-            this.linkRepository.findByKey(UUID.fromString(xLink)).ifPresent(link -> {
+            Link link = this.linkRepository.findByKey(UUID.fromString(xLink));
+            if (link != null) {
                 List<String> usedBy = link.getUsedBys().stream().filter(u -> Objects.equals(u, username))
                         .collect(Collectors.toList());
                 if (usedBy.isEmpty()) {
                     switch (link.getType()) {
                         case "g":
-                            Optional<GroupAlgo> optionalGroup = this.groupRepository.findById(link.getRefId());
+                            Optional<Group> optionalGroup = this.groupRepository.findById(link.getRefId());
                             if (optionalGroup.isPresent()) {
                                 Profile profile = new Profile();
                                 profile.setGroup(optionalGroup.get().getId());
-                                Profile profileSaved = this.profileRepository.save(profile);
+                                Profile lProfileSaved = this.profileRepository.save(profile);
 
-                                Role role = new Role(UUID.randomUUID(), profileSaved.getId(), "ROLE_USER");
+                                Role role = new Role();
+                                role.setId(UUID.randomUUID());
+                                role.setProfileId(lProfileSaved.getId());
+                                role.setRole("ROLE_USER");
                                 this.roleRepository.save(role);
 
-                                user.getProfiles().add(profile);
-                                User userNew = user.withGroup(optionalGroup.get().getId()).withProfile(profile);
+                                User userNew = JsonUtil.clone(user, objectMapper);
+                                userNew.getProfiles().add(profile);
+                                userNew.setGroup(optionalGroup.get().getId());
+                                userNew.setProfile(profile);
                                 this.userRepository.save(userNew);
                             }
                             break;
@@ -144,7 +161,8 @@ public class FirebaseService {
                     link.getUsedBys().add(username);
                     this.linkRepository.save(link);
                 }
-            });
+            }
+            ;
         }
 
         List<Role> roles = user.getProfile() != null ? this.roleRepository.findRoleByProfile(user.getProfile().getId())

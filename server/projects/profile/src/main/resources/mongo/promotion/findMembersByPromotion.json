@@ -1,0 +1,114 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup: {\n" +
+            "            from: 'events',\n" +
+            "            localField: 'events.\$id',\n" +
+            "            foreignField: '_id',\n" +
+            "            as: 'events'\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$events'\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$events._id',\n" +
+            "            data: { '\$first': '\$events' },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gte: [ '\$data.type', :#{#offset[0]} ] },\n" +
+            "                    {\$gt: [ '\$data.info.range.start', { \$toDate: :#{#offset[1]} } ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[2]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.info.range.start': 1, 'data.type': 1, 'data.createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'profiles',\n" +
+            "            let: { 'p_id': '\$data.info.members.profile.\$id', 'p_members' : '\$data.info.members' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$eq: ['\$\$p_id', '\$_id']\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \$project: {\n" +
+            "                        '_id' : '\$\$p_members._id',\n" +
+            "                        'profile': '\$\$ROOT',\n" +
+            "                        'createdDate': '\$\$p_members.createdDate',\n" +
+            "                        'status': '\$\$p_members.status'\n" +
+            "                    }\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            as: 'profiles',\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$profiles'\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$profiles._id',\n" +
+            "            data: {\n" +
+            "                \$first: '\$profiles'\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[1]} }] },\n" +
+            "                    {\$in: [ '\$data.status', :#{#status} ] },\n" +
+            "                    {\$gte: [ '\$data.status', :#{#offset[0]} ] }\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.status': 1, 'data.createdDate': -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'member': '\$data'}, { offset: ['\$data.status', '\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

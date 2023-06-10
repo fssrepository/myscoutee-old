@@ -1,21 +1,41 @@
 package com.raxim.myscoutee.profile.controller;
 
-import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
-import com.raxim.myscoutee.common.util.CommonUtil;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
-import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.dto.rest.*;
-import com.raxim.myscoutee.profile.repository.mongo.*;
-import com.raxim.myscoutee.profile.service.ProfileService;
-import com.raxim.myscoutee.profile.service.StatusService;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
+import com.raxim.myscoutee.common.util.CommonUtil;
+import com.raxim.myscoutee.common.util.JsonUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.Member;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.dto.rest.CodeDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.service.ProfileService;
+import com.raxim.myscoutee.profile.service.StatusService;
 
 @RepositoryRestController
 @RequestMapping("activity")
@@ -25,17 +45,20 @@ public class ActivityMemberRestController {
     private final ProfileService profileService;
     private final ProfileRepository profileRepository;
     private final StatusService statusService;
+    private final ObjectMapper objectMapper;
 
     public ActivityMemberRestController(EventRepository eventRepository,
             EventItemRepository eventItemRepository,
-            ProfileService profileService, 
+            ProfileService profileService,
             ProfileRepository profileRepository,
-            StatusService statusService) {
+            StatusService statusService,
+            ObjectMapper objectMapper) {
         this.eventRepository = eventRepository;
         this.eventItemRepository = eventItemRepository;
         this.profileService = profileService;
         this.profileRepository = profileRepository;
         this.statusService = statusService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("events/{id}/items/{itemId}/join")
@@ -93,7 +116,7 @@ public class ActivityMemberRestController {
         List<Object> lOffset = members.isEmpty() ? Arrays.asList(tOffset) : members.get(members.size() - 1).getOffset();
 
         Object lRole = null;
-        if(!members.isEmpty()) {
+        if (!members.isEmpty()) {
             lRole = Arrays.asList(tOffset);
         } else {
             lRole = members.get(members.size() - 1).getRole();
@@ -107,7 +130,8 @@ public class ActivityMemberRestController {
             @RequestParam("step") Integer step,
             @RequestParam("offset") String[] offset) {
         String[] tOffset = (offset != null && offset.length == 3)
-                ? new String[] { CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]), CommonUtil.decode(offset[2]) }
+                ? new String[] { CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]),
+                        CommonUtil.decode(offset[2]) }
                 : new String[] { "a", "1900-01-01", "1900-01-01" };
 
         List<SchoolDTO> schools = profileService.getSchools(UUID.fromString(id), step, tOffset);
@@ -164,38 +188,60 @@ public class ActivityMemberRestController {
 
     @PostMapping("events/{id}/members")
     @Transactional
-    public ResponseEntity<List<MemberDTO>> addMember(@PathVariable String id, @RequestBody List<String> profiles) {
+    public ResponseEntity<List<MemberDTO>> addMember(
+            @PathVariable String id,
+            @RequestBody List<String> profiles) {
         return eventRepository.findById(UUID.fromString(id)).map(event -> {
-            List<UUID> uProfiles = profiles.stream().map(UUID::fromString).collect(Collectors.toList());
-            List<Profile> pProfiles = profileRepository.findAllById(uProfiles);
+            List<UUID> uProfiles = profiles.stream()
+                    .map(UUID::fromString)
+                    .collect(Collectors.toList());
 
-            Set<Member> tMembers = pProfiles.stream().map(profile -> {
-                Member member = event.getInfo().getMembers().stream()
-                        .filter(m -> m.getId().equals(profile.getId()))
-                        .findFirst().orElse(null);
+            List<com.raxim.myscoutee.profile.data.document.mongo.Profile> pProfiles = profileRepository
+                    .findAllById(uProfiles);
 
-                if (member == null) {
-                    String code = null;
-                    if (event.getInfo().isTicket()) {
-                        code = UUID.randomUUID().toString();
-                    }
+            Set<com.raxim.myscoutee.profile.data.document.mongo.Member> tMembers = pProfiles.stream()
+                    .map(profile -> {
+                        com.raxim.myscoutee.profile.data.document.mongo.Member member = event.getInfo().getMembers()
+                                .stream()
+                                .filter(m -> m.getId().equals(profile.getId()))
+                                .findFirst()
+                                .orElse(null);
 
-                    member = new Member(profile.getId(), profile, "I", new Date(), code, "U");
-                } else {
-                    member.setStatus("I");
-                }
-                return member;
-            }).collect(Collectors.toSet());
+                        if (member == null) {
+                            String code = null;
+                            if (event.getInfo().getTicket()) {
+                                code = UUID.randomUUID().toString();
+                            }
+
+                            Member newMember = new Member();
+                            newMember.setId(profile.getId());
+                            newMember.setProfile(profile);
+                            newMember.setStatus("I");
+                            newMember.setCreatedDate(new Date());
+                            newMember.setCode(code);
+                            newMember.setRole("U");
+                            return newMember;
+                        } else {
+                            Member clonedMember = JsonUtil.clone(member, objectMapper);
+                            clonedMember.setStatus("I");
+                            return clonedMember;
+                        }
+                    })
+                    .collect(Collectors.toSet());
 
             tMembers.addAll(event.getInfo().getMembers());
             event.getInfo().setMembers(tMembers);
+
             eventRepository.save(event);
 
-            List<Member> membersDto = tMembers.stream().map(member -> {
-                return new Member(member, Arrays.asList(new Date(), member.getStatus()));
-            }).collect(Collectors.toList());
+            List<MemberDTO> membersDto = tMembers.stream()
+                    .map(member -> new MemberDTO(
+                            member,
+                            List.of(new Date(), member.getStatus())))
+                    .collect(Collectors.toList());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(membersDto);
         }).orElse(ResponseEntity.notFound().build());
     }
+
 }

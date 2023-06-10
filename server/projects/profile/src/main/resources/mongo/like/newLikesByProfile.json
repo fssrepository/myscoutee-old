@@ -1,0 +1,24 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "            \$and: [\n" +
+            "                {\$eq: ['\$to.\$id', ?0]},\n" +
+            "                {\$gt: ['\$createdDate', {\$toDate: ?1 }] },\n" +
+            "                {\n" +
+            "                    \$eq: [{\$ifNull: [ '\$ref', 0]}, 0]\n" +
+            "                },\n" +
+            "            ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }",
+    "{ \$count: 'games' }",
+    "{ \n" +
+            "            \$replaceRoot: {  \n" +
+            "                'newRoot': {  \n" +
+            "                    \$mergeObjects: [{'root': 'games', 'value': '\$games' } ]\n" +
+            "                } \n" +
+            "            } \n" +
+            "    }"
+]

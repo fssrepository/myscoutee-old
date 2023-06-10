@@ -1,0 +1,95 @@
+[
+    "{ \n" +
+            "        \$unwind: { path: '\$profiles' } \n" +
+            "    }",
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'profiles',\n" +
+            "            let: { p_id: '\$profiles.\$id' },\n" +
+            "            pipeline: [\n" +
+            "              {\n" +
+            "                  \$match: {\n" +
+            "                    \$expr: \n" +
+            "                      {\n" +
+            "                        \$and: [\n" +
+            "                          {\$eq: [ '\$\$p_id', '\$_id' ]},\n" +
+            "                          {\$gte: ['\$createdDate', { \$toDate: ?0 }]},\n" +
+            "                        ]\n" +
+            "                      }\n" +
+            "                  },            \n" +
+            "              },\n" +
+            "              {\n" +
+            "                \$lookup:\n" +
+            "                  {\n" +
+            "                      from: 'groups',\n" +
+            "                      let: { g_id: '\$group' },\n" +
+            "                      pipeline: [\n" +
+            "                        {\n" +
+            "                            \$match: {\n" +
+            "                              \$expr: \n" +
+            "                                {\n" +
+            "                                  \$and: [{\n" +
+            "                                    \$eq: [ '\$\$g_id', '\$_id' ],\n" +
+            "                                  }]\n" +
+            "                                }\n" +
+            "                            },\n" +
+            "                            \n" +
+            "                        },\n" +
+            "                      ],\n" +
+            "                    as: 'group'\n" +
+            "                }\n" +
+            "              }\n" +
+            "            ],\n" +
+            "          as: 'profiles'\n" +
+            "      }\n" +
+            "    }",
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'tokens',\n" +
+            "            let: { p_uuid: '\$_id' },\n" +
+            "            pipeline: [\n" +
+            "              {\n" +
+            "                  \$match: {\n" +
+            "                    \$expr: \n" +
+            "                      {\n" +
+            "                        \$eq: [ '\$\$p_uuid', '\$uuid' ],\n" +
+            "                      }\n" +
+            "                  },\n" +
+            "              },\n" +
+            "            ],\n" +
+            "          as: 'tokens'\n" +
+            "      }\n" +
+            "    }",
+
+    "{ \n" +
+            "        \$unwind: { path: '\$profiles' } \n" +
+            "    }",
+
+    // inside lookup $in not working
+    "{\n" +
+            "      \$match: {\n" +
+            "          \$expr: \n" +
+            "            {\n" +
+            "              \$in: [ '\$profiles.status', :#{#status} ],\n" +
+            "            }\n" +
+            "        },\n" +
+            "    }",
+
+    "{ \n" +
+            "        \$unwind: { path: '\$profiles.group' } \n" +
+            "    }",
+
+    "{ \n" +
+            "        \$unwind: { path: '\$tokens' } \n" +
+            "    }",
+
+    "{ \n" +
+            "        \$group: {\n" +
+            "            '_id': '\$profiles.group._id', \n" +
+            "            'name': {\$first: '\$profiles.group.name'},\n" +
+            "            'tokens': {\$addToSet: '\$tokens.deviceKey'},\n" +
+            "        }, \n" +
+            "    }"
+]

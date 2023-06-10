@@ -1,0 +1,57 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup: {\n" +
+            "            from: 'cars',\n" +
+            "            localField: 'cars.\$id',\n" +
+            "            foreignField: '_id',\n" +
+            "            as: 'cars'\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$cars'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$cars._id',\n" +
+            "            data: {\n" +
+            "                \$first: '\$cars'\n" +
+            "            }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$eq: [ '\$data.status', 'A' ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[0]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.createdDate': -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'car': '\$data'}, { offset: ['\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

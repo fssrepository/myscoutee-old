@@ -35,6 +35,12 @@ import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventItemDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
+import com.raxim.myscoutee.profile.repository.mongo.SettingRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.util.EventItemUtil;
 
@@ -190,9 +196,9 @@ public class ActivityRestController {
     }
 
     @PostMapping("events/{id}/recommend")
-    public ResponseEntity<Event> recommend(@PathVariable String id,
+    public ResponseEntity<EventDTO> recommend(@PathVariable String id,
             @RequestParam(value = "step", required = false) Integer step) {
-        Optional<Event> eventDto = eventService.recommendEvent(UUID.fromString(id));
+        Optional<EventDTO> eventDto = eventService.recommendEvent(UUID.fromString(id));
 
         return eventDto.map(event -> ResponseEntity.ok(event))
                 .orElse(ResponseEntity.badRequest().build());

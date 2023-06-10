@@ -1,9 +1,10 @@
 package com.raxim.myscoutee.profile.service;
 
-import com.raxim.myscoutee.profile.data.document.mongo.Message;
-import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import com.raxim.myscoutee.profile.data.document.mongo.Message;
+import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
 
 @Service
 public class MessageService {

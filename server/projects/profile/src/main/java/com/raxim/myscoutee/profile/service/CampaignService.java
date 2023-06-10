@@ -24,6 +24,13 @@ import com.raxim.myscoutee.profile.data.document.mongo.Slot;
 import com.raxim.myscoutee.profile.data.dto.rest.IdeaDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.JobDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PromotionDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
+import com.raxim.myscoutee.profile.repository.mongo.IdeaRepository;
+import com.raxim.myscoutee.profile.repository.mongo.JobRepository;
+import com.raxim.myscoutee.profile.repository.mongo.MemberRepository;
+import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
 @Service
@@ -84,7 +91,7 @@ public class CampaignService {
                 : promotion;
 
         Group group = null;
-        if (currPromotion.getGroup() != null && !currPromotion.getGroup().isSystem()) {
+        if (currPromotion.getGroup() != null && !currPromotion.getGroup().getSystem()) {
             group = this.groupRepository.findById(currPromotion.getGroup().getId()).get();
         } else {
             group = this.groupRepository.findSystemGroupByType(currPromotion.getGroupType());

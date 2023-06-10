@@ -1,0 +1,135 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "          \$expr: \n" +
+            "            {\n" +
+            "              \$gte: ['\$createdDate', { \$toDate: ?0 }]\n" +
+            "            }\n" +
+            "        },\n" +
+            "    }",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'likes',\n" +
+            "            let: { p_from: '\$from.\$id' , p_to: '\$to.\$id' },\n" +
+            "            pipeline: [\n" +
+            "              {\n" +
+            "                \$match: {\n" +
+            "                    \$expr: \n" +
+            "                    {\n" +
+            "                          \$or: [\n" +
+            "                            {\n" +
+            "                              \$and: [\n" +
+            "                                { \$eq: ['\$from.\$id', '\$\$p_from'] },\n" +
+            "                                { \$eq: ['\$to.\$id', '\$\$p_to'] },\n" +
+            "                                { \$eq: [ {\$ifNull: [ '\$ref', 0]}, 0 ]}\n" +
+            "                              ]\n" +
+            "                            },\n" +
+            "                            {\n" +
+            "                              \$and: [\n" +
+            "                                { \$eq: ['\$to.\$id', '\$\$p_from'] },\n" +
+            "                                { \$eq: ['\$from.\$id', '\$\$p_to'] },\n" +
+            "                                { \$eq: [ {\$ifNull: [ '\$ref', 0]}, 0 ]}\n" +
+            "                              ]\n" +
+            "                            }\n" +
+            "                          ]\n" +
+            "                    }\n" +
+            "                }\n" +
+            "              },\n" +
+            "              { \n" +
+            "                  \$group: {\n" +
+            "                      '_id': '\$\$p_from', \n" +
+            "                      'distance': { \n" +
+            "                          \$avg: '\$distance' \n" +
+            "                      },\n" +
+            "                      'type': { \n" +
+            "                          \$avg: { \n" +
+            "                              \$switch: { \n" +
+            "                                  branches: [ \n" +
+            "                                      {  \n" +
+            "                                          case: {  \n" +
+            "                                              \$and: [ \n" +
+            "                                                  { \$eq: ['\$to.\$id', '\$\$p_to' ] }, \n" +
+            "                                                  { \$eq: ['\$double', false] },\n" +
+            "                                                  { \$eq: [ {\$ifNull: [ '\$ref', 0]}, 0 ]} \n" +
+            "                                              ] \n" +
+            "                                          }, \n" +
+            "                                          then: 2 \n" +
+            "                                      }, \n" +
+            "                                      {  \n" +
+            "                                          case: {  \n" +
+            "                                              \$and: [ \n" +
+            "                                                  { \$eq: ['\$from.\$id', '\$\$p_to' ] }, \n" +
+            "                                                  { \$eq: ['\$double', false] },\n" +
+            "                                                  { \$eq: [ {\$ifNull: [ '\$ref', 0]}, 0 ]}\n" +
+            "                                              ] \n" +
+            "                                          }, \n" +
+            "                                          then: 1 \n" +
+            "                                      }, \n" +
+            "                                  ], \n" +
+            "                                  default: 0 \n" +
+            "                              } \n" +
+            "                          } \n" +
+            "                      },\n" +
+            "                      'rate': {\n" +
+            "                              \$sum: { \n" +
+            "                                \$switch: { \n" +
+            "                                    branches: [ \n" +
+            "                                        {  \n" +
+            "                                            case: {  \n" +
+            "                                                \$and: [\n" +
+            "                                                    { \$eq: ['\$double', false] }, \n" +
+            "                                                ] \n" +
+            "                                            }, \n" +
+            "                                            then: {\$divide: [1, '\$rate']} \n" +
+            "                                        } \n" +
+            "                                    ],\n" +
+            "                                    default: 0 \n" +
+            "                                } \n" +
+            "                              }\n" +
+            "                      },\n" +
+            "                      'from': {\n" +
+            "                        \$first: '\$from'\n" +
+            "                      },\n" +
+            "                      'to': {\n" +
+            "                        \$first: '\$to'\n" +
+            "                      },\n" +
+            "                      'createdDate': { \n" +
+            "                          \$max: '\$createdDate' \n" +
+            "                      }, \n" +
+            "                  }, \n" +
+            "              },\n" +
+            "            ],\n" +
+            "          as: 'likes'\n" +
+            "      }\n" +
+            "    }",
+
+    "{ \n" +
+            "        \$unwind: { path: '\$likes' } \n" +
+            "    }",
+
+    "{\n" +
+            "      \$group: {\n" +
+            "          '_id': '\$likes.createdDate',\n" +
+            "          'data': { \$first : '\$likes'}\n" +
+            "      } \n" +
+            "    }",
+
+    "{ \n" +
+            "        \$match: { \n" +
+            "            \$expr:  \n" +
+            "            { \n" +
+            "              \$and: [\n" +
+            "                {\$eq: [ {\$ifNull: ['\$data.type', 0.0]}, ?1 ]}\n" +
+            "              ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }",
+
+    "{ \n" +
+            "            \$replaceRoot: {  \n" +
+            "                'newRoot': '\$data' \n" +
+            "            } \n" +
+            "    }"
+]

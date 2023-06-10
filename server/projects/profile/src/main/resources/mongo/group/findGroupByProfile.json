@@ -1,0 +1,48 @@
+[
+    "{\n" +
+            "        \$geoNear :\n" +
+            "        {\n" +
+            "            near :\n" +
+            "            ?1,\n" +
+            "            spherical     : true,\n" +
+            "            minDistance   : :#{#offset[0]},\n" +
+            "            distanceField : 'distance',\n" +
+            "            distanceMultiplier: 0.001,\n" +
+            "            query         : {'_id': { \$nin: ?4 }, 'type': ?0, 'system': false, 'visibility': 'pu' }\n" +
+            "        }\n" +
+            "}",
+
+    "{ \n" +
+            "                            \$match: { \n" +
+            "                                \$expr:  \n" +
+            "                                { \n" +
+            "                                            \$and: [\n" +
+            "                                                {\$gt: [{\$ifNull: [ '\$createdDate', ISODate()]}, {\$toDate: :#{#offset[1]} }] }, \n" +
+            "                                                {\$gte: ['\$distance', :#{#offset[2]} ] }, \n" +
+            "                                            ] \n" +
+            "                                }, \n" +
+            "                            } \n" +
+            "                        }",
+
+    "{ \n" +
+            "                                    \$addFields: { \n" +
+            "                                        'groupKey': {\$multiply: [{\$floor : [{\$divide : ['\$distance', ?3]}]}, ?3]}, \n" +
+            "                                    } \n" +
+            "                                }",
+
+    "{ \n" +
+            "                            \$sort: { \n" +
+            "                                'groupKey': 1, 'distance': 1, 'createdDate': -1 \n" +
+            "                            } \n" +
+            "                    }",
+
+    "{ \$limit : ?2 }",
+
+    "{ \n" +
+            "                \$replaceRoot: {  \n" +
+            "                    'newRoot': {  \n" +
+            "                        \$mergeObjects: [{'group': '\$\$ROOT'}, { groupKey: '\$groupKey', offset: ['\$groupKey', '\$distance', '\$createdDate'] } ] \n" +
+            "                    } \n" +
+            "                } \n" +
+            "            }"
+]

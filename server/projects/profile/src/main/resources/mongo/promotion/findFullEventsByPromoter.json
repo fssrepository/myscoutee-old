@@ -1,0 +1,108 @@
+[
+    "{ \n" +
+            "            \$match: { \n" +
+            "                createdBy: ?0 \n" +
+            "            } \n" +
+            "    }",
+    "{ \n" +
+            "            \$unwind: '\$events'\n" +
+            "    }",
+    "{ \n" +
+            "            \$lookup: \n" +
+            "            { \n" +
+            "                from: 'events', \n" +
+            "                let: { 'e_id': '\$events.\$id' },\n" +
+            "                pipeline: [ \n" +
+            "                    { \n" +
+            "                        \$match: { \n" +
+            "                            \$expr: { \n" +
+            "                                \$and: [\n" +
+            "                                    {\$eq: [ '\$status', 'P' ]},\n" +
+            "                                    {\$eq: [ '\$\$e_id', '\$ref.\$id' ]},\n" +
+            "                                ] \n" +
+            "                            } \n" +
+            "                        } \n" +
+            "                    },\n" +
+            "                    {\n" +
+            "                        \$project: {\n" +
+            "                            '_id': '\$_id',\n" +
+            "                            'cap': {\n" +
+            "                                \$size: {\n" +
+            "                                    \$filter: {\n" +
+            "                                        input: '\$info.members',\n" +
+            "                                        as: \"member\",\n" +
+            "                                        cond: { \$eq: [ '\$\$member.status', 'A' ] }\n" +
+            "                                    },    \n" +
+            "                                }\n" +
+            "                            },\n" +
+            "                            'data': '\$\$ROOT'\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                    { \n" +
+            "                        \$match: { \n" +
+            "                            \$expr: { \n" +
+            "                                \$and: [\n" +
+            "                                    {\$gte: [ '\$cap', '\$data.capacity.min' ]},\n" +
+            "                                ] \n" +
+            "                            } \n" +
+            "                        } \n" +
+            "                    },\n" +
+            "                    { \n" +
+            "                        \$replaceRoot: {  \n" +
+            "                            'newRoot': '\$data' \n" +
+            "                        } \n" +
+            "                    },\n" +
+            "                ], \n" +
+            "                as: 'events', \n" +
+            "            } \n" +
+            "    }",
+
+    "{ \n" +
+            "            \$unwind: '\$events'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': '\$events'\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gte: [ '\$info.range.start', { \$toDate: :#{#offset[0]} } ] },\n" +
+            "                    {\$gt: [ '\$createdDate', { \$toDate: :#{#offset[1]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'info.range.start': 1, 'createdDate': 1\n" +
+            "        }\n" +
+            "    }",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'groupKey': {\n" +
+            "                \$dateToString: {\n" +
+            "                    format: ?3,\n" +
+            "                    date: '\$info.range.start'\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'event': '\$\$ROOT'}, { groupKey: '\$groupKey', sortKey: { \$toLong: '\$info.range.start' }, offset: ['\$info.range.start', '\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }"
+]

@@ -1,0 +1,197 @@
+[
+    "{\n" +
+            "        \$geoNear :\n" +
+            "        {\n" +
+            "            near :\n" +
+            "            ?1,\n" +
+            "            spherical     : true,\n" +
+            "            minDistance   : :#{#offset[0]},\n" +
+            "            distanceField : 'distance',\n" +
+            "            distanceMultiplier: 0.001,\n" +
+            "            query         : {'_id': { \$nin: [?0] }, 'group': ?4 }\n" +
+            "        }\n" +
+            "}",
+
+    "{ \n" +
+            "                            \$lookup: \n" +
+            "                            { \n" +
+            "                                from: 'likes', \n" +
+            "                                let: { p_id: '\$_id' }, \n" +
+            "                                pipeline: [ \n" +
+            "                                    { \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr:  \n" +
+            "                                            { \n" +
+            "                                                \$or: [ \n" +
+            "                                                    { \n" +
+            "                                                        \$and: [ \n" +
+            "                                                            { \$eq: ['\$from.\$id', '\$\$p_id'] }, \n" +
+            "                                                            { \$eq: ['\$to.\$id', ?0 ] },\n" +
+            "                                                            {\n" +
+            "                                                               \$eq: [{\$ifNull: [ '\$ref', 0]}, 0]\n" +
+            "                                                            },\n" +
+            "                                                        ] \n" +
+            "                                                    }, \n" +
+            "                                                    { \n" +
+            "                                                        \$and: [ \n" +
+            "                                                            { \$eq: ['\$to.\$id', '\$\$p_id'] }, \n" +
+            "                                                            { \$eq: ['\$from.\$id', ?0 ] },\n" +
+            "                                                            {\n" +
+            "                                                               \$eq: [{\$ifNull: [ '\$ref', 0]}, 0]\n" +
+            "                                                            },\n" +
+            "                                                        ] \n" +
+            "                                                    },\n" +
+            "                                                ] \n" +
+            "                                            }, \n" +
+            "                                        } \n" +
+            "                                    }, \n" +
+            "                                    { \n" +
+            "                                        \$group: {\n" +
+            "                                            '_id': '\$\$p_id', \n" +
+            "                                            'distance': { \n" +
+            "                                                \$avg: '\$distance' \n" +
+            "                                            }, \n" +
+            "                                            'type': { \n" +
+            "                                                \$avg: { \n" +
+            "                                                    \$switch: { \n" +
+            "                                                        branches: [ \n" +
+            "                                                            {  \n" +
+            "                                                                case: {  \n" +
+            "                                                                    \$and: [ \n" +
+            "                                                                        { \$eq: ['\$to.\$id', ?0 ] }, \n" +
+            "                                                                        { \$eq: ['\$double', false] }, \n" +
+            "                                                                    ] \n" +
+            "                                                                }, \n" +
+            "                                                                then: 2 \n" +
+            "                                                            }, \n" +
+            "                                                            {  \n" +
+            "                                                                case: {  \n" +
+            "                                                                    \$and: [ \n" +
+            "                                                                        { \$eq: ['\$from.\$id', ?0 ] }, \n" +
+            "                                                                        { \$eq: ['\$double', false] }, \n" +
+            "                                                                    ] \n" +
+            "                                                                }, \n" +
+            "                                                                then: 1 \n" +
+            "                                                            }, \n" +
+            "                                                        ], \n" +
+            "                                                        default: 0 \n" +
+            "                                                    } \n" +
+            "                                                } \n" +
+            "                                            },\n" +
+            "                                            'rate': { \n" +
+            "                                                \$sum: { \n" +
+            "                                                    \$switch: { \n" +
+            "                                                        branches: [ \n" +
+            "                                                            {  \n" +
+            "                                                                case: {  \n" +
+            "                                                                    \$and: [ \n" +
+            "                                                                        { \$eq: ['\$createdBy.\$id', ?0 ] }, \n" +
+            "                                                                        { \$eq: ['\$double', true] }, \n" +
+            "                                                                    ] \n" +
+            "                                                                }, \n" +
+            "                                                                then: '\$rate' \n" +
+            "                                                            } \n" +
+            "                                                        ],\n" +
+            "                                                        default: 0 \n" +
+            "                                                    } \n" +
+            "                                                } \n" +
+            "                                            },\n" +
+            "                                            'createdDate': { \n" +
+            "                                                \$max: '\$createdDate' \n" +
+            "                                            }, \n" +
+            "                                        }, \n" +
+            "                                    },\n" +
+            "                                ], \n" +
+            "                                as: 'likes', \n" +
+            "                            } \n" +
+            "                        }",
+
+    "{\n" +
+            "        \$unwind: { path: '\$likes', preserveNullAndEmptyArrays: true }\n" +
+            "    }",
+
+    "{ \n" +
+            "                            \$match: { \n" +
+            "                                \$expr:  \n" +
+            "                                { \n" +
+            "                                            \$and: [\n" +
+            "                                                {\n" +
+            "                                                    \$or: [\n" +
+            "                                                        {\$eq: [ '\$status', 'A' ] },\n" +
+            "                                                        {\$eq: [ '\$status', 'F' ] }, \n" +
+            "                                                    ]\n" +
+            "                                                },\n" +
+            "                                                \n" +
+            "                                                {\$gte: [{\$ifNull: [ '\$likes.distance', 0]}, :#{#offset[1]} ] }, \n" +
+            "                                            ] \n" +
+            "                                }, \n" +
+            "                            } \n" +
+            "                        }",
+
+    "{\n" +
+            "                \$addFields: {\n" +
+            "                    'groupKey': {\$multiply: [{\$floor : [{\$divide : ['\$distance', ?3]}]}, ?3]},\n" +
+            "                }\n" +
+            "            }",
+
+    "{\n" +
+            "                \$addFields: {\n" +
+            "                    'likes.rate': {\$ifNull: [ '\$likes.rate', 0]},\n" +
+            "                }\n" +
+            "            }",
+
+    // lookup members table to check whether profile was invited
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'events',\n" +
+            "            let: { 'p_id': '\$_id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$and: [{\$in: [\n" +
+            "                                '\$\$p_id',\n" +
+            "                                '\$info.members.profile.\$id'\n" +
+            "                            ]},\n" +
+            "                            {\$gt: [{\$ifNull: [ '\$info.range.start', ISODate()]}, { \$toDate: :#{#offset[3]} }]}\n" +
+            "                            ]\n" +
+            "                        }\n" +
+            "                    }\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        'info.members' : { \n" +
+            "                            \$elemMatch: {\n" +
+            "                                'profile.\$id': ?0,\n" +
+            "                                'status': 'I'\n" +
+            "                            }\n" +
+            "                        }\n" +
+            "                    }\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'events',\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: { path: '\$events' }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'groupKey': 1, 'rate': -1, 'distance': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?2 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'event': '\$events'}, { groupKey: '\$groupKey', isPromotion: { \$cond: [ {\$ifNull: ['\$ref', false] }, true, false ] }, offset: ['\$groupKey', '\$rate', '\$distance', '\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }"
+]

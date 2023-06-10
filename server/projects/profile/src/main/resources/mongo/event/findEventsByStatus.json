@@ -1,0 +1,30 @@
+[
+            "{\n" +
+                    "        \$match: {\n" +
+                    "            \$expr: \n" +
+                    "            {\n" +
+                    "                \$and: [\n" +
+                    "                    {\$eq: [ '\$group', ?0 ] },\n" +
+                    "                    {\$eq: [ '\$status', 'U' ] },\n" +
+                    "                    { \$gt: [ {\$ifNull: [ '\$createdDate', ISODate()]}, { \$toDate: :#{#offset[0]} }] }, \n" +
+                    "                ]\n" +
+                    "            },\n" +
+                    "        }\n" +
+                    "    }",
+
+            "{\n" +
+                    "        \$sort: {\n" +
+                    "            'createdDate': 1\n" +
+                    "        }\n" +
+                    "    }",
+
+            "{ \$limit : ?1 }",
+
+            "{\n" +
+                    "        \$replaceRoot: { \n" +
+                    "            'newRoot': { \n" +
+                    "                \$mergeObjects: [{'event': '\$\$ROOT'}, { sortKey: { \$toLong: '\$createdDate' }, offset: ['\$createdDate'] } ]\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "    }"
+        ]

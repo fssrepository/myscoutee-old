@@ -1,0 +1,34 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            'createdBy': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$createdDate', ISODate()]}, { \$toDate: :#{#offset[0]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'idea': '\$\$ROOT'}, { groupKey: '\$createdDate', offset: ['\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

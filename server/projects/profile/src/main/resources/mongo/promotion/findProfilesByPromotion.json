@@ -1,0 +1,141 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup: {\n" +
+            "            from: 'events',\n" +
+            "            localField: 'events.\$id',\n" +
+            "            foreignField: '_id',\n" +
+            "            as: 'events'\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$events'\n" +
+            "}",
+
+    "{ \n" +
+            "                            \$lookup: \n" +
+            "                            { \n" +
+            "                                from: 'likes', \n" +
+            "                                let: { 'p_id': '\$events._id' }, \n" +
+            "                                pipeline: [ \n" +
+            "                                    { \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr: { \n" +
+            "                                                \$and: [\n" +
+            "                                                    {\$eq: [ '\$\$p_id', '\$ref' ]},\n" +
+            "                                                ] \n" +
+            "                                            } \n" +
+            "                                        } \n" +
+            "                                    },\n" +
+            "                                ], \n" +
+            "                                as: 'likes', \n" +
+            "                            } \n" +
+            "                    }",
+
+    "{ \n" +
+            "                            \$unwind: { path: '\$likes', preserveNullAndEmptyArrays: true } \n" +
+            "                        }",
+
+    "{ \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr: { \n" +
+            "                                                \$and: [\n" +
+            "                                                    {\$ne: [ '\$likes.from.\$id', ?3 ]},\n" +
+            "                                                ] \n" +
+            "                                            } \n" +
+            "                                        } \n" +
+            "                                    }",
+
+    "{ \n" +
+            "                            \$lookup: \n" +
+            "                            { \n" +
+            "                                from: 'profiles', \n" +
+            "                                let: { 'p_id': '\$likes.from.\$id', 'g_id': '\$group.\$id' }, \n" +
+            "                                pipeline: [ \n" +
+            "                                    { \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr: { \n" +
+            "                                                \$and: [\n" +
+            "                                                    {\$eq: [ '\$\$g_id', '\$group' ]},\n" +
+            "                                                    {\$eq: [ '\$\$p_id', '\$_id' ]},\n" +
+            "                                                ] \n" +
+            "                                            } \n" +
+            "                                        } \n" +
+            "                                    },\n" +
+            "                                ], \n" +
+            "                                as: 'profiles', \n" +
+            "                            } \n" +
+            "                    }",
+
+    "{ \n" +
+            "                            \$unwind: { path: '\$profiles' } \n" +
+            "                        }",
+
+    "{ \n" +
+            "                            \$lookup: \n" +
+            "                            { \n" +
+            "                                from: 'likes', \n" +
+            "                                let: { 'p_id': '\$profiles._id', 'e_id': '\$events._id' }, \n" +
+            "                                pipeline: [ \n" +
+            "                                    { \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr: { \n" +
+            "                                                \$and: [\n" +
+            "                                                    {\$eq: [ '\$\$p_id', '\$to.\$id' ]},\n" +
+            "                                                    {\$eq: [ '\$\$e_id', '\$ref' ]},\n" +
+            "                                                ] \n" +
+            "                                            } \n" +
+            "                                        } \n" +
+            "                                    },\n" +
+            "                                ], \n" +
+            "                                as: 'likes', \n" +
+            "                            } \n" +
+            "                    }",
+
+    "{ \n" +
+            "                            \$unwind: { path: '\$likes', preserveNullAndEmptyArrays: true } \n" +
+            "                        }",
+
+    "{ \n" +
+            "                            \$group: { \n" +
+            "                                '_id': '\$profiles._id', \n" +
+            "                                'data': { '\$first': '\$profiles' },\n" +
+            "                                'ref': { '\$first': '\$events._id' },\n" +
+            "                                'rate': { '\$first': {\$ifNull: [ '\$likes.rate', 0]} },\n" +
+            "                            } \n" +
+            "                    }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$lte: [ '\$rate', :#{#offset[0]} ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[1]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'rate': -1, 'data.createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'profile': '\$data'}, { ref: '\$ref', rate: '\$rate', offset: ['\$rate', '\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

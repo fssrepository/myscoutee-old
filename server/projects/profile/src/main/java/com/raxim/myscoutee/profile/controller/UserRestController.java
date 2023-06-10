@@ -24,12 +24,16 @@ import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Badge;
 import com.raxim.myscoutee.profile.data.document.mongo.Form;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
-import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Setting;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
+import com.raxim.myscoutee.profile.repository.mongo.FormRepository;
+import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.SettingRepository;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 
 @RepositoryRestController
 @RequestMapping("user")
@@ -55,6 +59,7 @@ public class UserRestController {
         this.settingRepository = settingRepository;
         this.formRepository = formRepository;
         this.config = config;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping()
@@ -122,7 +127,7 @@ public class UserRestController {
             Optional<Form> form = formRepository.findFormByKey(key);
             if (form.isPresent()) {
                 Form sForm = form.get();
-                
+
                 Setting settingToSave = new Setting();
                 settingToSave.setId(UUID.randomUUID());
                 settingToSave.setKey(key);

@@ -1,0 +1,57 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup: {\n" +
+            "            from: 'schools',\n" +
+            "            localField: 'schools.\$id',\n" +
+            "            foreignField: '_id',\n" +
+            "            as: 'schools'\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$schools'\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$schools._id',\n" +
+            "            data: { '\$first': '\$schools' },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$eq: [ '\$data.status', 'A' ] },\n" +
+            "                    {\$gte: [ '\$data.type', :#{#offset[0]} ] },\n" +
+            "                    {\$gt: [ '\$data.range.start', { \$toDate: :#{#offset[1]} } ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[2]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.type': 1, 'data.range.start': 1, 'data.createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'school': '\$data'}, { groupKey: '\$data.type', offset: ['\$data.type', '\$data.range.start', '\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

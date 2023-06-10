@@ -1,0 +1,35 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            'createdBy': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ '\$range.start', { \$toDate: :#{#offset[0]} } ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$createdDate', ISODate()]}, { \$toDate: :#{#offset[1]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'range.start': 1, 'type': 1, 'createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'promotion': '\$\$ROOT'}, { groupKey: '\$createdDate', offset: ['\$range.start', '\$type', '\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

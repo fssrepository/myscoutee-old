@@ -1,0 +1,64 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            'info.members' : { \$elemMatch: { 'profile.\$id': ?0, 'status': :#{#status} } }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$lt: [ '\$info.range.start', { \$toDate: :#{#offset[0]}} ] },\n" +
+            "                    {\$gt: [ '\$createdDate', { \$toDate: :#{#offset[1]} }] },\n" +
+            "                    {\$in: [ '\$status', :#{#evtStatus} ] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'info.range.start': 1, 'createdDate': -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'groupKey': {\n" +
+            "                \$dateToString: {\n" +
+            "                    format: ?3,\n" +
+            "                    date: '\$info.range.start'\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'user': { \$first : {\n" +
+            "                        \$filter: {\n" +
+            "                            input: '\$info.members',\n" +
+            "                            as: 'member',\n" +
+            "                            cond: { \$and: [" +
+            "                                        {\$eq: [ '\$\$member.profile.\$id', ?0 ] },\n" +
+            "                                        {\$eq: [ '\$\$member.status', 'A' ] }\n" +
+            "                                    ]\n"+
+            "                            }\n"+
+            "                        }\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'event': '\$\$ROOT'}, { groupKey: '\$groupKey', role: { \$cond: [ {\$ifNull: ['\$user', null] }, '\$user.role', null ] }, isPromotion: { \$cond: [ {\$ifNull: ['\$ref', false] }, true, false ] }, sortKey: {\$toLong: '\$info.range.start'}, offset: ['\$info.range.start', '\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

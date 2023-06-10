@@ -37,13 +37,13 @@ import com.raxim.myscoutee.profile.util.EventUtil;
 
 @RestController
 @RequestMapping("/api")
-public class RecommendationPromotionController {
+public class RecommendationPromotionRestController {
     private final PromotionRepository promotionRepository;
     private final ConfigProperties config;
     private final EventService eventService;
     private final EventRepository eventRepository;
 
-    public RecommendationPromotionController(
+    public RecommendationPromotionRestController(
             PromotionRepository promotionRepository,
             ConfigProperties config,
             EventService eventService,

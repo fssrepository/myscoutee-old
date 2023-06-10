@@ -1,0 +1,66 @@
+[
+    "{ \n" +
+            "                            \$lookup: \n" +
+            "                            { \n" +
+            "                                from: 'likes', \n" +
+            "                                let: { 'p_id': '\$_id' }, \n" +
+            "                                pipeline: [ \n" +
+            "                                    { \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr: { \n" +
+            "                                                \$and: [\n" +
+            "                                                    {\$eq: [ '\$from.\$id', ?0 ]},\n" +
+            "                                                    {\$eq: [ '\$\$p_id', '\$ref' ]},\n" +
+            "                                                ] \n" +
+            "                                            } \n" +
+            "                                        } \n" +
+            "                                    },\n" +
+            "                                ], \n" +
+            "                                as: 'likes', \n" +
+            "                            } \n" +
+            "                    }",
+
+    "{ \n" +
+            "                \$unwind: { path: '\$likes'} \n" +
+            "            }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gte: [ '\$info.range.start', { \$toDate: :#{#offset[0]} } ] },\n" +
+            "                    {\$lte: [ '\$likes.rate', :#{#offset[1]} ] },\n" +
+            "                    {\$gt: [ '\$createdDate', { \$toDate: :#{#offset[2]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'info.range.start': 1, 'likes.rate': -1 , 'createdDate': 1\n" +
+            "        }\n" +
+            "    }",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'groupKey': {\n" +
+            "                \$dateToString: {\n" +
+            "                    format: ?3,\n" +
+            "                    date: '\$info.range.start'\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'event': '\$\$ROOT'}, { groupKey: '\$groupKey', rate: '\$likes.rate', sortKey: { \$toLong: '\$info.range.start' }, offset: ['\$info.range.start', '\$likes.rate', '\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }"
+]

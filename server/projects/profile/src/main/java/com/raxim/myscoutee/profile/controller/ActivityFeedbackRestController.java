@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.util.CommonUtil;
+import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Feedback;
 import com.raxim.myscoutee.profile.data.dto.rest.FeedbackDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
@@ -29,11 +31,14 @@ import com.raxim.myscoutee.profile.repository.mongo.FeedbackRepository;
 public class ActivityFeedbackRestController {
     private final EventRepository eventRepository;
     private final FeedbackRepository feedbackRepository;
+    private final ObjectMapper objectMapper;
 
     public ActivityFeedbackRestController(EventRepository eventRepository,
-            FeedbackRepository feedbackRepository) {
+            FeedbackRepository feedbackRepository,
+            ObjectMapper objectMapper) {
         this.eventRepository = eventRepository;
         this.feedbackRepository = feedbackRepository;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping(value = { "events/{id}/feedbacks", "invitations/{id}/feedbacks" })
@@ -86,10 +91,12 @@ public class ActivityFeedbackRestController {
             @PathVariable String feedbackId,
             @RequestBody Feedback feedback) {
         Optional<Feedback> savedFeedback = eventRepository.findById(UUID.fromString(id)).map(event -> {
-            Feedback dbFeedback = event.getFeedbacks().stream().filter(f -> f.getId().equals(feedbackId.uuid()))
+            Feedback dbFeedback = event.getFeedbacks().stream()
+                    .filter(f -> f.getId().equals(CommonUtil.parseUUID(feedbackId)))
                     .findFirst().orElse(null);
             if (dbFeedback != null) {
-                Feedback lFeedback = feedback.copyWithId(dbFeedback.getId());
+                Feedback lFeedback = JsonUtil.clone(feedback, objectMapper);
+                lFeedback.setId(dbFeedback.getId());
                 Feedback saved = feedbackRepository.save(lFeedback);
                 event.getFeedbacks().add(saved);
                 eventRepository.save(event);

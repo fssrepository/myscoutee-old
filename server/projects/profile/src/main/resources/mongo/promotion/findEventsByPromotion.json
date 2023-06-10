@@ -1,0 +1,108 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup: {\n" +
+            "            from: 'events',\n" +
+            "            localField: 'events.\$id',\n" +
+            "            foreignField: '_id',\n" +
+            "            as: 'events'\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$events'\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$eq: [ '\$events.status', 'P' ] },\n" +
+            "                    {\$gt: [ '\$events.cnt', 0 ] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{ \n" +
+            "                            \$lookup: \n" +
+            "                            { \n" +
+            "                                from: 'likes', \n" +
+            "                                let: { 'p_id': '\$events._id' }, \n" +
+            "                                pipeline: [ \n" +
+            "                                    { \n" +
+            "                                        \$match: { \n" +
+            "                                            \$expr: { \n" +
+            "                                                \$and: [\n" +
+            "                                                    {\$eq: [ '\$\$p_id', '\$ref' ]},\n" +
+            "                                                    {\$eq: [ '\$from.\$id', ?4 ]},\n" +
+            "                                                ] \n" +
+            "                                            } \n" +
+            "                                        } \n" +
+            "                                    },\n" +
+            "                                ], \n" +
+            "                                as: 'likes', \n" +
+            "                            } \n" +
+            "                    }",
+
+    "{ \n" +
+            "                            \$unwind: { path: '\$likes', preserveNullAndEmptyArrays: true } \n" +
+            "                        }",
+
+
+    "{ \n" +
+            "                            \$group: { \n" +
+            "                                '_id': '\$events._id', \n" +
+            "                                'data': { '\$first': '\$events' },\n" +
+            "                                'groupType': { '\$first': '\$groupType' },\n" +
+            "                                'promoType': { '\$first': '\$type' },\n" +
+            "                                'rate': { '\$first': {\$ifNull: [ '\$likes.rate', 0]} },\n" +
+            "                            } \n" +
+            "                    }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ '\$data.info.range.start', { \$toDate: :#{#offset[0]} } ] },\n" +
+            "                    {\$lte: [ '\$rate', :#{#offset[1]} ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[2]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.info.range.start': 1, 'rate': -1, 'data.createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'groupKey': {\n" +
+            "                \$dateToString: {\n" +
+            "                    format: ?3,\n" +
+            "                    date: '\$data.info.range.start'\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'event': '\$data'}, { groupKey: '\$groupKey', promoType: '\$promoType', rate: '\$rate', groupType: '\$groupType', offset: ['\$data.info.range.start', '\$rate', '\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

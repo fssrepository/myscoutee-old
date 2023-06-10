@@ -1,0 +1,101 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: {\n" +
+            "                \$and: [\n" +
+            "                    {\$in: [ '\$_id', :#{#eventIds} ] }\n" +
+            "                ]\n" +
+            "            }\n" +
+            "        },\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$info.members'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: {\n" +
+            "                \$or: [\n" +
+            "                    {\$eq: [ '\$info.members.status', 'A'] }\n" +
+            "                    {\$eq: [ '\$info.members.status', 'I'] }\n" +
+            "                ]\n" +
+            "            }\n" +
+            "        },\n" +
+            "    }",
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'profiles',\n" +
+            "            let: { 'p_id': '\$info.members.profile.\$id', 'p_members' : '\$info.members' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$and: [\n" +
+            "                                {\$eq: ['\$\$p_id', '\$_id']},\n" +
+            "                                {\$eq: [ '\$status', 'A']}\n" +
+            "                            ]\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'profiles',\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$profiles'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'users',\n" +
+            "            let: { 'p_id': '\$profiles._id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$in: ['\$\$p_id', '\$profiles.\$id']\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            as: 'users',\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$users'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'tokens',\n" +
+            "            let: { 'u_id': '\$users._id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$eq: ['\$\$u_id', '\$uuid']\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            as: 'tokens',\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$tokens'\n" +
+            "    }",
+
+    "{ \n" +
+            "        \$replaceRoot: {  \n" +
+            "            'newRoot': '\$tokens' \n" +
+            "        } \n" +
+            "    }"
+
+]

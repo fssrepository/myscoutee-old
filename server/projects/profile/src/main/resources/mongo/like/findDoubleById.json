@@ -1,0 +1,94 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "            \$and: [\n" +
+            "                {\$eq: ['\$createdBy.\$id', ?0]},\n" +
+            "                {\n" +
+            "                    \$or: [\n" +
+            "                        {\$eq: ['\$from.\$id', ?1]},\n" +
+            "                        {\$eq: ['\$to.\$id', ?1]}\n" +
+            "                    ]\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \$eq: ['\$double', true]\n" +
+            "                },\n" +
+            "                {\n" +
+            "                    \$eq: [{\$ifNull: [ '\$ref', 0]}, 0]\n" +
+            "                },\n" +
+            "            ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'profiles',\n" +
+            "            let: { 'from_id': '\$from.\$id', 'to_id' : '\$to.\$id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$or: [{\n" +
+            "                                    \$and: [\n" +
+            "                                        { \$eq: ['\$\$from_id', '\$_id']}, \n" +
+            "                                        { \$ne: ['\$\$from_id', ?1]}\n" +
+            "                                    ]},\n" +
+            "                                {\n" +
+            "                                    \$and: [\n" +
+            "                                        { \$eq: ['\$\$to_id', '\$_id']}, \n" +
+            "                                        { \$ne: ['\$\$to_id', ?1]}\n" +
+            "                                    ]}\n" +
+            "                            ]\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'profiles',\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$profiles'\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$profiles._id',\n" +
+            "            'rate': {\$first: '\$rate'},\n" +
+            "            data: {\n" +
+            "                \$first: '\$profiles'\n" +
+            "            }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[0]} }] },\n" +
+            "                    {\$in: [ '\$data.status', :#{#status} ]},\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.createdDate': -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?2 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'profile': '\$data'}, { rate: {\$ifNull: [ '\$rate', 0]}, offset: ['\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

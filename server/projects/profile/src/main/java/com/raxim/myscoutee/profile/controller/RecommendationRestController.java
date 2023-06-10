@@ -19,13 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.Page;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
-import com.raxim.myscoutee.profile.data.document.mongo.Feedback;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Role;
@@ -37,6 +34,11 @@ import com.raxim.myscoutee.profile.data.dto.rest.FeedbackDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.RoleRepository;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.util.EventUtil;
 

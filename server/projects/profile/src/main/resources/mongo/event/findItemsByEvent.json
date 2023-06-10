@@ -1,0 +1,111 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$lookup: {\n" +
+            "            from: 'items',\n" +
+            "            localField: 'items.\$id',\n" +
+            "            foreignField: '_id',\n" +
+            "            as: 'items'\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$items'\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$items._id',\n" +
+            "            data: { '\$first': '\$items' },\n" +
+            "            evt: { '\$first': '\$\$ROOT' },\n" +
+            /*"            user: { \$first : {\n" +
+            "                        \$filter: {\n" +
+            "                            input: '\$info.members',\n" +
+            "                            as: 'member',\n" +
+            "                            cond: { \$eq: [ '\$\$member.profile.\$id', ?4 ] }\n" +
+            "                        }\n" +
+            "                }\n" +
+            "            },\n" +*/
+            "            positions: { '\$first': '\$positions' },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$eq: [ '\$data.status', 'A' ] },\n" +
+            "                    {\$gt: [ '\$data.range.start', { \$toDate: :#{#offset[0]} } ] },\n" +
+            "                    {\$gt: [ {\$ifNull: [ '\$data.createdDate', ISODate()]}, { \$toDate: :#{#offset[1]} }] },\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'data.range.start': 1, 'data.createdDate': 1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?1 }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'groupKey': {\n" +
+            "                \$dateToString: {\n" +
+            "                    format: ?3,\n" +
+            "                    date: '\$data.range.start'\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'member': { \$first : {\n" +
+            "                        \$filter: {\n" +
+            "                            input: '\$data.members',\n" +
+            "                            as: 'member',\n" +
+            "                            cond: { \$and: [" +
+            "                                        {\$eq: [ '\$\$member.profile.\$id', ?4 ] },\n" +
+            "                                        {\$eq: [ '\$\$member.status', 'A' ] }\n" +
+            "                                    ]\n"+
+            "                            }\n"+
+            "                        }\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$addFields: {\n" +
+            "            'user': { \$first : {\n" +
+            "                        \$filter: {\n" +
+            "                            input: '\$evt.info.members',\n" +
+            "                            as: 'member',\n" +
+            "                            cond: { \$and: [" +
+            "                                        {\$eq: [ '\$\$member.profile.\$id', ?4 ] },\n" +
+            "                                        {\$eq: [ '\$\$member.status', 'A' ] }\n" +
+            "                                    ]\n"+
+            "                            }\n"+
+            "                        }\n" +
+            "                }\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'item': '\$data'}, { groupKey: '\$groupKey', role: { \$cond: [ {\$ifNull: ['\$user', null] }, '\$user.role', null ] }, isPromotion: { \$cond: [ {\$ifNull: ['\$evt.ref', false] }, true, false ] }, sortKey: { \$toLong: '\$data.createdDate' }, isMember: { \$cond: [ {\$ifNull: ['\$member', false] }, true, false ] }, category: '\$evt.info.category', main: { \$cond: [ { \$eq: ['\$evt.info._id', '\$data._id'] }, true, false] }, positions: { \$cond: [ { \$eq: ['\$evt.info._id', '\$data._id'] }, \$positions, null] }, offset: ['\$data.range.start', '\$data.createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

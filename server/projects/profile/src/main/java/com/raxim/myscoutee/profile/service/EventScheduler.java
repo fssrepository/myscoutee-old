@@ -2,6 +2,7 @@ package com.raxim.myscoutee.profile.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Notification;
 import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
 import com.raxim.myscoutee.common.util.JsonUtil;
@@ -44,30 +45,46 @@ public class EventScheduler {
 
     @Scheduled(cron = "0 0 3 * * MON")
     public void autoGenerateRooms() {
-        generateEvents();
+        try {
+            generateEvents();
+        } catch (FirebaseMessagingException | InvalidScheduleSettingsException e) {
+            e.printStackTrace();
+        }
     }
 
     @Scheduled(cron = "0 0 2 * * MON")
     public void autoTopicRegistration() {
-        topicRegistration("1900-01-01");
+        try {
+            topicRegistration("1900-01-01");
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     // greater than profileUpdated field!
-    public void topicRegistration(String lastTime) {
+    public void topicRegistration(String lastTime) throws FirebaseMessagingException {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         userRepository.findDeviceWithProfileStatusAll(lastTime, new String[]{"A"})
                 .forEach(topic -> {
                     String topicName = topic.getName().replace(" ", "_");
-                    FirebaseMessaging.getInstance().subscribeToTopic(topic.getTokens(), topicName);
+                    try {
+                        FirebaseMessaging.getInstance().subscribeToTopic(topic.getTokens(), topicName);
+                    } catch (FirebaseMessagingException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println(topic.getTokens().size() + " tokens were subscribed successfully from " + topic.getName());
                 });
 
         userRepository.findDeviceWithProfileStatusAll(lastTime, new String[]{"I", "F", "S", "P"})
                 .forEach(topic -> {
                     String topicName = topic.getName().replace(" ", "_");
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(topic.getTokens(), topicName);
+                    try {
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic.getTokens(), topicName);
+                    } catch (FirebaseMessagingException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println(topic.getTokens().size() + " tokens were unsubscribed successfully from " + topic.getName());
                 });
 
@@ -87,7 +104,7 @@ public class EventScheduler {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    public void generateEvents() {
+    public void generateEvents() throws InvalidScheduleSettingsException, FirebaseMessagingException {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 

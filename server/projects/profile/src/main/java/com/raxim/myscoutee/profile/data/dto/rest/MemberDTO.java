@@ -18,6 +18,11 @@ public class MemberDTO {
     @JsonProperty(value = "role")
     private String role;
 
+    public MemberDTO(Member member, List<Object> offset) {
+        this.member = member;
+        this.offset = offset;
+    }
+
     public Member getMember() {
         return member;
     }

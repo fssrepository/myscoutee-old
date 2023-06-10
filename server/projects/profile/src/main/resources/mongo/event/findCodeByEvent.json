@@ -1,0 +1,32 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            '_id': ?0\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            'info.members' : { \$elemMatch: { 'profile.\$id': ?1 } }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$unwind: '\$info.members'\n" +
+            "}",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$info.members._id',\n" +
+            "            data: {\n" +
+            "                \$first: '\$info.members.code'\n" +
+            "            }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$replaceRoot: {\n" +
+            "            'newRoot': {'code': '\$data'}\n" +
+            "        }\n" +
+            "}"
+]

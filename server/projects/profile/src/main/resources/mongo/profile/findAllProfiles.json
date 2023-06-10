@@ -1,0 +1,26 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$lt: [{\$ifNull: [ \$createdDate, ISODate()]}, { \$toDate: :#{#offset[0]} }]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            createdDate: -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?0 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            newRoot: { \n" +
+            "                \$mergeObjects: [{profile: \$\$ROOT}, { offset: [\$createdDate] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "}"
+]

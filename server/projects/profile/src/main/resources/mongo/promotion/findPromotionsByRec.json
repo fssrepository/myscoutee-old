@@ -1,0 +1,50 @@
+[
+    "{\n" +
+            "        \$geoNear :\n" +
+            "        {\n" +
+            "            near :\n" +
+            "            ?1,\n" +
+            "            spherical     : true,\n" +
+            "            minDistance   : :#{#offset[0]},\n" +
+            "            distanceField : 'distance',\n" +
+            "            distanceMultiplier: 0.001,\n" +
+
+            // 'type': ?4, 'group': ?5
+            "            query         : { 'group.\$id': ?5 }\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: \n" +
+            "            {\n" +
+            "                \$and: [\n" +
+            "                    {\$gt: [ '\$cnt', 0 ] }\n" +
+            "                ]\n" +
+            "            },\n" +
+            "        }\n" +
+            "}",
+
+    "{\n" +
+            "                \$addFields: {\n" +
+            "                    'groupKey': {\$multiply: [{\$floor : [{\$divide : ['\$distance', ?3]}]}, ?3]},\n" +
+            "                }\n" +
+            "            }",
+
+    // 'rate': -1,
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'groupKey': 1, 'distance': 1, createdDate: -1\n" +
+            "        }\n" +
+            "}",
+
+    "{ \$limit : ?2 }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            'newRoot': { \n" +
+            "                \$mergeObjects: [{'promotion': '\$\$ROOT'}, { groupKey: '\$groupKey', offset: ['\$groupKey', '\$distance', '\$createdDate'] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }"
+]

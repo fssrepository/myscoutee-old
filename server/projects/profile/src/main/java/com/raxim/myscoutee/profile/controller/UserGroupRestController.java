@@ -43,6 +43,13 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileStatusDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
+import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
+import com.raxim.myscoutee.profile.repository.mongo.LinkRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.RoleRepository;
+import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.service.ProfileService;
 import com.raxim.myscoutee.profile.util.EventItemUtil;
@@ -78,6 +85,7 @@ public class UserGroupRestController {
         this.likeRepository = likeRepository;
         this.linkRepository = linkRepository;
         this.config = config;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/groups/{groupId}/events")
@@ -327,8 +335,7 @@ public class UserGroupRestController {
         Role roleToSave = new Role();
         roleToSave.setId(UUID.randomUUID());
         roleToSave.setProfileId(profileSaved.getId());
-        roleToSave.setRole(null);
-        UUID.randomUUID(), profileSaved.getId(), FirebaseService.ROLE_ADMIN);
+        roleToSave.setRole(FirebaseService.ROLE_ADMIN);
         roleRepository.save(roleToSave);
 
         return ResponseEntity.ok(groupProfileSaved);
@@ -342,7 +349,10 @@ public class UserGroupRestController {
             @RequestBody Group group) {
 
         Optional<Group> groupSaved = groupRepository.findById(UUID.fromString(id)).map(groupOld -> {
-            Group groupToSave = group.copy(groupOld.getId(), groupOld.getCreatedDate(), groupOld.getCreatedBy());
+            Group groupToSave = JsonUtil.clone(group, objectMapper);
+            groupToSave.setId(groupOld.getId());
+            groupToSave.setCreatedDate(groupOld.getCreatedDate());
+            groupToSave.setCreatedBy(groupOld.getCreatedBy());
             return groupRepository.save(groupToSave);
         });
 

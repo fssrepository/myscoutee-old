@@ -1,0 +1,110 @@
+[
+    "{\n" +
+            "        \$match: {\n" +
+            "            \$expr: { \$eq: ['\$email', ?0] }\n" +
+            "        }\n" +
+            "    }",
+
+    "{ \n" +
+            "                            \$unwind: '\$profiles' \n" +
+            "                        }",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'profiles',\n" +
+            "            let: { 'p_id': '\$profiles.\$id' },\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\n" +
+            "                            \$and: [\n" +
+            "                                { \$eq: ['\$\$p_id', '\$_id'] },\n" +
+            "                                { \$ne: ['\$status', 'D'] }\n" +
+            "                                { \$ne: ['\$status', 'P'] }\n" +
+            "                            ]\n" +
+            "                        }\n" +
+            "                    },\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'profile'\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$profile'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            \"newRoot\": '\$profile'\n" +
+            "        }\n" +
+            "    }",
+
+    "{ \n" +
+            "        \$lookup: \n" +
+            "        { \n" +
+            "            from: 'roles', \n" +
+            "            let: { 'p_id': '\$_id' }, \n" +
+            "            pipeline: [ \n" +
+            "                { \n" +
+            "                    \$match: { \n" +
+            "                        \$expr: { \$eq: ['\$\$p_id', '\$profileId'] } \n" +
+            "                    }, \n" +
+            "                }, \n" +
+            "            ], \n" +
+            "            as: 'role' \n" +
+            "        } \n" +
+            "    }",
+
+    "{ \n" +
+            "        \$unwind: '\$role' \n" +
+            "    }",
+
+    "{\n" +
+            "        \$lookup:\n" +
+            "        {\n" +
+            "            from: 'groups',\n" +
+            "            let: { 'g_id': '\$group'},\n" +
+            "            pipeline: [\n" +
+            "                {\n" +
+            "                    \$match: {\n" +
+            "                        \$expr: {\$eq: ['\$\$g_id', '\$_id']},\n" +
+            "                        \n" +
+            "                    },\n" +
+            "                },\n" +
+            "            ],\n" +
+            "            as: 'group'\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$unwind: '\$group'\n" +
+            "    }",
+
+    "{\n" +
+            "        \$group: {\n" +
+            "            '_id': '\$_id',\n" +
+            "            'role': {\n" +
+            "                \$first: '\$role.role'\n" +
+            "            },\n" +
+            "            'data': {\n" +
+            "                \$first: '\$group'\n" +
+            "            },\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$sort: {\n" +
+            "            'group.createdDate': 1\n" +
+            "        }\n" +
+            "    }",
+
+    "{\n" +
+            "        \$replaceRoot: { \n" +
+            "            \"newRoot\": { \n" +
+            "                \$mergeObjects: [{'group': '\$data'}, { 'role': '\$role' , offset: [] } ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }"
+]

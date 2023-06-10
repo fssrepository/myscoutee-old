@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import com.raxim.myscoutee.algo.BGroupSet;
 import com.raxim.myscoutee.algo.NodeRepository;
 import com.raxim.myscoutee.algo.dto.Bound;
 import com.raxim.myscoutee.algo.dto.Edge;
+import com.raxim.myscoutee.algo.dto.GroupAlgo;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
@@ -30,13 +32,12 @@ public class EventGeneratorService {
     private final LikeRepository likeRepository;
     private final Map<String, Profile> nodes;
 
-    public GroupGenerator(ScheduleRepository scheduleRepository, LikeRepository likeRepository) {
+    public EventGeneratorService(ScheduleRepository scheduleRepository, LikeRepository likeRepository) {
         this.scheduleRepository = scheduleRepository;
         this.likeRepository = likeRepository;
         this.nodes = new HashMap<>();
     }
 
-    @Override
     public List<Set<Profile>> generate(Bound flags) {
         Optional<Schedule> schedule = scheduleRepository.findByKey(RANDOM_GROUP);
         Date lastRunningTime = schedule.map(Schedule::getLastRunDate).orElse(new Date());
@@ -66,9 +67,11 @@ public class EventGeneratorService {
         nodes.putAll(nodeMap);
 
         List<Set<Profile>> profileList = new ArrayList<>();
-        for(com.raxim.myscoutee.algo.dto.Group group : groupSet) {
-            
-            Set<Profile> profilesByGroup = group.getNodes().stream().map(node -> node.stream().map(id -> nodes.get(id.getId())).collect(Collectors.toSet()))
+        for (GroupAlgo group : groupSet) {
+
+            Set<Profile> profilesByGroup = group.getNodes().stream()
+                    .map(node -> nodes.get(node.getId()))
+                    .collect(Collectors.toSet());
             profileList.add(profilesByGroup);
 
         }

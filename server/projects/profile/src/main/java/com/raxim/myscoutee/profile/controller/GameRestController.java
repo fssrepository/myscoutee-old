@@ -191,7 +191,7 @@ public class GameRestController {
                     profile.getId(),
                     gender,
                     profile.getGroup(),
-                    1.0);
+                    1.0,0);
 
             // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
 
@@ -249,7 +249,7 @@ public class GameRestController {
                     profile.getId(),
                     gender,
                     profile.getGroup(),
-                    2.0);
+                    2.0,0);
 
             // nullify rate received
             List<ProfileDTO> profiles = fProfiles.stream().map(fProfile -> {
@@ -426,7 +426,7 @@ public class GameRestController {
                     profile.getId(),
                     gender,
                     profile.getGroup(),
-                    1.5);
+                    1.5, 0);
 
             // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
 

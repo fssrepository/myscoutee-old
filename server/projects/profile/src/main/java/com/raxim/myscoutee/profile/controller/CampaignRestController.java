@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.google.api.Page;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Idea;
@@ -108,11 +107,12 @@ public class CampaignRestController {
         User user = principal.getUser();
         UUID profileId = user.getProfile().getId();
 
-        List<Object> tOffset;
+        Object[] tOffset;
         if (offset != null && offset.length == 3) {
-            tOffset = Arrays.asList( CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]), CommonUtil.decode(offset[2]) );
+            tOffset = new Object[] { CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]),
+                    CommonUtil.decode(offset[2]) };
         } else {
-            tOffset = Arrays.asList( "A", "1900-01-01", "1900-01-01" );
+            tOffset = new Object[] { "A", "1900-01-01", "1900-01-01" };
         }
 
         List<ProfileDTO> profiles = promotionRepository.findProfilesByPromotion(UUID.fromString(promoId), 20,
