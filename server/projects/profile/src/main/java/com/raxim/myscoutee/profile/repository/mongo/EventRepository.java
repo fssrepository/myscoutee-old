@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -22,8 +21,7 @@ import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 
 @RepositoryRestResource(collectionResourceRel = "events", path = "events")
-public interface EventRepository extends MongoRepository<Event, UUID>,
-        QuerydslPredicateExecutor<Event> {
+public interface EventRepository extends MongoRepository<Event, UUID> {
 
     @Query("{'status': 'P', 'ref.$id': ?0, 'info.members.profile.$id': ?1}")
     List<Event> findPendingEvents(UUID eventId, UUID profileId);
@@ -35,46 +33,46 @@ public interface EventRepository extends MongoRepository<Event, UUID>,
 
     @Aggregation(pipeline = "findEventsByStatus")
     List<EventDTO> findEventsByStatus(
-            UUID group,
-            int limit,
+            @Param("group") UUID group,
+            @Param("limit") int limit,
             @Param("offset") String[] offset,
             @Param("status") String status);
 
     @Aggregation(pipeline = "findEventsByProfile")
     List<EventDTO> findEventsByProfile(
-            UUID currentId,
-            Point loc,
-            int limit,
-            int step,
-            UUID groupId,
+            @Param("currentId") UUID currentId,
+            @Param("loc") Point loc,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("groupId") UUID groupId,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findEventDown")
     List<EventDTO> findEventDown(
-            UUID currentId,
-            int limit,
-            int step,
-            String format,
+            @Param("currentId") UUID currentId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
             @Param("evtStatus") String[] eventStatus,
             @Param("offset") String[] offset,
             @Param("status") String status);
 
     @Aggregation(pipeline = "findEventUp")
     List<EventDTO> findEventUp(
-            UUID currentId,
-            int limit,
-            int step,
-            String format,
+            @Param("currentId") UUID currentId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
             @Param("evtStatus") String[] eventStatus,
             @Param("offset") String[] offset,
             @Param("status") String status);
 
     @Aggregation(pipeline = "findEventByMonth")
     List<EventDTO> findEventByMonth(
-            UUID currentId,
-            int limit,
-            int step,
-            String format,
+            @Param("currentId") UUID currentId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
             @Param("evtStatus") String[] eventStatus,
             @Param("until") Object until,
             @Param("offset") String[] offset,
@@ -82,61 +80,61 @@ public interface EventRepository extends MongoRepository<Event, UUID>,
 
     @Aggregation(pipeline = "findProfileByEvent")
     List<ProfileDTO> findProfileByEvent(
-            UUID currentId,
-            int limit,
-            int step,
+            @Param("currentId") UUID currentId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset,
             @Param("status") String status);
 
     @Aggregation(pipeline = "findItemsByEvent")
     List<EventItemDTO> findItemsByEvent(
-            UUID eventId,
-            int limit,
-            int step,
-            String format,
-            UUID profileId,
+            @Param("eventId") UUID eventId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
+            @Param("profileId") UUID profileId,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findFeedbacksByEvent")
     List<FeedbackDTO> findFeedbacksByEvent(
-            UUID eventId,
-            int limit,
-            int step,
+            @Param("eventId") UUID eventId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findMembersByEvent")
     List<MemberDTO> findMembersByEvent(
-            UUID eventId,
-            int limit,
-            int step,
-            UUID profileId,
+            @Param("eventId") UUID eventId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("profileId") UUID profileId,
             @Param("status") String[] status,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findProfilesByPromotion")
     List<ProfileDTO> findProfilesByPromotion(
-            UUID eventId,
-            int limit,
-            int step,
-            UUID profileId,
+            @Param("eventId") UUID eventId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("profileId") UUID profileId,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findMemberByCode")
     Optional<MemberDTO> findMemberByCode(
-            UUID eventId,
-            String code);
+            @Param("eventId") UUID eventId,
+            @Param("code") String code);
 
     @Aggregation(pipeline = "findCodeByEvent")
     Optional<CodeDTO> findCodeByEvent(
-            UUID eventId,
-            UUID userUid);
+            @Param("eventId") UUID eventId,
+            @Param("userUid") UUID userUid);
 
     @Aggregation(pipeline = "findEventsByRated")
     List<EventDTO> findEventsByRated(
-            UUID currentId,
-            int limit,
-            int step,
-            String format,
+            @Param("currentId") UUID currentId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findTokensByEvent")

@@ -1,16 +1,16 @@
 [
         {
             "$geoNear": {
-                "near": "?1",
+                "near": ":#{#loc}",
                 "spherical": true,
                 "minDistance": ":#{#offset[0]}",
                 "distanceField": "distance",
                 "distanceMultiplier": 0.001,
                 "query": {
-                    "_id": { "$nin": "?4" },
-                    "type": "?0",
+                    "_id": { "$nin": [":#{#uuids}"] },
+                    "type": ":#{#type}",
                     "system": false,
-                    "visibility": "pu"
+                    "visibility": "public"
                 }
             }
         },
@@ -19,14 +19,14 @@
                 "$expr": {
                     "$and": [
                         { "$gt": [{ "$ifNull": ["$createdDate", "ISODate()"] }, { "$toDate": ":#{#offset[1]}" }] },
-                        { "$gte": ["$distance", ":#{#offset[2]}"] }
+                        { "$gte": ["$distance", ":#{#offset[2]}" ] }
                     ]
                 }
             }
         },
         {
             "$addFields": {
-                "groupKey": { "$multiply": [{ "$floor": [{ "$divide": ["$distance", "?3"] }] }, "?3"] }
+                "groupKey": { "$multiply": [{ "$floor": [{ "$divide": ["$distance", ":#{#step}"] }] }, ":#{#step}"] }
             }
         },
         {
@@ -37,7 +37,7 @@
             }
         },
         {
-            "$limit": "?2"
+            "$limit": ":#{#limit}"
         },
         {
             "$replaceRoot": {

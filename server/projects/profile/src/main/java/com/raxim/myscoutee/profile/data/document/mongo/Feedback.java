@@ -1,18 +1,17 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.querydsl.core.annotations.QueryEntity;
+import java.util.Date;
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /*
  * 1) panel coloring depends on rate.
  */
-@QueryEntity
 @Document(collection = "feedbacks")
 public class Feedback {
 

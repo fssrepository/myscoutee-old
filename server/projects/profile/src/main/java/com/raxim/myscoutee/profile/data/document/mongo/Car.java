@@ -1,14 +1,15 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.querydsl.core.annotations.QueryEntity;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@QueryEntity
 @Document(collection = "cars")
 public class Car {
     @Id

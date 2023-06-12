@@ -16,9 +16,9 @@ public interface JobRepository extends MongoRepository<Job, UUID> {
 
     @Aggregation(pipeline = "findJobsByProfile")
     List<JobDTO> findJobsByProfile(
-            UUID profileId,
-            int limit,
-            int step,
+            @Param("profileId") UUID profileId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
 }

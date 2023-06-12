@@ -1,14 +1,12 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.querydsl.core.annotations.QueryEntity;
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@QueryEntity
 @Document(collection = "scheduleSettings")
 public class ScheduleSetting {
     @Id

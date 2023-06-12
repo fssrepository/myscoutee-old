@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +14,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 
 @Repository
-public interface GroupRepository extends MongoRepository<Group, UUID>,
-        QuerydslPredicateExecutor<Group> {
+public interface GroupRepository extends MongoRepository<Group, UUID> {
 
     @Query("{system: true}")
     List<Group> findSystemGroups();
@@ -26,11 +24,11 @@ public interface GroupRepository extends MongoRepository<Group, UUID>,
 
     @Aggregation(pipeline = "findGroupByProfile")
     List<GroupDTO> findGroupByProfile(
-            String type,
-            Point loc,
-            int limit,
-            int step,
-            List<UUID> uuids,
+            @Param("type") String type,
+            @Param("loc") Point loc,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("uuids") List<UUID> uuids,
             @Param("offset") Object[] offset);
 
 }

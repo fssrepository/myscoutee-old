@@ -19,58 +19,58 @@ import com.raxim.myscoutee.profile.data.dto.rest.PromotionDTO;
 
 @Repository
 public interface PromotionRepository
-        extends MongoRepository<com.raxim.myscoutee.profile.data.document.mongo.Promotion, UUID> {
+        extends MongoRepository<Promotion, UUID> {
 
     @Query("{'events.$id' : ?0}")
     Optional<Promotion> findPromotionByEvent(UUID eventId);
 
     @Aggregation(pipeline = "findPromotionsByProfile")
     List<PromotionDTO> findPromotionsByProfile(
-            UUID profileId,
-            int limit,
-            int step,
+            @Param("profileId") UUID profileId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findEventsByPromotion")
     List<EventDTO> findEventsByPromotion(
-            UUID promotionId,
-            int limit,
-            int step,
-            String format,
-            UUID profileId,
+            @Param("promotionId") UUID promotionId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
+            @Param("profileId") UUID profileId,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findProfilesByPromotion")
     List<ProfileDTO> findProfilesByPromotion(
-            UUID promotionId,
-            int limit,
-            int step,
-            UUID profileId,
+            @Param("promotionId") UUID promotionId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("profileId") UUID profileId,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findMembersByPromotion")
     List<MemberDTO> findMembersByPromotion(
-            UUID promotionId,
-            int limit,
-            int step,
+            @Param("promotionId") UUID promotionId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("status") String[] status,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findPromotionsByRec")
     List<PromotionDTO> findPromotionsByRec(
-            UUID currentId,
-            Point loc,
-            int limit,
-            int step,
-            String type,
-            UUID groupId,
+            @Param("currentId") UUID currentId,
+            @Param("loc") Point loc,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("type") String type,
+            @Param("groupId") UUID groupId,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findFullEventsByPromoter")
     List<EventDTO> findFullEventsByPromoter(
-            UUID profileId,
-            int limit,
-            int step,
-            String format,
+            @Param("profileId") UUID profileId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("format") String format,
             @Param("offset") Object[] offset);
 }

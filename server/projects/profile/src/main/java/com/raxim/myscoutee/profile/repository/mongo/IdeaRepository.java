@@ -16,9 +16,9 @@ public interface IdeaRepository extends MongoRepository<Idea, UUID> {
 
     @Aggregation(pipeline = "findIdeasByProfile")
     List<IdeaDTO> findIdeasByProfile(
-            UUID profileId,
-            int limit,
-            int step,
+            @Param("profileId") UUID profileId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
 }

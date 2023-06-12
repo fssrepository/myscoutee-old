@@ -13,24 +13,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.querydsl.core.annotations.QueryEntity;
 import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 
-@QueryEntity
 @Document(collection = "groups")
 public class Group {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
 
+    /*
+     * values: dating
+     */
     @JsonProperty(value = "name")
     private String name;
 
-    // dating/team building
+    // values: d
     @JsonProperty(value = "type")
     private String type;
 
-    // public, private
+    // public
     @JsonProperty(value = "visibility")
     private String visibility;
 

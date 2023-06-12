@@ -1,10 +1,10 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@QueryEntity
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 @Document(collection = "rules")
 public class Rule {
     @JsonProperty(value = "met")

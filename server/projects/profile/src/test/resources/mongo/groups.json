@@ -1,0 +1,16 @@
+[
+    {
+        "_id": { "$binary": "9LgfL1AomJ0udg==", "$type": "03" },
+        "name": "dating",
+        "type": "d",
+        "visibility": "public",
+        "system": true,
+        "desc": "Dating",
+        "position": {
+          "type": "Point",
+          "coordinates": [47.497912,19.040235]
+        },
+        "createdDate": { "$date": "2023-06-12T12:30:00Z" },
+        "createdBy": "2e7b0c6c-57e6-4c0a-98c0-516abed677ab"
+      }
+]

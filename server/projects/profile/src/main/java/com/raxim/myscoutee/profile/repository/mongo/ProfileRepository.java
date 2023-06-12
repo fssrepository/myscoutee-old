@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -20,60 +19,59 @@ import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
 
 @RepositoryRestResource(collectionResourceRel = "profiles", path = "profiles")
-public interface ProfileRepository extends MongoRepository<Profile, UUID>,
-        QuerydslPredicateExecutor<Profile> {
+public interface ProfileRepository extends MongoRepository<Profile, UUID> {
 
     @Aggregation(pipeline = "findProfile")
     List<ProfileDTO> findProfile(
-            Point loc,
+            @Param("loc") Point loc,
             @Param("offset") Object[] offset, // minDistance
-            int limit,
-            int step,
-            UUID currentId,
-            String gender,
-            UUID groupId,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("currentId") UUID currentId,
+            @Param("gender") String gender,
+            @Param("groupId") UUID groupId,
             @Param("type") double type,
-            Integer score);
+            @Param("offset") Integer score);
 
     @Aggregation(pipeline = "findProfileNoType")
     List<ProfileDTO> findProfileNoType(
-            Point loc,
+            @Param("loc") Point loc,
             @Param("offset") Object[] offset, // minDistance
-            int limit,
-            int step,
-            UUID sProfileId,
-            String gender,
-            UUID groupId,
-            UUID cProfileId, // curr
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("sProfileId") UUID sProfileId,
+            @Param("gender") String gender,
+            @Param("groupId") UUID groupId,
+            @Param("cProfileId") UUID cProfileId, // curr
             @Param("type") double type);
 
     @Aggregation(pipeline = "findInvitationByProfile")
     List<EventDTO> findInvitationByProfile(
-            UUID currentId,
-            Point loc,
-            int limit,
-            int step,
-            UUID group,
+            @Param("currentId") UUID currentId,
+            @Param("loc") Point loc,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("groupId") UUID groupId,
             @Param("offset") Object[] offset,
             @Param("type") double type);
 
     @Aggregation(pipeline = "findPeopleByProfile")
     @Deprecated
     List<ProfileDTO> findPeopleByProfile(
-            UUID currentId,
-            Point loc,
-            int limit,
-            int step,
-            String gender,
-            UUID groupId,
+            @Param("currentId") UUID currentId,
+            @Param("loc") Point loc,
+            @Param("limit") int limit,
+            @Param("step") int step,
+            @Param("gender") String gender,
+            @Param("groupId") UUID groupId,
             @Param("offset") Object[] offset,
             @Param("type") double type);
 
     @Aggregation(pipeline = "findCarsByProfilePage")
     List<CarDTO> findCarsByProfile(
-            UUID profileId,
-            int limit,
-            int step,
+            @Param("profileId") UUID profileId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findCarByProfile")
@@ -84,22 +82,22 @@ public interface ProfileRepository extends MongoRepository<Profile, UUID>,
 
     @Aggregation(pipeline = "findSchoolsByProfile")
     List<SchoolDTO> findSchoolsByProfile(
-            UUID profileId,
-            int limit,
-            int step,
+            @Param("profileId") UUID profileId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findAllProfiles")
     List<ProfileDTO> findAllProfiles(
-            int limit,
-            int step,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findProfilesByGroup")
     List<ProfileDTO> findProfilesByGroup(
-            UUID profileId,
-            UUID groupId,
-            int limit,
-            int step,
+            @Param("profileId") UUID profileId,
+            @Param("groupId") UUID groupId,
+            @Param("limit") int limit,
+            @Param("step") int step,
             @Param("offset") Object[] offset);
 }

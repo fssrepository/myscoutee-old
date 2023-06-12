@@ -1,12 +1,13 @@
 package com.raxim.myscoutee.profile.repository.mongo;
 
-import com.raxim.myscoutee.profile.data.document.mongo.Car;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.UUID;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+import com.raxim.myscoutee.profile.data.document.mongo.Car;
+
 @RepositoryRestResource(collectionResourceRel = "cars", path = "cars")
-public interface CarRepository extends MongoRepository<Car, UUID>, QuerydslPredicateExecutor<Car> {
+public interface CarRepository extends MongoRepository<Car, UUID> {
     // Add any additional methods or custom queries if needed
 }

@@ -16,8 +16,9 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:7.1.1'
 	implementation 'org.apache.httpcomponents:httpasyncclient'
 
-	implementation 'com.querydsl:querydsl-mongodb'
-	implementation 'com.querydsl:querydsl-apt'
+	implementation ('com.querydsl:querydsl-mongodb') {
+		exclude group: 'org.mongodb', module: 'mongo-java-driver'
+	}
 	
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -28,7 +29,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 
 	implementation 'com.itextpdf:itextpdf:5.5.13.2'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.7.0'
 }
 
 tasks.named('test') {
