@@ -3,7 +3,6 @@ package com.raxim.myscoutee.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -30,23 +29,24 @@ import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 @TestExecutionListeners(value = MongoDataLoaderTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class GroupRepositoryTest {
 
+        private final static Point LOCATION_DEFAULT = new Point(new Position(List.of(47.497912, 19.040235)));
+
         @Autowired
         private GroupRepository groupRepository;
 
         @Test
         void testShouldGetSystemGroup() {
                 Object[] tOffset = new Object[] { 0.0, "1900-01-01", 0.0 };
-                List<GroupDTO> groups = groupRepository.findGroupByProfile("d",
-                                new Point(new Position(Arrays.asList(new Double[] {
-                                                47.497912, 19.040235
-                                }))), 20, 5000, new ArrayList<>(), tOffset);
+                List<GroupDTO> groups = groupRepository.findGroupByProfile(
+                                "d", LOCATION_DEFAULT, 20, 5000,
+                                new ArrayList<>(), tOffset);
 
                 assertEquals(1, groups.size());
         }
 
         @Test
         void testShouldEmpthy() {
-            List<Group>  groups =  groupRepository.findAll();
-            assertEquals(1, groups.size());
+                List<Group> groups = groupRepository.findAll();
+                assertEquals(1, groups.size());
         }
 }

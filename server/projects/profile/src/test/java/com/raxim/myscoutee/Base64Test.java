@@ -24,7 +24,7 @@ public class Base64Test {
     @Test
     public void base64() {
         System.out.println(UUID.fromString("ce0e1cec-f698-4888-aedf-b1dc9aa2596f").toString());
-        System.out.println(CommonUtil.asUUID("BBBBBBBBBBBBBBBBBBBBBB=="));
+        System.out.println(CommonUtil.asUUID("sAGVEajTS4+CWS8FT6AqFw=="));
     }
 
     @Test
