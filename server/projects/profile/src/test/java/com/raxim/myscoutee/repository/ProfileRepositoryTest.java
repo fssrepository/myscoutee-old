@@ -19,13 +19,14 @@ import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
+import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 
 @DataMongoTest
 @Import({ RepositoryConfig.class })
 @TestPropertySource(properties = { "de.flapdoodle.mongodb.embedded.version=6.0.6",
         "logging.level.org.springframework.data.mongodb=DEBUG" })
-@TestData({ "mongo/groups.json", "mongo/profiles.json" })
+@TestData({ "mongo/groups.json", "mongo/profiles.json", "mongo/likes.json" })
 @TestExecutionListeners(value = MongoDataLoaderTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class ProfileRepositoryTest {
 
@@ -36,6 +37,9 @@ public class ProfileRepositoryTest {
 
     @Autowired
     private ProfileRepository profileRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     @Test
     public void testShouldFindProfilesNotRatedInTwoPages() {

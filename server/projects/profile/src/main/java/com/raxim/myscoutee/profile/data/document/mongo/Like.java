@@ -14,6 +14,8 @@ import java.util.UUID;
 @Document(collection = "likes")
 public class Like {
 
+    // generate UUID in the format below: 
+    // _id : { $binary: $(random UUID with 16 characters in base64 format), $type: "3"}
     @Id
     @JsonProperty(value = "id")
     private UUID id;
@@ -22,30 +24,42 @@ public class Like {
     @JsonProperty(value = "double")
     private Boolean isDouble;
 
+    /*
+     * 'from' is the relevant profile which likes the 'to' pls. use ref tag in binary type 3
+     */
     @DBRef
     @JsonProperty(value = "from")
     private Profile from;
 
+    /*
+     * 'to' is the relevant profile which liked by 'from'", pls use ref tag in binary type 3
+     * 
+     */
     @DBRef
     @JsonProperty(value = "to")
     private Profile to;
 
+    /* the value of the 'rate' field is random between 1 and 10*/
     @JsonProperty(value = "rate")
     private Integer rate;
 
+    /* 'createdBy' is same value as from */
     @DBRef
     @JsonProperty(value = "createdBy")
     private Profile createdBy;
 
+    /* 'createdDate' is random DateTime in the past (max. one year backward) */
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonProperty(value = "createdDate")
     private Date createdDate;
 
+    // 'distance' should not be included in the json 
     // in queries there are more rows, and it will be the average, taking care of the "double" flag also
     @JsonProperty(value = "distance")
     private Long distance; // 20*(20-abs(rate1-rate2)) + profile difference
 
-    // ref - like happened on idea, job, or promotion event
+    /* 'ref' should not be included in the json
+    */
     @JsonIgnore
     private UUID ref;
 
