@@ -1,167 +1,451 @@
 [
-        {
-            "$geoNear": {
-                "near": "?0",
-                "spherical": true,
-                "minDistance": ":#{#offset[0]}",
-                "distanceField": "distance",
-                "query": {
-                    "_id": { "$nin": ["?4"] },
-                    "gender": "?5",
-                    "group": "?6",
-                    "status": "A"
-                }
-            }
-        },
-        {
-            "$lookup": {
-                "from": "likes",
-                "let": { "p_id": "$_id" },
-                "pipeline": [
-                    {
-                        "$match": {
-                            "$expr": {
-                                "$or": [
-                                    {
-                                        "$and": [
-                                            { "$eq": ["$from.$id", "$$p_id"] },
-                                            { "$eq": ["$to.$id", "?4"] },
-                                            { "$eq": ["$type", "P" ] }
-                                        ]
-                                    },
-                                    {
-                                        "$and": [
-                                            { "$eq": ["$to.$id", "$$p_id"] },
-                                            { "$eq": ["$from.$id", "?4"] },
-                                            { "$eq": ["$type", "P" ] }
-                                        ]
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        "$group": {
-                            "_id": null,
-                            "distance": { "$avg": "$distance" },
-                            "ref": { "$first": { "$ifNull": ["$ref", 0] } },
-                            "direction": {
-                                "$avg": {
-                                    "$switch": {
-                                        "branches": [
-                                            {
-                                                "case": {
-                                                    "$and": [
-                                                        { "$eq": ["$to.$id", "?4"] },
-                                                        { "$in": ["$status", ["A", "P", "G"] ] }
-                                                    ]
-                                                },
-                                                "then": 2
-                                            },
-                                            {
-                                                "case": {
-                                                    "$and": [
-                                                        { "$eq": ["$from.$id", "?4"] },
-                                                        { "$in": ["$status", ["A", "P", "G"] ] }
-                                                    ]
-                                                },
-                                                "then": 1
-                                            }
-                                        ],
-                                        "default": 0
-                                    }
-                                }
-                            },
-                            "rate": {
-                                "$sum": {
-                                    "$switch": {
-                                        "branches": [
-                                            {
-                                                "case": {
-                                                    "$and": [
-                                                        { "$in": ["$status", ["A", "P", "G"] ] }
-                                                    ]
-                                                },
-                                                "then": { "$divide": [ 1, "$rate" ]}
-                                            }
-                                        ],
-                                        "default": 0
-                                    }
-                                }
-                            },
-                            "rate_d": {
-                                "$sum": {
-                                    "$switch": {
-                                        "branches": [
-                                            {
-                                                "case": {
-                                                    "$and": [
-                                                        { "$eq": ["$status", "D" ] }
-                                                    ]
-                                                },
-                                                "then": { "$divide": [ "$rate", 10 ]}
-                                            }
-                                        ],
-                                        "default": 0
-                                    }
-                                }
-                            },
-                            "num": {
-                                "$sum": {
-                                        "$cond": [ { "$in": ["$status", ["A", "P", "G"] ] }, 1, 0 ]
-                                }
-                            },
-                            "createdDate": { "$max": "$createdDate" }
-                        }
-                    },
-                    {
-                        "$set":
-                        {
-                            "rate": { "$add": [ { "$divide": ["$num", "$rate"] }, "$rate_d"] }
-                        }
-                    }
-                ],
-                "as": "likes"
-            }
-        },
-        {
-            "$unwind": { "path": "$likes", "preserveNullAndEmptyArrays": true }
-        },
-        {
-            "$match": {
-                "$expr": {
-                    "$and": [
-                        { "$eq": [{ "$ifNull": ["$likes.direction", 0] }, ":#{#direction}"] },
-                        { "$gte": [{ "$ifNull": ["$likes.rate", 0] }, ":#{#offset[1]}"] },
-                        { "$gte": [{ "$ifNull": ["$likes.distance", { "$abs": { "$subtract": ["$score", "?8"] } }] }, ":#{#offset[2]}"] },
-                        { "$gt": [{ "$ifNull": ["$createdDate", "ISODate()"] }, { "$toDate": ":#{#offset[3]}" }] }
+    {
+        "$geoNear": {
+            "near": "?0",
+            "spherical": true,
+            "minDistance": ":#{#offset[0]}",
+            "distanceField": "distance",
+            "query": {
+                "_id": {
+                    "$nin": [
+                        "?4"
                     ]
-                }
-            }
-        },
-        { "$limit": "?2" },
-        {
-            "$addFields": {
-                "groupKey": { "$multiply": [{ "$floor": { "$divide": ["$distance", ":#{#step}"] } }, ":#{#step}"] }
-            }
-        },
-        {
-            "$addFields": {
-                "likes.rate": { "$ifNull": ["$likes.rate", 0] }
-            }
-        },
-        {
-            "$sort": { "groupKey": 1, "likes.rate": -1, "likes.distance": 1, "createdDate": -1 }
-        },
-        {
-            "$replaceRoot": {
-                "newRoot": {
-                    "$mergeObjects": [
-                        { "profile": "$$ROOT" },
-                        { "rate": "$likes.rate", "groupKey": "$groupKey", "offset": ["$distance", "$likes.rate", { "$ifNull": ["$likes.distance", 0] }, "$createdDate" ] }
-                    ]
-                }
+                },
+                "gender": "?5",
+                "group": "?6",
+                "status": "A"
             }
         }
-    ]
-    
+    },
+    {
+        "$lookup": {
+            "from": "likes",
+            "let": {
+                "p_id": "$_id"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$or": [
+                                {
+                                    "$and": [
+                                        {
+                                            "$eq": [
+                                                "$from.$id",
+                                                "$$p_id"
+                                            ]
+                                        },
+                                        {
+                                            "$eq": [
+                                                "$to.$id",
+                                                "?4"
+                                            ]
+                                        },
+                                        {
+                                            "$eq": [
+                                                "$type",
+                                                "P"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "$and": [
+                                        {
+                                            "$eq": [
+                                                "$to.$id",
+                                                "$$p_id"
+                                            ]
+                                        },
+                                        {
+                                            "$eq": [
+                                                "$from.$id",
+                                                "?4"
+                                            ]
+                                        },
+                                        {
+                                            "$eq": [
+                                                "$type",
+                                                "P"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$group": {
+                        "_id": null,
+                        "distance": {
+                            "$avg": "$distance"
+                        },
+                        "ref": {
+                            "$first": {
+                                "$ifNull": [
+                                    "$ref",
+                                    0
+                                ]
+                            }
+                        },
+                        "direction": {
+                            "$avg": {
+                                "$switch": {
+                                    "branches": [
+                                        {
+                                            "case": {
+                                                "$and": [
+                                                    {
+                                                        "$eq": [
+                                                            "$to.$id",
+                                                            "?4"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$in": [
+                                                            "$status",
+                                                            [
+                                                                "A",
+                                                                "P",
+                                                                "G"
+                                                            ]
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "then": 2
+                                        },
+                                        {
+                                            "case": {
+                                                "$and": [
+                                                    {
+                                                        "$eq": [
+                                                            "$from.$id",
+                                                            "?4"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$in": [
+                                                            "$status",
+                                                            [
+                                                                "A",
+                                                                "P",
+                                                                "G"
+                                                            ]
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "then": 1
+                                        }
+                                    ],
+                                    "default": 0
+                                }
+                            }
+                        },
+                        "rateAPG": {
+                            "$sum": {
+                                "$switch": {
+                                    "branches": [
+                                        {
+                                            "case": {
+                                                "$and": [
+                                                    {
+                                                        "$in": [
+                                                            "$status",
+                                                            [
+                                                                "A",
+                                                                "P",
+                                                                "G"
+                                                            ]
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "then": {
+                                                "$divide": [
+                                                    1,
+                                                    "$rate"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "default": 0
+                                }
+                            }
+                        },
+                        "avgRateD": {
+                            "$avg": {
+                                "$switch": {
+                                    "branches": [
+                                        {
+                                            "case": {
+                                                "$and": [
+                                                    {
+                                                        "$eq": [
+                                                            "$status",
+                                                            "D"
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "then": "$rate"
+                                        }
+                                    ],
+                                    "default": 0
+                                }
+                            }
+                        },
+                        "numD": {
+                            "$sum": {
+                                "$cond": [
+                                    {
+                                        "$in": [
+                                            "$status",
+                                            [
+                                                "D"
+                                            ]
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        "numAPG": {
+                            "$sum": {
+                                "$cond": [
+                                    {
+                                        "$in": [
+                                            "$status",
+                                            [
+                                                "A",
+                                                "P",
+                                                "G"
+                                            ]
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        "createdDate": {
+                            "$max": "$createdDate"
+                        }
+                    }
+                },
+                {
+                    "$set": {
+                        "numD": {
+                            "$cond": {
+                                "if": {
+                                    "$lt": [
+                                        "$numD",
+                                        1
+                                    ]
+                                },
+                                "then": 1,
+                                "else": {
+                                    "$cond": {
+                                        "if": {
+                                            "$gt": [
+                                                "$numD",
+                                                50
+                                            ]
+                                        },
+                                        "then": 50,
+                                        "else": "$numD"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "$set": {
+                        "numD": {
+                            "$divide": [
+                                {
+                                    "$ln": {
+                                        "$add": [
+                                            "$numD",
+                                            1
+                                        ]
+                                    }
+                                },
+                                {
+                                    "$ln": {
+                                        "$add": [
+                                            50,
+                                            1
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$set": {
+                        "rate": {
+                            "$add": [
+                                {
+                                    "$divide": [
+                                        "$numAPG",
+                                        "$rateAPG"
+                                    ]
+                                },
+                                {
+                                    "$divide": [
+                                        {
+                                            "$multiply": [
+                                                "$avgRateD",
+                                                "$numD"
+                                            ]
+                                        },
+                                        10
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "as": "likes"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$likes",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$and": [
+                    {
+                        "$eq": [
+                            {
+                                "$ifNull": [
+                                    "$likes.direction",
+                                    0
+                                ]
+                            },
+                            ":#{#direction}"
+                        ]
+                    },
+                    {
+                        "$gte": [
+                            {
+                                "$ifNull": [
+                                    "$likes.rate",
+                                    0
+                                ]
+                            },
+                            ":#{#offset[1]}"
+                        ]
+                    },
+                    {
+                        "$gte": [
+                            {
+                                "$ifNull": [
+                                    "$likes.distance",
+                                    {
+                                        "$abs": {
+                                            "$subtract": [
+                                                "$score",
+                                                "?8"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            ":#{#offset[2]}"
+                        ]
+                    },
+                    {
+                        "$gt": [
+                            {
+                                "$ifNull": [
+                                    "$createdDate",
+                                    "ISODate()"
+                                ]
+                            },
+                            {
+                                "$toDate": ":#{#offset[3]}"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$limit": "?2"
+    },
+    {
+        "$addFields": {
+            "groupKey": {
+                "$multiply": [
+                    {
+                        "$floor": {
+                            "$divide": [
+                                "$distance",
+                                ":#{#step}"
+                            ]
+                        }
+                    },
+                    ":#{#step}"
+                ]
+            }
+        }
+    },
+    {
+        "$addFields": {
+            "likes.rate": {
+                "$ifNull": [
+                    "$likes.rate",
+                    0
+                ]
+            }
+        }
+    },
+    {
+        "$sort": {
+            "groupKey": 1,
+            "likes.rate": -1,
+            "likes.distance": 1,
+            "createdDate": -1
+        }
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$mergeObjects": [
+                    {
+                        "profile": "$$ROOT"
+                    },
+                    {
+                        "rate": "$likes.rate",
+                        "groupKey": "$groupKey",
+                        "offset": [
+                            "$distance",
+                            "$likes.rate",
+                            {
+                                "$ifNull": [
+                                    "$likes.distance",
+                                    0
+                                ]
+                            },
+                            "$createdDate"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]

@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class MongoRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
 		extends RepositoryFactoryBeanSupport<T, S, ID> {
 
-	private static final String PARAM_REGEX = "\"([:|\\?|I][^ ].*?)\"";
+	private static final String PARAM_REGEX = "\"([:|\\?|I|M][^ ].*?)\"";
 
 	private @Nullable MongoOperations operations;
 	private boolean createIndexesForQueryMethods = false;

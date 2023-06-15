@@ -3,7 +3,6 @@ package com.raxim.myscoutee.common.repository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.InsertManyOptions;
 import com.raxim.myscoutee.common.util.FileUtil;
-import com.raxim.myscoutee.common.util.JsonUtil;
 
 public class MongoDataLoaderTestExecutionListener extends AbstractTestExecutionListener {
 
