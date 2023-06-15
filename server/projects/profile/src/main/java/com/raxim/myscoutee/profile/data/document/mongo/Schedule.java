@@ -24,6 +24,36 @@ public class Schedule {
     @JsonProperty(value = "lastRunDate")
     private Date lastRunDate;
 
+    @JsonProperty(value = "lastIdx")
+    private long lastIdx;
+
+    @JsonProperty(value = "batchSize")
+    private long batchSize;
+
+    public Schedule(long lastIdx, long batchSize) {
+        this.lastIdx = lastIdx;
+        this.batchSize = batchSize;
+    }
+
+    public Schedule() {
+    }
+
+    public long getBatchSize() {
+        return batchSize;
+    }
+
+    public void setBatchSize(long batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public long getLastIdx() {
+        return lastIdx;
+    }
+
+    public void setLastIdx(long lastIdx) {
+        this.lastIdx = lastIdx;
+    }
+
     public UUID getId() {
         return id;
     }

@@ -101,4 +101,12 @@ public class CommonUtil {
     public static Point point(GeoJsonPoint point) {
         return new Point(new Position(point.getCoordinates()));
     }
+
+    /*
+     * return a number between 0..1, result is exponencially growing towards 1
+     */
+    public static double exp(double pValue, double maxPValue) {
+        double value = pValue < 1 ? 1 : pValue > 50 ? 50 : pValue;
+        return Math.log(value + 1) / Math.log(maxPValue + 1);
+    }
 }

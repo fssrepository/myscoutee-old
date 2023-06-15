@@ -114,7 +114,7 @@ public class EventScheduler {
 
         Bound bound = JsonUtil.jsonToObject(scheduleSetting.getFlags(), Bound.class, objectMapper);
 
-        List<Set<Profile>> profilesByGroup = eventGeneratorService.generate(bound, new Date());
+        List<Set<Profile>> profilesByGroup = eventGeneratorService.generate(bound);
         eventService.saveEvents(profilesByGroup);
 
         com.google.firebase.messaging.Message message = com.google.firebase.messaging.Message.builder()

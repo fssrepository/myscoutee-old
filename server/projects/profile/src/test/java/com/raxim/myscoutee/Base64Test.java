@@ -30,6 +30,13 @@ public class Base64Test {
     }
 
     @Test
+    public void rangeExp() {
+        double parameter = 25;
+        double maxParameterValue = 50;
+        System.out.println(CommonUtil.exp(parameter, maxParameterValue));
+    }
+
+    @Test
     public void hash() {
         int result = new Date().hashCode();
         result = 31 * result + Boolean.TRUE.hashCode();

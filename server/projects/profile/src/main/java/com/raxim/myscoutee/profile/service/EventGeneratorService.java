@@ -1,9 +1,6 @@
 package com.raxim.myscoutee.profile.service;
 
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +17,13 @@ import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.GroupAlgo;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
-import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
+import com.raxim.myscoutee.profile.data.dto.rest.LikeGroupDTO;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
+import com.raxim.myscoutee.profile.util.LikeUtil;
 
 @Service
 public class EventGeneratorService {
@@ -41,12 +39,37 @@ public class EventGeneratorService {
         this.nodes = new HashMap<>();
     }
 
-    public List<Set<Profile>> generate(Bound flags, Date lastRunningDate) {
+    public List<Set<Profile>> generate(Bound flags) {
         Optional<Schedule> schedule = scheduleRepository.findByKey(RANDOM_GROUP);
-        Date lastRunningTime = schedule.map(Schedule::getLastRunDate).orElse(lastRunningDate);
+        long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
+        long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
 
-        // rates should be harmonic mean, findBothAll should query by 1000 records (configurable)
-        List<Like> likesBoth = likeRepository.findBothAll(CommonUtil.asISO(lastRunningTime), 1.5);
+        // rates should be harmonic mean, findBothAll should query by 1000 records
+        // (configurable)
+        List<LikeGroupDTO> likeGroups = likeRepository.findBothAll(lastIdx, batchSize);
+
+        List<Like> likesBoth = likeGroups
+                .stream().map(group -> {
+                    List<Like> likesWithStatusP = group.getLikes().stream()
+                            .filter(like -> "P".equals(like.getStatus())).collect(Collectors.toList());
+                    if (!likesWithStatusP.isEmpty()) {
+                        Like firstLike = likesWithStatusP.get(0);
+
+                        List<Double> ratesForStatusP = likesWithStatusP.stream().map(like -> like.getRate())
+                                .collect(Collectors.toList());
+
+                        List<Double> ratesForStatusD = group.getLikes().stream()
+                                .filter(like -> like.getStatus().equals("D")).map(like -> like.getRate())
+                                .collect(Collectors.toList());
+
+                        double rate = LikeUtil.calcAdjustedHarmonicMean(ratesForStatusP, ratesForStatusD);
+                        firstLike.setRate(rate);
+                        return firstLike;
+                    } else {
+                        return null;
+                    }
+                }).filter(like -> like != null)
+                .collect(Collectors.toList());
 
         List<Edge> edges = new ArrayList<>();
         for (Like likeBoth : likesBoth) {

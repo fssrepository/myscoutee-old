@@ -12,6 +12,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.raxim.myscoutee.profile.data.document.mongo.Badge;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
+import com.raxim.myscoutee.profile.data.dto.rest.LikeGroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 
 @RepositoryRestResource(collectionResourceRel = "likes", path = "likes")
@@ -33,6 +34,6 @@ public interface LikeRepository extends MongoRepository<Like, UUID> {
             @Param("offset") Object[] offset);
 
     @Aggregation(pipeline = "findBothAll")
-    List<Like> findBothAll(String lastTime, double type);
+    List<LikeGroupDTO> findBothAll(long lastIdx, long batchSize);
 
 }

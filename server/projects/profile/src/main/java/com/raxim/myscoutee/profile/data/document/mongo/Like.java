@@ -14,28 +14,31 @@ import java.util.UUID;
 @Document(collection = "likes")
 public class Like {
 
-    // generate UUID in the format below: 
-    // _id : { $binary: $(random UUID with the lenght of 16 characters in base64 format), $type: "3"}
+    // generate UUID in the format below:
+    // _id : { $binary: $(random UUID with the lenght of 16 characters in base64
+    // format), $type: "3"}
     @Id
     @JsonProperty(value = "id")
     private UUID id;
 
     /*
-     * 'from' is the relevant profile which likes the 'to' pls. use ref tag in binary type 3
+     * 'from' is the relevant profile which likes the 'to' pls. use ref tag in
+     * binary type 3
      */
     @DBRef
     @JsonProperty(value = "from")
     private Profile from;
 
     /*
-     * 'to' is the relevant profile which liked by 'from'", pls use ref tag in binary type 3
+     * 'to' is the relevant profile which liked by 'from'", pls use ref tag in
+     * binary type 3
      * 
      */
     @DBRef
     @JsonProperty(value = "to")
     private Profile to;
 
-    /* the value of the 'rate' field is random between 1 and 10*/
+    /* the value of the 'rate' field is random between 1 and 10 */
     @JsonProperty(value = "rate")
     private Double rate;
 
@@ -49,13 +52,15 @@ public class Like {
     @JsonProperty(value = "createdDate")
     private Date createdDate;
 
-    // 'distance' should not be included in the json 
-    // in queries there are more rows, and it will be the average, taking care of the "double" flag also
+    // 'distance' should not be included in the json
+    // in queries there are more rows, and it will be the average, taking care of
+    // the "double" flag also
     @JsonProperty(value = "distance")
     private Long distance = 1L; // 20*(20-abs(rate1-rate2)) + profile difference
 
-    /* 'ref' should not be included in the json
-    */
+    /*
+     * 'ref' should not be included in the json
+     */
     @JsonIgnore
     private UUID ref;
 
@@ -63,9 +68,9 @@ public class Like {
      * A (active)
      * P (pending, both has been rated)
      * G (for Pending records, random events can be generated)
-     * D (double rate -> the relation has been rated by an other person, to suggest the like)
+     * D (double rate -> the relation has been rated by an other person, to suggest
+     * the like)
      */
-    @JsonIgnore
     private String status;
 
     /*
@@ -73,24 +78,25 @@ public class Like {
      * I (idea)
      * J (job)
      */
-    @JsonIgnore
+    @JsonProperty("type")
     private String type;
 
     /*
-     * same value for (from, to) = (to,from), to make the ordering easier in the queries,
+     * same value for (from, to) = (to,from), to make the ordering easier in the
+     * queries,
      * it might be replaced by ObjectId, to make better indexes
      */
-    @JsonIgnore
-    private UUID hash;
+    private Long cnt;
 
     // Getters and Setters
 
-    public UUID getHash() {
-        return hash;
+    public Long getCnt() {
+        return cnt;
     }
 
-    public void setHash(UUID hash) {
-        this.hash = hash;
+    @JsonProperty("cnt")
+    public void setCnt(Long cnt) {
+        this.cnt = cnt;
     }
 
     public String getType() {
@@ -105,6 +111,7 @@ public class Like {
         return status;
     }
 
+    @JsonProperty("status")
     public void setStatus(String status) {
         this.status = status;
     }

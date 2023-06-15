@@ -1,6 +1,7 @@
 package com.raxim.myscoutee.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
-import com.raxim.myscoutee.profile.data.document.mongo.Like;
+import com.raxim.myscoutee.profile.data.dto.rest.LikeGroupDTO;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 
 @DataMongoTest
@@ -31,16 +32,21 @@ public class LikeRepositoryTest {
     @Test
     public void testShouldFindBothAll() {
 
-        List<Like> likes = this.likeRepository.findBothAll("1900-01-01", 1.5);
+        List<LikeGroupDTO> likes = this.likeRepository.findBothAll(0L, 1000L);
 
         assertEquals(2, likes.size());
 
-        Like like1 = likes.get(0);
-        assertEquals("Evelyn", like1.getFrom().getFirstName());
-        assertEquals("Liam", like1.getTo().getFirstName());
+        LikeGroupDTO likeGroup1 = likes.get(0);
+        assertEquals(2, likeGroup1.getLikes().size());
 
-        Like like2 = likes.get(1);
-        assertEquals("Oliver", like2.getFrom().getFirstName());
-        assertEquals("Mia", like2.getTo().getFirstName());
+        assertTrue(likeGroup1.getLikes().stream().anyMatch(
+                like -> "Evelyn".equals(like.getFrom().getFirstName())
+                        && "Liam".equals(like.getTo().getFirstName())));
+
+        LikeGroupDTO likeGroup2 = likes.get(1);
+        assertEquals(2, likeGroup1.getLikes().size());
+        assertTrue(likeGroup2.getLikes().stream().anyMatch(
+                like -> "Oliver".equals(like.getFrom().getFirstName())
+                        && "Mia".equals(like.getTo().getFirstName())));
     }
 }
