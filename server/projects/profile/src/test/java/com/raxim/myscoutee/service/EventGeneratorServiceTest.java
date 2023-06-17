@@ -21,9 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.raxim.myscoutee.algo.dto.Bound;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
+import com.raxim.myscoutee.profile.data.document.mongo.LikeForGroup;
+import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
-import com.raxim.myscoutee.profile.data.dto.rest.LikeGroupDTO;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorService;
@@ -50,17 +51,17 @@ public class EventGeneratorServiceTest {
 
         @Test
         public void testShouldGetBalancedGroup() throws IOException {
-                Like[] likeArray = JsonUtil.loadJson(this, "algo/likes.json", Like[].class);
+                LikeForGroup[] likeArray = JsonUtil.loadJson(this, "algo/likes.json", LikeForGroup[].class);
 
-                List<LikeGroupDTO> likesBoth = Arrays.asList(likeArray)
+                List<LikeGroup> likesBoth = Arrays.asList(likeArray)
                                 .stream().collect(Collectors.groupingBy(Like::getCnt))
                                 .entrySet().stream()
-                                .map(entry -> new LikeGroupDTO(entry.getKey(), entry.getValue()))
+                                .map(entry -> new LikeGroup(entry.getKey(), entry.getValue()))
                                 .collect(Collectors.toList());
 
                 when(scheduleRepository.findByKey(EventGeneratorService.SCHEDULE_RANDOM_GROUP))
                                 .thenReturn(Optional.of(new Schedule(0L, 1000L)));
-                when(likeRepository.findBothAll(0L, 1000L))
+                when(likeRepository.findAll(0L, 1000L))
                                 .thenReturn(likesBoth);
 
                 List<Set<Profile>> profilesByGroup = eventGeneratorService.generate(FLAGS_DEFAULT);

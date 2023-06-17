@@ -71,7 +71,7 @@ public class MongoDataLoaderTestExecutionListener extends AbstractTestExecutionL
         if (dataAnnotation != null) {
             String[] jsonFiles = dataAnnotation.value();
             for (String jsonFile : jsonFiles) {
-                loadJsonData(testContext, jsonFile);
+                loadJsonData(jsonFile);
                 // insertOne(testContext, jsonFile);
             }
         }
@@ -84,7 +84,7 @@ public class MongoDataLoaderTestExecutionListener extends AbstractTestExecutionL
         });
     }
 
-    private void loadJsonData(TestContext testContext, String jsonFile) throws IOException {
+    private void loadJsonData(String jsonFile) throws IOException {
         Path filePath = FileUtil.getResourcePath(this, jsonFile);
         String jsonData = new String(Files.readAllBytes(filePath));
 

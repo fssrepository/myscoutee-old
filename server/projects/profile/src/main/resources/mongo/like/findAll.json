@@ -46,29 +46,16 @@
         }
     },
     {
-        "$lookup": {
-            "from": "likes",
-            "localField": "cnt",
-            "foreignField": "cnt",
-            "as": "matchingItems"
-        }
-    },
-    {
-        "$match": {
-            "matchingItems": {
-                "$elemMatch": {
-                    "type": "P",
-                    "status": "P"
-                }
-            }
-        }
-    },
-    {
         "$group": {
             "_id": "$cnt",
             "likes": {
                 "$push": "$$ROOT"
             }
+        }
+    },
+    {
+        "$sort": {
+            "_id": 1
         }
     },
     {

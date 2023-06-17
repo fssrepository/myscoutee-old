@@ -1,0 +1,37 @@
+[
+    {
+        "$match": {
+            "$and": [
+                {
+                    "createdBy.$id": "?0"
+                },
+                {
+                    "type": "P"
+                },
+                {
+                    "from": {
+                        "$in": "?#{#likes.![from]}"
+                    }
+                },
+                {
+                    "to": {
+                        "$in": "?#{#likes.![to]}"
+                    }
+                },
+                {
+                    "ref": {
+                        "$in": "?#{#likes.![ref]}"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "$group": {
+            "_id": "$cnt",
+            "likes": {
+                "$push": "$$ROOT"
+            }
+        }
+    }
+]

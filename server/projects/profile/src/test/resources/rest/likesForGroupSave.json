@@ -1,0 +1,27 @@
+[
+    {
+        "to": "534ccc6b-2547-4bf0-ad91-dca739943ea4",
+        "rate": 8,
+        "type": "P",
+        "comment": "Sophia - Oliver"
+    },
+    {
+        "to": "2f7e01ce-1336-37d4-e69e-efc88d2ee81a",
+        "rate": 9,
+        "type": "P",
+        "comment": "Sophia - Ethan"
+    },
+    {
+        "to": "4f4d0e96-3b96-e4e1-1f0f-2a5a03c52ba4",
+        "rate": 2,
+        "type": "P",
+        "comment": "Sophia - Noah"
+    },
+    {
+        "from": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+        "to": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+        "rate": 6,
+        "type": "P",
+        "comment": "Lucas - Emma"
+    }
+]

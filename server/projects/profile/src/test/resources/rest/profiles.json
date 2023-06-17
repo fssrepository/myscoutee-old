@@ -1,0 +1,158 @@
+[
+    {
+        "key": "39402632-a452-57be-2518-53cc117b1abc",
+        "firstName": "Sophia",
+        "gender": "w",
+        "birthday": "1990-09-15T00:00:00Z",
+        "smoker": false,
+        "marital": "Single",
+        "hasChild": false,
+        "height": 165,
+        "physique": "Slim",
+        "languages": [
+            "English",
+            "Spanish"
+        ],
+        "religion": "Christian",
+        "profession": "Teacher",
+        "position": [
+            47.496587,
+            19.044607
+        ],
+        "status": "A",
+        "createdDate": "2022-11-01T00:00:00Z",
+        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "score": 75,
+        "lastLogin": "2023-06-10T09:15:00Z"
+    },
+    {
+        "key": "534ccc6b-2547-4bf0-ad91-dca739943ea4",
+        "firstName": "Oliver",
+        "gender": "m",
+        "birthday": "1993-02-18T00:00:00Z",
+        "smoker": false,
+        "marital": "Single",
+        "hasChild": false,
+        "height": 175,
+        "physique": "Average",
+        "languages": [
+            "English",
+            "French"
+        ],
+        "religion": "None",
+        "profession": "Software Engineer",
+        "position": [
+            47.506953,
+            19.019821
+        ],
+        "status": "A",
+        "createdDate": "2022-09-20T00:00:00Z",
+        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "score": 90,
+        "lastLogin": "2023-06-11T15:30:00Z"
+    },
+    {
+        "key": "2f7e01ce-1336-37d4-e69e-efc88d2ee81a",
+        "firstName": "Ethan",
+        "gender": "m",
+        "birthday": "1995-03-12T00:00:00Z",
+        "smoker": false,
+        "marital": "Single",
+        "hasChild": false,
+        "height": 175,
+        "physique": "Average",
+        "languages": [
+            "English",
+            "Spanish"
+        ],
+        "religion": "None",
+        "profession": "Graphic Designer",
+        "position": [
+            47.508699,
+            19.052418
+        ],
+        "status": "A",
+        "createdDate": "2022-08-23T00:00:00Z",
+        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "score": 80,
+        "lastLogin": "2023-06-12T12:30:00Z"
+    },
+    {
+        "key": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+        "firstName": "Lucas",
+        "gender": "m",
+        "birthday": "1991-12-30T00:00:00Z",
+        "smoker": false,
+        "marital": "Single",
+        "hasChild": false,
+        "height": 180,
+        "physique": "Athletic",
+        "languages": [
+            "English",
+            "German"
+        ],
+        "religion": "None",
+        "profession": "Engineer",
+        "position": [
+            47.500870,
+            19.028995
+        ],
+        "status": "A",
+        "createdDate": "2022-10-10T00:00:00Z",
+        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "score": 75,
+        "lastLogin": "2023-06-10T09:15:00Z"
+    },
+    {
+        "key": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+        "firstName": "Emma",
+        "gender": "w",
+        "birthday": "1994-07-20T00:00:00Z",
+        "smoker": false,
+        "marital": "Single",
+        "hasChild": false,
+        "height": 165,
+        "physique": "Slim",
+        "languages": [
+            "English",
+            "Spanish"
+        ],
+        "religion": "Christian",
+        "profession": "Teacher",
+        "position": [
+            47.502316,
+            19.082017
+        ],
+        "status": "A",
+        "createdDate": "2022-11-01T00:00:00Z",
+        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "score": 75,
+        "lastLogin": "2023-06-10T09:15:00Z"
+    },
+    {
+        "key": "4f4d0e96-3b96-e4e1-1f0f-2a5a03c52ba4",
+        "firstName": "Noah",
+        "gender": "m",
+        "birthday": "1990-11-18T00:00:00Z",
+        "smoker": false,
+        "marital": "Single",
+        "hasChild": false,
+        "height": 185,
+        "physique": "Athletic",
+        "languages": [
+            "English",
+            "German"
+        ],
+        "religion": "None",
+        "profession": "Engineer",
+        "position": [
+            47.496694,
+            19.064839
+        ],
+        "status": "A",
+        "createdDate": "2022-10-05T00:00:00Z",
+        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "score": 70,
+        "lastLogin": "2023-06-11T10:10:00Z"
+    }
+]

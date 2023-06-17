@@ -1,14 +1,15 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Date;
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 // single rate only
 @Document(collection = "likes")
@@ -71,6 +72,7 @@ public class Like {
      * D (double rate -> the relation has been rated by an other person, to suggest
      * the like)
      */
+    @JsonIgnore
     private String status;
 
     /*
@@ -86,6 +88,7 @@ public class Like {
      * queries,
      * it might be replaced by ObjectId, to make better indexes
      */
+    @JsonIgnore
     private Long cnt;
 
     // Getters and Setters
@@ -94,7 +97,6 @@ public class Like {
         return cnt;
     }
 
-    @JsonProperty("cnt")
     public void setCnt(Long cnt) {
         this.cnt = cnt;
     }
@@ -111,7 +113,6 @@ public class Like {
         return status;
     }
 
-    @JsonProperty("status")
     public void setStatus(String status) {
         this.status = status;
     }

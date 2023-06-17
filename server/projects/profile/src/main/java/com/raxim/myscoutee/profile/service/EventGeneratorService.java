@@ -18,9 +18,10 @@ import com.raxim.myscoutee.algo.dto.GroupAlgo;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
+import com.raxim.myscoutee.profile.data.document.mongo.LikeForGroup;
+import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
-import com.raxim.myscoutee.profile.data.dto.rest.LikeGroupDTO;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
@@ -44,7 +45,7 @@ public class EventGeneratorService {
         long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
         long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
 
-        List<LikeGroupDTO> likeGroups = likeRepository.findBothAll(lastIdx, batchSize);
+        List<LikeGroup> likeGroups = likeRepository.findAll(lastIdx, batchSize);
 
         List<Like> likesBoth = reduceLikeGroups(likeGroups);
 
@@ -82,10 +83,10 @@ public class EventGeneratorService {
         return profileList;
     }
 
-    private List<Like> reduceLikeGroups(List<LikeGroupDTO> likeGroups) {
+    private List<Like> reduceLikeGroups(List<LikeGroup> likeGroups) {
         List<Like> likesBoth = likeGroups
                 .stream().map(group -> {
-                    List<Like> likesWithStatusP = group.getLikes().stream()
+                    List<LikeForGroup> likesWithStatusP = group.getLikes().stream()
                             .filter(like -> "P".equals(like.getStatus())).toList();
                     if (!likesWithStatusP.isEmpty()) {
                         Like firstLike = likesWithStatusP.get(0);

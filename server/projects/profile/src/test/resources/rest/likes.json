@@ -1,0 +1,20 @@
+[
+    {
+        "from": "39402632-a452-57be-2518-53cc117b1abc",
+        "to": "534ccc6b-2547-4bf0-ad91-dca739943ea4",
+        "rate": 8,
+        "comment": "Sophia - Oliver"
+    },
+    {
+        "from": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+        "to": "eb494fba-6c56-752f-5123-c414c8c86599",
+        "rate": 6,
+        "comment": "Lucas - Ava"
+    },
+    {
+        "from": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+        "to": "39402632-a452-57be-2518-53cc117b1abc",
+        "rate": 6,
+        "comment": "Lucas - Sophia - not in db"
+    }
+]

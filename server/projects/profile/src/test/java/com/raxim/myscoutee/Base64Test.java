@@ -26,7 +26,7 @@ public class Base64Test {
         System.out.println(UUID.randomUUID());
         System.out.println(UUID.fromString("ce0e1cec-f698-4888-aedf-b1dc9aa2596f").toString());
         System.out.println(CommonUtil.asBase64(UUID.fromString("a73860cd-d9a2-4186-8a9b-3f9fc53c2342")));
-        System.out.println(CommonUtil.asUUID("sAGVEajTS4+CWS8FT6AqFw=="));
+        System.out.println(CommonUtil.asUUID("QVzopgl2TUiN9zD3CJIJAQ=="));
     }
 
     @Test

@@ -1,24 +1,23 @@
-package com.raxim.myscoutee.profile.data.dto.rest;
+package com.raxim.myscoutee.profile.data.document.mongo;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.raxim.myscoutee.profile.data.document.mongo.Like;
 
-@JsonRootName("likes")
-public class LikeGroupDTO {
+@JsonRootName("likeGroups")
+public class LikeGroup {
 
     @JsonProperty(value = "cnt")
     private long _id;
 
     @JsonProperty(value = "likes")
-    private List<Like> likes;
+    private List<LikeForGroup> likes;
 
-    public LikeGroupDTO() {
+    public LikeGroup() {
     }
 
-    public LikeGroupDTO(long _id, List<Like> likes) {
+    public LikeGroup(long _id, List<LikeForGroup> likes) {
         this._id = _id;
         this.likes = likes;
     }
@@ -31,11 +30,11 @@ public class LikeGroupDTO {
         this._id = _id;
     }
 
-    public List<Like> getLikes() {
+    public List<LikeForGroup> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<Like> likes) {
+    public void setLikes(List<LikeForGroup> likes) {
         this.likes = likes;
     }
 }
