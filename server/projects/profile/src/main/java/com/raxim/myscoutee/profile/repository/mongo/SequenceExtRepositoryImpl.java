@@ -16,8 +16,12 @@ public class SequenceExtRepositoryImpl implements SequenceExtRepository {
     }
 
     public Sequence nextValue(String sequenceName) {
+        return nextValue(sequenceName, 1);
+    }
+
+    public Sequence nextValue(String sequenceName, long step) {
         Query query = new Query(Criteria.where("_id").is(sequenceName));
-        Update update = new Update().inc("cnt", 1);
+        Update update = new Update().inc("cnt", step);
 
         FindAndModifyOptions options = new FindAndModifyOptions()
                 .returnNew(true)
@@ -25,5 +29,4 @@ public class SequenceExtRepositoryImpl implements SequenceExtRepository {
 
         return mongoTemplate.findAndModify(query, update, options, Sequence.class);
     }
-
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeForGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.Sequence;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
@@ -42,6 +43,18 @@ public class LikeService {
             return like;
         }).toList();
 
+        List<LikeForGroup> likes = handleLikes(profile, likeDTOs);
+
+        List<LikeForGroup> likesWithCnt = generateNewCounters(likes);
+
+        // save likes
+        List<LikeForGroup> likesSaved = likeRepository.saveAll(likesWithCnt);
+
+        List<LikeDTO> likesAll = toLikeDTOs(likesSaved);
+        return likesAll;
+    }
+
+    private List<LikeForGroup> handleLikes(Profile profile, List<LikeDTO> likeDTOs) {
         // load likes, add + parameter based on like type (Person,Job,Idea)
         List<LikeGroup> dbLikeGroups = likeRepository.findByParty(profile.getId(),
                 likeDTOs);
@@ -86,9 +99,6 @@ public class LikeService {
                                 && profile.getId().equals(dbLike.getCreatedBy().getId()))
                         .findFirst()
                         .orElse(null);
-            } else {
-                //TODO: maybe generate by range, hence avoid to check db several times
-                cnt = sequenceRepository.nextValue("likes").getCnt();
             }
 
             if (mLike != null) {
@@ -116,10 +126,10 @@ public class LikeService {
             }
             return Stream.of(mLike);
         }).filter(likeForGroup -> likeForGroup != null).toList();
+        return likes;
+    }
 
-        // save likes
-        List<LikeForGroup> likesSaved = likeRepository.saveAll(likes);
-
+    private List<LikeDTO> toLikeDTOs(List<LikeForGroup> likesSaved) {
         // return the updated likes
         List<LikeDTO> likesAll = likesSaved.stream()
                 .map(like -> {
@@ -139,5 +149,23 @@ public class LikeService {
                 })
                 .toList();
         return likesAll;
+    }
+
+    private List<LikeForGroup> generateNewCounters(List<LikeForGroup> likes) {
+        // update cnt values
+        long newLikesNum = likes.stream().filter(like -> like.getCnt() == null).count();
+        long newCnt = sequenceRepository.nextValue("likes", newLikesNum).getCnt();
+        Sequence oldSequence = new Sequence("likes", newCnt - newLikesNum);
+
+        List<LikeForGroup> likesWithCnt = likes.stream().map(like -> {
+            if (like.getCnt() == null) {
+                long cnt = oldSequence.getCnt();
+                ++cnt;
+                like.setCnt(cnt);
+                oldSequence.setCnt(cnt);
+            }
+            return like;
+        }).toList();
+        return likesWithCnt;
     }
 }

@@ -58,7 +58,7 @@ public class LikeServiceTest {
         LikeDTO[] likeArray = JsonUtil.loadJson(this, "rest/likesForGroupSave.json", LikeDTO[].class);
         Profile[] profileArray = JsonUtil.loadJson(this, "rest/profiles.json", ProfileForGroup[].class);
 
-        final Sequence sequence = new Sequence(SEQENCE_KEY, 2L);
+        final Sequence sequence = new Sequence(SEQENCE_KEY, 2L + 2L); // two existing and two new group
         LikeGroup[] likeGroupsArray = JsonUtil.loadJson(this, "mongo/likeGroups.json", LikeGroup[].class);
 
         List<LikeDTO> likes = Arrays.asList(likeArray);
@@ -67,11 +67,7 @@ public class LikeServiceTest {
 
         when(likeRepository.findByParty(eq(UUID_PROFILE_SOPHIA), anyList())).thenReturn(likeGroups);
         when(profileRepository.findAllById(anySet())).thenReturn(profiles);
-        when(sequenceRepository.nextValue(eq(SEQENCE_KEY))).thenAnswer(invocation -> {
-            long cnt = sequence.getCnt();
-            sequence.setCnt(++cnt);
-            return sequence;
-        });
+        when(sequenceRepository.nextValue(eq(SEQENCE_KEY), eq(2L))).thenReturn(sequence);
 
         // Sophia is the first profile
         likeService.saveLikes(profiles.get(0), likes);
