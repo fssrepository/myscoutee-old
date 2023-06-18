@@ -194,7 +194,7 @@ public class EventService {
                 event.setGroup(profile.getGroup());
                 event.setStatus(status);
                 event.setCreatedBy(profile.getId());
-                // event.setCreatedDate(LocalDateTime.now());
+                event.setCreatedDate(LocalDateTime.now());
                 return Optional.of(event);
             } else {
                 return Optional.empty();
