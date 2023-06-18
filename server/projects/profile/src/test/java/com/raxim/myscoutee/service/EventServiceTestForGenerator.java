@@ -33,8 +33,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
-import com.raxim.myscoutee.profile.repository.mongo.MemberRepository;
-import com.raxim.myscoutee.profile.service.EventService;
+import com.raxim.myscoutee.profile.service.EventServiceForGenerator;
 import com.raxim.myscoutee.util.TestJsonUtil;
 
 @ExtendWith({ SpringExtension.class })
@@ -48,16 +47,13 @@ public class EventServiceTestForGenerator {
         private static final UUID UUID_PROFILE_EMMA = UUID.fromString("fc4c72f8-a905-e1d1-05f8-c0d9914e158c");
 
         @InjectMocks
-        private EventService eventService;
+        private EventServiceForGenerator eventServiceForGenerator;
 
         @Mock
         private EventRepository eventRepository;
 
         @Mock
         private EventItemRepository eventItemRepository;
-
-        @Mock
-        private MemberRepository memberRepository;
 
         @Autowired
         @Spy
@@ -91,7 +87,7 @@ public class EventServiceTestForGenerator {
                 profileByGroups.add(Set.of(profiles.get(0), profiles.get(1))); // Sophia - Oliver
                 profileByGroups.add(Set.of(profiles.get(2), profiles.get(4))); // Ethan - Emma
 
-                eventService.saveEvents(profileByGroups);
+                eventServiceForGenerator.saveEvents(profileByGroups);
 
                 Mockito.verify(eventItemRepository).saveAll(captorEventItems.capture());
 

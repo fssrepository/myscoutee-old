@@ -1,19 +1,14 @@
 package com.raxim.myscoutee.profile.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,7 +20,6 @@ import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
-import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
@@ -149,7 +143,7 @@ public class EventService {
             clonedEvent.setId(UUID.randomUUID());
             clonedEvent.setStatus("U");
             clonedEvent.setRef(event);
-            //clonedEvent.setCreatedDate(LocalDateTime.now());
+            // clonedEvent.setCreatedDate(LocalDateTime.now());
 
             Event savedEvent = eventRepository.save(clonedEvent);
 
@@ -200,7 +194,7 @@ public class EventService {
                 event.setGroup(profile.getGroup());
                 event.setStatus(status);
                 event.setCreatedBy(profile.getId());
-                //event.setCreatedDate(LocalDateTime.now());
+                // event.setCreatedDate(LocalDateTime.now());
                 return Optional.of(event);
             } else {
                 return Optional.empty();
@@ -235,49 +229,6 @@ public class EventService {
                 .orElse(null);
 
         return Optional.of(Pair.of(event, eventItem));
-    }
-
-    // random events - generator service
-    public void saveEvents(List<Set<Profile>> groups) {
-        List<List<Member>> membersByGroup = groups.stream()
-                .map(profiles -> profiles.stream()
-                        .map(profile -> new Member(profile, "A", "U"))
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
-
-        List<EventItem> eventItems = membersByGroup.stream()
-                .map(members -> {
-                    EventItem eventItem = new EventItem();
-                    eventItem.setId(UUID.randomUUID());
-                    eventItem.setType("g");
-                    eventItem.setCategory("l");
-                    eventItem.setName("Generated Event!");
-                    eventItem.setDesc("Generated Event for strangers!");
-                    eventItem.setMembers(new HashSet<>(members));
-
-                    LocalDateTime fromDT = LocalDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-                            .withHour(21);
-                    LocalDateTime toDT = fromDT.plusHours(3);
-                    RangeLocal range = new RangeLocal(fromDT, toDT);
-                    eventItem.setRange(range);
-                    return eventItem;
-                })
-                .collect(Collectors.toList());
-
-        List<EventItem> eventItemsSaved = eventItemRepository.saveAll(eventItems);
-
-        List<Event> events = eventItemsSaved.stream()
-                .map(eventItemSaved -> {
-                    Event event = new Event();
-                    event.setId(UUID.randomUUID());
-                    event.setInfo(eventItemSaved);
-                    event.setItems(new ArrayList<>(Collections.singletonList(eventItemSaved)));
-                    event.setStatus("A");
-                    return event;
-                })
-                .collect(Collectors.toList());
-
-        eventRepository.saveAll(events);
     }
 
     public List<EventItemDTO> getEventItems(UUID eventId, Integer step, Object[] tOffset, UUID profileId) {
