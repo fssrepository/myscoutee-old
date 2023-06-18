@@ -33,22 +33,26 @@ import com.raxim.myscoutee.profile.data.dto.rest.PromotionDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.service.EventService;
+import com.raxim.myscoutee.profile.service.PromotionService;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
 @RestController
 @RequestMapping("/api")
 public class RecommendationPromotionRestController {
     private final PromotionRepository promotionRepository;
+    private final PromotionService promotionService;
     private final ConfigProperties config;
     private final EventService eventService;
     private final EventRepository eventRepository;
 
     public RecommendationPromotionRestController(
             PromotionRepository promotionRepository,
+            PromotionService promotionService,
             ConfigProperties config,
             EventService eventService,
             EventRepository eventRepository) {
         this.promotionRepository = promotionRepository;
+        this.promotionService = promotionService;
         this.config = config;
         this.eventService = eventService;
         this.eventRepository = eventRepository;
@@ -122,7 +126,7 @@ public class RecommendationPromotionRestController {
             tOffset = Arrays.asList("1900-01-01", 10, "1900-01-01");
         }
 
-        List<EventDTO> events = eventService.getEventsByPromotion(
+        List<EventDTO> events = promotionService.getEventsByPromotion(
                 profileId,
                 UUID.fromString(promoId),
                 step,

@@ -41,7 +41,6 @@ import com.raxim.myscoutee.profile.util.EventUtil;
 public class EventService {
     private final EventRepository eventRepository;
     private final EventItemRepository eventItemRepository;
-    private final PromotionRepository promotionRepository;
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
 
@@ -52,7 +51,6 @@ public class EventService {
             ObjectMapper objectMapper) {
         this.eventRepository = eventRepository;
         this.eventItemRepository = eventItemRepository;
-        this.promotionRepository = promotionRepository;
         this.memberRepository = memberRepository;
         this.objectMapper = objectMapper;
     }
@@ -239,6 +237,7 @@ public class EventService {
         return Optional.of(Pair.of(event, eventItem));
     }
 
+    // random events - generator service
     public void saveEvents(List<Set<Profile>> groups) {
         List<List<Member>> membersByGroup = groups.stream()
                 .map(profiles -> profiles.stream()
@@ -248,17 +247,17 @@ public class EventService {
 
         List<EventItem> eventItems = membersByGroup.stream()
                 .map(members -> {
-                    LocalDateTime fromDT = LocalDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-                            .withHour(21);
-                    LocalDateTime toDT = fromDT.plusHours(3);
-                    RangeLocal range = new RangeLocal(fromDT, toDT);
-
                     EventItem eventItem = new EventItem();
                     eventItem.setType("g");
                     eventItem.setCategory("l");
                     eventItem.setName("Generated Event!");
                     eventItem.setDesc("Generated Event for strangers!");
                     eventItem.setMembers(new HashSet<>(members));
+
+                    LocalDateTime fromDT = LocalDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+                            .withHour(21);
+                    LocalDateTime toDT = fromDT.plusHours(3);
+                    RangeLocal range = new RangeLocal(fromDT, toDT);
                     eventItem.setRange(range);
                     return eventItem;
                 })
@@ -281,10 +280,5 @@ public class EventService {
 
     public List<EventItemDTO> getEventItems(UUID eventId, Integer step, Object[] tOffset, UUID profileId) {
         return eventRepository.findItemsByEvent(eventId, 20, step != null ? step : 5, "%Y-%m-%d", profileId, tOffset);
-    }
-
-    public List<EventDTO> getEventsByPromotion(UUID profileId, UUID eventId, Integer step, Object[] tOffset) {
-        return promotionRepository.findEventsByPromotion(eventId, 20, step != null ? step : 5, "%Y-%m-%d", profileId,
-                tOffset);
     }
 }
