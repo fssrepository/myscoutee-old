@@ -1,19 +1,15 @@
 package com.raxim.myscoutee.profile.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.raxim.myscoutee.common.util.FileUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Car;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
@@ -89,49 +85,33 @@ public class ProfileService {
 
     public ProfileDTO saveProfile(UUID userId, UUID profileId, UUID group,
             Profile profile, MultipartFile voice) throws IOException {
+
         String fileName = UUID.randomUUID().toString();
 
-        Pair<String, String> separatorPermDir = FileUtil.uuidToPath(fileName, true);
-        String separator = separatorPermDir.getFirst();
-        String permDir = separatorPermDir.getSecond();
+        Optional<Profile> profileResult = profileId != null ? profileRepository.findById(profileId) : Optional.empty();
 
-        if (voice != null && !voice.isEmpty()) {
-            InputStream voiceStream = new ByteArrayInputStream(voice.getBytes());
-            FileUtil.save(voiceStream, permDir + separator + "_" + fileName + "_voice");
-        }
-
-        Profile profileToSave;
-        if (profileId != null) {
-            Optional<Profile> profileResult = this.profileRepository.findById(profileId);
+        Profile clonedProfile = profile.clone();
+        if (profileResult.isPresent()) {
             Profile profileEntity = profileResult.get();
 
-            Profile clonedProfile = JsonUtil.clone(profile, objectMapper);
             clonedProfile.setId(profileEntity.getId());
             clonedProfile.setCars(profileEntity.getCars());
             clonedProfile.setSchools(profileEntity.getSchools());
-            clonedProfile.setVoice(fileName);
+            if (profileEntity.getVoice() == null) {
+                clonedProfile.setVoice(fileName);
+            }
             clonedProfile.setGroup(group);
-
-            profileToSave = clonedProfile;
         } else {
-            Profile clonedProfile = JsonUtil.clone(profile, objectMapper);
             clonedProfile.setId(UUID.randomUUID());
             clonedProfile.setVoice(fileName);
             clonedProfile.setGroup(group);
-
-            profileToSave = clonedProfile;
         }
+        clonedProfile.setScore(ProfileUtil.score(clonedProfile));
 
-        Profile clonedProfileToSave = JsonUtil.clone(profileToSave, objectMapper);
-        clonedProfileToSave.setScore(ProfileUtil.score(profileToSave));
-        Profile profileSaved = this.profileRepository.save(clonedProfileToSave);
+        ProfileUtil.saveVoice(voice, clonedProfile.getVoice());
 
-        this.userRepository.findById(userId).ifPresent(user -> {
-            user.setProfile(profileSaved);
-
-            user.getProfiles().add(profileSaved);
-            userRepository.save(user);
-        });
+        Profile profileSaved = this.profileRepository.save(clonedProfile);
+        this.userRepository.addProfile(userId, profileSaved);
 
         this.profileEventHandler.handleAfterCreate(profileSaved);
 

@@ -14,26 +14,26 @@ import com.raxim.myscoutee.profile.data.document.mongo.User;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 
 @RepositoryRestResource(collectionResourceRel = "users", path = "users")
-public interface UserRepository extends MongoRepository<User, UUID> {
+public interface UserRepository extends MongoRepository<User, UUID>, UserExtRepository {
 
-    @Query("{email: ?0}")
-    User findUserByEmail(String email);
+        @Query("{email: ?0}")
+        User findUserByEmail(String email);
 
-    @Aggregation(pipeline = "findGroupsByEmail")
-    List<GroupDTO> findGroupsByEmail(
-            @Param("email") String email,
-            @Param("role") String role,
-            @Param("isAdmin") boolean isAdmin,
-            @Param("profile") UUID profile,
-            @Param("limit") int limit,
-            @Param("step") int step,
-            @Param("offset") Object[] offset);
+        @Aggregation(pipeline = "findGroupsByEmail")
+        List<GroupDTO> findGroupsByEmail(
+                        @Param("email") String email,
+                        @Param("role") String role,
+                        @Param("isAdmin") boolean isAdmin,
+                        @Param("profile") UUID profile,
+                        @Param("limit") int limit,
+                        @Param("step") int step,
+                        @Param("offset") Object[] offset);
 
-    @Aggregation(pipeline = "findAllGroupsByEmail")
-    List<GroupDTO> findAllGroupsByEmail(String email);
+        @Aggregation(pipeline = "findAllGroupsByEmail")
+        List<GroupDTO> findAllGroupsByEmail(String email);
 
-    @Aggregation(pipeline = "findDeviceWithProfileStatusAll")
-    List<Topic> findDeviceWithProfileStatusAll(
-            @Param("lastTime") String lastTime,
-            @Param("status") String[] status);
+        @Aggregation(pipeline = "findDeviceWithProfileStatusAll")
+        List<Topic> findDeviceWithProfileStatusAll(
+                        @Param("lastTime") String lastTime,
+                        @Param("status") String[] status);
 }

@@ -1,5 +1,13 @@
 package com.raxim.myscoutee.profile.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.springframework.data.util.Pair;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.raxim.myscoutee.common.util.FileUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.School;
 
@@ -23,5 +31,16 @@ public class ProfileUtil {
         result = 31 * result + (profile.getVoice() != null ? profile.getVoice().hashCode() : 0);
         return result;
     }
-    
+
+    public static void saveVoice(MultipartFile voice, String fileName) throws IOException {
+        Pair<String, String> separatorPermDir = FileUtil.uuidToPath(fileName, true);
+        String separator = separatorPermDir.getFirst();
+        String permDir = separatorPermDir.getSecond();
+
+        if (voice != null && !voice.isEmpty()) {
+            InputStream voiceStream = new ByteArrayInputStream(voice.getBytes());
+            FileUtil.save(voiceStream, permDir + separator + "_" + fileName + "_voice");
+        }
+    }
+
 }
