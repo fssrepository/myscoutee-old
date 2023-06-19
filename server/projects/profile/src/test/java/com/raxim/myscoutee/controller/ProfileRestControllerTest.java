@@ -32,13 +32,12 @@ public class ProfileRestControllerTest {
                 "multipart/form-data",
                 new FileInputStream(Paths.get("src/test/resources/file", "img.canvas").toFile()));
 
-        UUID profileId = UUID.randomUUID();
-
         mvc.perform(MockMvcRequestBuilders.multipart("/images")
                 .file(canvasFile))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
+        UUID profileId = UUID.randomUUID();
         /*
          * String regex =
          * "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}";
