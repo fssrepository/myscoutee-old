@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.raxim.myscoutee.algo.dto.GroupAlgo;
+import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.exception.NodeTypeMissingError;
 
@@ -16,12 +16,12 @@ import com.raxim.myscoutee.algo.exception.NodeTypeMissingError;
  * It should be extended with shadow likes (that likes can be used to put same people together again
  * balanced and shadow -> BSHGroupSetIterator - the change should be in the GroupSetIterator which balanced iterator depends on)
  */
-public class BGroupSetIterator implements Iterator<GroupAlgo> {
+public class BGroupSetIterator implements Iterator<CGroup> {
     private ConcurrentMap<String, LinkedBlockingDeque<Node>> nodesByType;
     private volatile int partition = -1;
-    private GroupAlgo currGroup = null;
+    private CGroup currGroup = null;
 
-    private GroupAlgo bGroup = new GroupAlgo(new ArrayList<>());
+    private CGroup bGroup = new CGroup(new ArrayList<>());
 
     private final BGroupSet bGroupSet;
     private final GroupSetIterator groupSetIterator;
@@ -34,7 +34,7 @@ public class BGroupSetIterator implements Iterator<GroupAlgo> {
 
     @Override
     public boolean hasNext() {
-        bGroup = new GroupAlgo(new ArrayList<>());
+        bGroup = new CGroup(new ArrayList<>());
 
         List<String> types = bGroupSet.getTypes();
         if (types == null || types.size() < 2)
@@ -112,7 +112,7 @@ public class BGroupSetIterator implements Iterator<GroupAlgo> {
     }
 
     @Override
-    public GroupAlgo next() {
+    public CGroup next() {
         return bGroup;
     }
 }

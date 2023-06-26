@@ -3,12 +3,12 @@ package com.raxim.myscoutee.algo.dto;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class GroupAlgo {
+public class CGroup {
     private final AtomicLong weight;
     private final List<Node> nodes;
     private int partition;
 
-    public GroupAlgo(List<Node> nodes) {
+    public CGroup(List<Node> nodes) {
         this.weight = new AtomicLong(0L);
         this.nodes = nodes;
         this.partition = -1;

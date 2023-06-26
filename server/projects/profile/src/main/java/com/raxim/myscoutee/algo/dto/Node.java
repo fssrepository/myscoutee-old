@@ -1,6 +1,6 @@
 package com.raxim.myscoutee.algo.dto;
 
-public class Node {
+public class Node implements Comparable<Node> {
 
 	private final String id;
 	private final String type;
@@ -46,6 +46,11 @@ public class Node {
 	@Override
 	public String toString() {
 		return "Node [id=" + id + ", type=" + type + "]";
+	}
+
+	@Override
+	public int compareTo(Node arg0) {
+		return getId().compareTo(arg0.getId());
 	}
 
 }

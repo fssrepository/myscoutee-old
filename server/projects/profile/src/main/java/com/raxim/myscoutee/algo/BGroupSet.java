@@ -3,7 +3,7 @@ package com.raxim.myscoutee.algo;
 import java.util.Iterator;
 import java.util.List;
 
-import com.raxim.myscoutee.algo.dto.GroupAlgo;
+import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Range;
 
 public class BGroupSet extends GroupSet {
@@ -15,7 +15,7 @@ public class BGroupSet extends GroupSet {
     }
 
     @Override
-    public Iterator<GroupAlgo> iterator() {
+    public Iterator<CGroup> iterator() {
         return new BGroupSetIterator(this);
     }
 

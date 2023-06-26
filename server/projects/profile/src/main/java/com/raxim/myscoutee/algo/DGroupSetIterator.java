@@ -12,7 +12,7 @@ import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.NodeInfo;
 import com.raxim.myscoutee.algo.dto.WeightNode;
 
-public class GroupSetIterator implements Iterator<CGroup> {
+public class DGroupSetIterator implements Iterator<CGroup> {
 
     private final PriorityQueue<NodeInfo> nodeTree = new PriorityQueue<>(
             Comparator.comparing(NodeInfo::getWeight).reversed().thenComparing(NodeInfo::getId));
@@ -22,13 +22,13 @@ public class GroupSetIterator implements Iterator<CGroup> {
     private CGroup group = new CGroup(new ArrayList<>());
     private volatile int partition = -1;
 
-    private final GroupSet groupSet;
+    private final DGroupSet groupSet;
 
-    public GroupSet getGroupSet() {
+    public DGroupSet getGroupSet() {
         return groupSet;
     }
 
-    public GroupSetIterator(final GroupSet groupSet) {
+    public DGroupSetIterator(final DGroupSet groupSet) {
         this.groupSet = groupSet;
     }
 

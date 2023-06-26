@@ -5,12 +5,12 @@ import java.util.Iterator;
 import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Range;
 
-public class GroupSet implements Iterable<CGroup> {
+public class DGroupSet implements Iterable<CGroup> {
 
     private final NodeRepository nodeRepository;
     private final Range range;
 
-    public GroupSet(final NodeRepository nodeRepository, final Range range) {
+    public DGroupSet(final NodeRepository nodeRepository, final Range range) {
         this.nodeRepository = nodeRepository;
 
         int minGroupSize = range.getMin() < 2 ? 2 : range.getMin();
@@ -20,7 +20,7 @@ public class GroupSet implements Iterable<CGroup> {
 
     @Override
     public Iterator<CGroup> iterator() {
-        return new GroupSetIterator(this);
+        return new DGroupSetIterator(this);
     }
 
     public NodeRepository getNodeRepository() {

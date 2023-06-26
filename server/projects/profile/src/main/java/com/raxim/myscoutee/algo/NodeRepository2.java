@@ -11,12 +11,12 @@ import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.NodeInfo;
 import com.raxim.myscoutee.algo.dto.WeightNode;
 
-public class NodeRepository {
+public class NodeRepository2 {
     private final ConcurrentMap<String, Node> nodes;
     private final PriorityQueue<NodeInfo> nodeForest;
     private final ConcurrentMap<String, NodeInfo> nodeInfos;
 
-    public NodeRepository() {
+    public NodeRepository2() {
         this.nodes = new ConcurrentHashMap<>();
         this.nodeForest = new PriorityQueue<>(
                 Comparator.comparing(NodeInfo::getWeight).reversed().thenComparing(NodeInfo::getId));
@@ -49,17 +49,5 @@ public class NodeRepository {
 
         WeightNode weightNode = new WeightNode(toId, weight);
         nodeInfo.add(weightNode);
-    }
-
-    public ConcurrentMap<String, Node> getNodes() {
-        return nodes;
-    }
-
-    public PriorityQueue<NodeInfo> getNodeForest() {
-        return this.nodeForest;
-    }
-
-    public ConcurrentMap<String, NodeInfo> getNodeInfos() {
-        return nodeInfos;
     }
 }

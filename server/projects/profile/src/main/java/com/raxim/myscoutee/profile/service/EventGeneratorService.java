@@ -15,7 +15,7 @@ import com.raxim.myscoutee.algo.BGroupSet;
 import com.raxim.myscoutee.algo.NodeRepository;
 import com.raxim.myscoutee.algo.dto.Bound;
 import com.raxim.myscoutee.algo.dto.Edge;
-import com.raxim.myscoutee.algo.dto.GroupAlgo;
+import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.util.JsonUtil;
@@ -86,7 +86,7 @@ public class EventGeneratorService {
         BGroupSet groupSet = new BGroupSet(nodeRepository, range, List.of(AppConstants.MAN, AppConstants.WOMAN));
 
         List<Set<Profile>> profileList = new ArrayList<>();
-        for (GroupAlgo group : groupSet) {
+        for (CGroup group : groupSet) {
 
             Set<Profile> profilesByGroup = group.getNodes().stream()
                     .map(node -> nodes.get(node.getId()))
