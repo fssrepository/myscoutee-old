@@ -2,16 +2,17 @@ package com.raxim.myscoutee.algo;
 
 import java.util.Iterator;
 
+import com.raxim.myscoutee.algo.dto.CGraph;
 import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Range;
 
-public class DGroupSet implements Iterable<CGroup> {
+public class DGroup implements Iterable<CGroup> {
 
-    private final NodeRepository nodeRepository;
+    private final CGraph cGraph;
     private final Range range;
 
-    public DGroupSet(final NodeRepository nodeRepository, final Range range) {
-        this.nodeRepository = nodeRepository;
+    public DGroup(final CGraph cGraph, final Range range) {
+        this.cGraph = cGraph;
 
         int minGroupSize = range.getMin() < 2 ? 2 : range.getMin();
         int maxGroupSize = range.getMax();
@@ -20,11 +21,11 @@ public class DGroupSet implements Iterable<CGroup> {
 
     @Override
     public Iterator<CGroup> iterator() {
-        return new DGroupSetIterator(this);
+        return new DGroupIterator(this);
     }
 
-    public NodeRepository getNodeRepository() {
-        return nodeRepository;
+    public CGraph getCGraph() {
+        return cGraph;
     }
 
     public Range getRange() {
@@ -33,6 +34,6 @@ public class DGroupSet implements Iterable<CGroup> {
 
     @Override
     public String toString() {
-        return this.nodeRepository.getNodeForest().toString();
+        return this.cGraph.toString();
     }
 }

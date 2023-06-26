@@ -27,7 +27,8 @@ public class CNode {
     }
 
     public Edge poll() {
-        return edgesOrdered.poll();
+        Edge edge = edgesOrdered.poll();
+        return edge;
     }
 
     public void add(Edge edge) {

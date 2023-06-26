@@ -3,17 +3,19 @@ package com.raxim.myscoutee.algo.dto;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.raxim.myscoutee.algo.CGraphIterator;
 import com.raxim.myscoutee.common.merge.Mergeable;
 
 /*
  * connected graph
  */
-public class CGraph implements Mergeable<CGraph>, Comparable<CGraph> {
+public class CGraph implements Mergeable<CGraph>, Comparable<CGraph>, Iterable<Edge> {
     private final ConcurrentMap<String, CNode> nodes;
     private final PriorityQueue<CNode> nodesOrdered;
 
@@ -95,5 +97,26 @@ public class CGraph implements Mergeable<CGraph>, Comparable<CGraph> {
     @Override
     public String toString() {
         return "CGraph [nodesOrdered=" + nodesOrdered + "]";
+    }
+
+    @Override
+    public Iterator<Edge> iterator() {
+        return new CGraphIterator(this);
+    }
+
+    public boolean isEmpty() {
+        return nodesOrdered.isEmpty();
+    }
+
+    public int size() {
+        return nodesOrdered.size();
+    }
+
+    public ConcurrentMap<String, CNode> getNodes() {
+        return nodes;
+    }
+
+    public PriorityQueue<CNode> getNodesOrdered() {
+        return nodesOrdered;
     }
 }

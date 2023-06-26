@@ -12,7 +12,7 @@ import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.NodeInfo;
 import com.raxim.myscoutee.algo.dto.WeightNode;
 
-public class DGroupSetIterator implements Iterator<CGroup> {
+public class DGroupIterator implements Iterator<CGroup> {
 
     private final PriorityQueue<NodeInfo> nodeTree = new PriorityQueue<>(
             Comparator.comparing(NodeInfo::getWeight).reversed().thenComparing(NodeInfo::getId));
@@ -22,22 +22,22 @@ public class DGroupSetIterator implements Iterator<CGroup> {
     private CGroup group = new CGroup(new ArrayList<>());
     private volatile int partition = -1;
 
-    private final DGroupSet groupSet;
+    private final DGroup groupSet;
 
-    public DGroupSet getGroupSet() {
+    public DGroup getGroupSet() {
         return groupSet;
     }
 
-    public DGroupSetIterator(final DGroupSet groupSet) {
+    public DGroupIterator(final DGroup groupSet) {
         this.groupSet = groupSet;
     }
 
     @Override
     public boolean hasNext() {
-        NodeInfo nodeInfo;
+        /*NodeInfo nodeInfo;
 
         do {
-            nodeInfo = groupSet.getNodeRepository().getNodeForest().peek();
+            nodeInfo = groupSet.getCGraph().getNodeForest().peek();
 
             if (nodeInfo != null) {
                 WeightNode wn = nodeInfo.peek();
@@ -50,10 +50,10 @@ public class DGroupSetIterator implements Iterator<CGroup> {
                     wn = nodeInfo.peek();
                 }
                 if (nodeInfo.getDegree() == 0) {
-                    groupSet.getNodeRepository().getNodeForest().poll();
+                    groupSet.getCGraph().getNodeForest().poll();
                 }
             }
-        } while (!groupSet.getNodeRepository().getNodeForest().isEmpty() && nodeInfo != null
+        } while (!groupSet.getCGraph().getNodeForest().isEmpty() && nodeInfo != null
                 && nodeInfo.getDegree() == 0);
 
         NodeInfo tNodeInfo;
@@ -79,24 +79,25 @@ public class DGroupSetIterator implements Iterator<CGroup> {
 
         return nodeInfo != null && nodeInfo.getDegree() > 0
                 && (isCollect
-                        || groupSet.getNodeRepository().getNodes().size() - visited.size() >= groupSet.getRange()
-                                .getMin());
+                        || groupSet.getCGraph().getNodes().size() - visited.size() >= groupSet.getRange()
+                                .getMin());*/
+        return false;
     }
 
     @Override
     public CGroup next() {
 
-        if (!isCollect) {
+        /*if (!isCollect) {
             group = new CGroup(new ArrayList<>());
             group.setPartition(partition);
         }
 
         if (nodeTree.isEmpty()) {
-            NodeInfo nodeInfo = groupSet.getNodeRepository().getNodeForest().peek();
+            NodeInfo nodeInfo = groupSet.getCGraph().getNodeForest().peek();
             nodeTree.add(nodeInfo);
 
             if (!visited.contains(nodeInfo.getId())) {
-                Node node = groupSet.getNodeRepository().getNodes().get(nodeInfo.getId());
+                Node node = groupSet.getCGraph().getNodes().get(nodeInfo.getId());
                 group.getNodes().add(node);
                 visited.add(nodeInfo.getId());
             }
@@ -106,8 +107,8 @@ public class DGroupSetIterator implements Iterator<CGroup> {
 
         while (group.getNodes().size() < groupSet.getRange().getMax()) {
             for (Node node : group.getNodes()) {
-                if (groupSet.getNodeRepository().getNodeInfos().containsKey(node.getId())) {
-                    NodeInfo nodeInfo = groupSet.getNodeRepository().getNodeInfos().get(node.getId());
+                if (groupSet.getCGraph().getNodeInfos().containsKey(node.getId())) {
+                    NodeInfo nodeInfo = groupSet.getCGraph().getNodeInfos().get(node.getId());
 
                     WeightNode wn = nodeInfo.peek();
                     while (wn != null && visited.contains(wn.getId())) {
@@ -119,16 +120,16 @@ public class DGroupSetIterator implements Iterator<CGroup> {
                         wn = nodeInfo.peek();
                     }
 
-                    groupSet.getNodeRepository().getNodeForest().remove(nodeInfo);
+                    groupSet.getCGraph().getNodeForest().remove(nodeInfo);
                     if (nodeInfo.getDegree() > 0) {
-                        groupSet.getNodeRepository().getNodeForest().add(nodeInfo);
+                        groupSet.getCGraph().getNodeForest().add(nodeInfo);
                     } else {
                         continue;
                     }
 
                     nodeTree.add(nodeInfo);
 
-                    NodeInfo sNodeInfo = groupSet.getNodeRepository().getNodeInfos().get(wn.getId());
+                    NodeInfo sNodeInfo = groupSet.getCGraph().getNodeInfos().get(wn.getId());
 
                     wn = sNodeInfo.peek();
                     while (wn != null && visited.contains(wn.getId())) {
@@ -140,9 +141,9 @@ public class DGroupSetIterator implements Iterator<CGroup> {
                         wn = sNodeInfo.peek();
                     }
 
-                    groupSet.getNodeRepository().getNodeForest().remove(sNodeInfo);
+                    groupSet.getCGraph().getNodeForest().remove(sNodeInfo);
                     if (sNodeInfo.getDegree() > 0) {
-                        groupSet.getNodeRepository().getNodeForest().add(sNodeInfo);
+                        groupSet.getCGraph().getNodeForest().add(sNodeInfo);
                     } else {
                         continue;
                     }
@@ -166,14 +167,14 @@ public class DGroupSetIterator implements Iterator<CGroup> {
             }
 
             if (nodeInfo.getDegree() == 0) {
-                groupSet.getNodeRepository().getNodeForest().remove(nodeInfo);
+                groupSet.getCGraph().getNodeForest().remove(nodeInfo);
                 nodeTree.remove(nodeInfo);
                 continue;
             }
 
-            groupSet.getNodeRepository().getNodeForest().remove(nodeInfo);
+            groupSet.getCGraph().getNodeForest().remove(nodeInfo);
             if (nodeInfo.getDegree() > 0) {
-                groupSet.getNodeRepository().getNodeForest().add(nodeInfo);
+                groupSet.getCGraph().getNodeForest().add(nodeInfo);
             }
 
             nodeTree.remove(nodeInfo);
@@ -181,7 +182,7 @@ public class DGroupSetIterator implements Iterator<CGroup> {
                 nodeTree.add(nodeInfo);
             }
 
-            Node node = groupSet.getNodeRepository().getNodes().get(wn.getId());
+            Node node = groupSet.getCGraph().getNodes().get(wn.getId());
             group.getNodes().add(node);
             visited.add(wn.getId());
 
@@ -198,7 +199,8 @@ public class DGroupSetIterator implements Iterator<CGroup> {
             isCollect = false;
         }
 
-        return group;
+        return group;*/
+        return null;
     }
 
     @Override

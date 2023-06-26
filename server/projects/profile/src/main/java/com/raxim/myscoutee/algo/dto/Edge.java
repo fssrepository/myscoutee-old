@@ -26,11 +26,9 @@ public class Edge {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((from == null) ? 0 : from.hashCode());
-        result = prime * result + ((to == null) ? 0 : to.hashCode());
-        return result;
+        int hashCode1 = from.hashCode() ^ to.hashCode();
+        int hashCode2 = to.hashCode() ^ from.hashCode();
+        return hashCode1 ^ hashCode2;
     }
 
     @Override
@@ -45,12 +43,12 @@ public class Edge {
         if (from == null) {
             if (other.from != null)
                 return false;
-        } else if (!from.equals(other.from))
+        } else if (!from.equals(other.from) && !to.equals(other.from))
             return false;
         if (to == null) {
             if (other.to != null)
                 return false;
-        } else if (!to.equals(other.to))
+        } else if (!to.equals(other.to) && !from.equals(other.to))
             return false;
         return true;
     }
