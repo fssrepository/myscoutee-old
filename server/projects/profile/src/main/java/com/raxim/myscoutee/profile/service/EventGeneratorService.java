@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.raxim.myscoutee.algo.BGroupSet;
+//import com.raxim.myscoutee.algo.BGroupSet;
 import com.raxim.myscoutee.algo.NodeRepository;
 import com.raxim.myscoutee.algo.dto.Bound;
 import com.raxim.myscoutee.algo.dto.Edge;
@@ -83,17 +83,17 @@ public class EventGeneratorService {
         nodeRepository.addAll(edges);
 
         Range range = new Range(flags.getMinGroupSize(), flags.getMaxGroupSize());
-        BGroupSet groupSet = new BGroupSet(nodeRepository, range, List.of(AppConstants.MAN, AppConstants.WOMAN));
+        //BGroupSet groupSet = new BGroupSet(nodeRepository, range, List.of(AppConstants.MAN, AppConstants.WOMAN));
 
         List<Set<Profile>> profileList = new ArrayList<>();
-        for (CGroup group : groupSet) {
+        /*for (CGroup group : groupSet) {
 
             Set<Profile> profilesByGroup = group.getNodes().stream()
                     .map(node -> nodes.get(node.getId()))
                     .collect(Collectors.toSet());
             profileList.add(profilesByGroup);
 
-        }
+        }*/
 
         return profileList;
     }

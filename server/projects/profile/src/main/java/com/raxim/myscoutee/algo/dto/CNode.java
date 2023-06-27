@@ -2,7 +2,6 @@ package com.raxim.myscoutee.algo.dto;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

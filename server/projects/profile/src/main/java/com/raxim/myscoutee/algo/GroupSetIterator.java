@@ -12,7 +12,7 @@ import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.NodeInfo;
 import com.raxim.myscoutee.algo.dto.WeightNode;
 
-public class GroupSetIterator implements Iterator<CGroup> {
+/*public class GroupSetIterator implements Iterator<CGroup> {
 
     private final PriorityQueue<NodeInfo> nodeTree = new PriorityQueue<>(
             Comparator.comparing(NodeInfo::getWeight).reversed().thenComparing(NodeInfo::getId));
@@ -206,4 +206,4 @@ public class GroupSetIterator implements Iterator<CGroup> {
         throw new UnsupportedOperationException("Remove is not supported!", null);
     }
 
-}
+}*/

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Range;
 
-public class GroupSet implements Iterable<CGroup> {
+/*public class GroupSet implements Iterable<CGroup> {
 
     private final NodeRepository nodeRepository;
     private final Range range;
@@ -35,4 +35,4 @@ public class GroupSet implements Iterable<CGroup> {
     public String toString() {
         return this.nodeRepository.getNodeForest().toString();
     }
-}
+}*/

@@ -16,7 +16,7 @@ import com.raxim.myscoutee.algo.exception.NodeTypeMissingError;
  * It should be extended with shadow likes (that likes can be used to put same people together again
  * balanced and shadow -> BSHGroupSetIterator - the change should be in the GroupSetIterator which balanced iterator depends on)
  */
-public class BGroupSetIterator implements Iterator<CGroup> {
+/*public class BGroupSetIterator implements Iterator<CGroup> {
     private ConcurrentMap<String, LinkedBlockingDeque<Node>> nodesByType;
     private volatile int partition = -1;
     private CGroup currGroup = null;
@@ -115,4 +115,4 @@ public class BGroupSetIterator implements Iterator<CGroup> {
     public CGroup next() {
         return bGroup;
     }
-}
+}*/

@@ -47,29 +47,4 @@ public class CGraph extends MergingSet<CNode> implements Mergeable<CGraph>, Comp
         CNode[] cNodes = super.toArray(new CNode[super.size()]);
         return "CGraph [nodesOrdered=" + cNodes + "]";
     }
-
-    /*
-     * @Override
-     * public Iterator<Edge> iterator() {
-     * return new CGraphIterator(this);
-     * }
-     */
-
-    /*
-     * public boolean isEmpty() {
-     * return nodesOrdered.isEmpty();
-     * }
-     * 
-     * public int size() {
-     * return nodesOrdered.size();
-     * }
-     * 
-     * public ConcurrentMap<String, CNode> getNodes() {
-     * return nodes;
-     * }
-     * 
-     * public PriorityQueue<CNode> getNodesOrdered() {
-     * return nodesOrdered;
-     * }
-     */
 }

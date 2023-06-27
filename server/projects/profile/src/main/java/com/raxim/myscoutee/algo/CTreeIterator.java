@@ -3,70 +3,122 @@ package com.raxim.myscoutee.algo;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.raxim.myscoutee.algo.dto.CNode;
 import com.raxim.myscoutee.algo.dto.Edge;
+import com.raxim.myscoutee.algo.dto.Node;
 
 public class CTreeIterator implements Iterator<Edge> {
 
+    public static final String DEFAULT_TYPE = "d";
+
     private final CTree cTree;
 
-    private final PriorityQueue<CNode> nodesOrdered = new PriorityQueue<>(
-            Comparator.comparing(CNode::getWeight).reversed().thenComparing(CNode::getNode));
+    private final Map<String, PriorityQueue<CNode>> nodesOrderedByType;
+    private final List<String> types;
+
     private final Set<String> visited = new HashSet<>();
 
+    private int currentIdx = 0;
     private Edge currEdge;
 
-    public CTreeIterator(final CTree cTree) {
+    public CTreeIterator(final CTree cTree, List<String> types) {
         this.cTree = cTree;
+        if (!types.isEmpty()) {
+            this.types = types;
+        } else {
+            this.types = List.of(DEFAULT_TYPE);
+        }
+        this.nodesOrderedByType = new ConcurrentHashMap<>();
+
+        for (String type : this.types) {
+            PriorityQueue<CNode> nodes = new PriorityQueue<>(
+                    Comparator.comparing(CNode::getWeight).reversed().thenComparing(CNode::getNode));
+
+            nodesOrderedByType.put(type, nodes);
+        }
     }
 
     @Override
     public boolean hasNext() {
-        if (nodesOrdered.isEmpty()) {
-            CNode cNode = cTree.getNodesOrdered().poll();
+        String type = types.get(currentIdx);
+        if (cTree.isEmpty()
+                && nodesOrderedByType.get(type).isEmpty()) {
+            return false;
+        }
 
-            String nodeFrom = cNode.getNode().getId();
-            visited.add(nodeFrom);
+        while (!cTree.isEmpty()
+                && nodesOrderedByType.get(type).isEmpty()) {
+            CNode cNode = cTree.poll();
 
-            nodesOrdered.add(cNode);
+            Node node = cNode.getNode();
+            if (node.getType() == null) {
+                node = new Node(node.getId(), DEFAULT_TYPE);
+            }
+            if (type.equals(node.getType())) {
+                String nodeFrom = cNode.getNode().getId();
+                visited.add(nodeFrom);
+            }
+
+            nodesOrderedByType.get(node.getType()).add(cNode);
         }
 
         CNode cNode;
         do {
-            cNode = nodesOrdered.peek();
+            if (nodesOrderedByType.get(type).isEmpty()) {
+                break;
+            }
+
+            cNode = nodesOrderedByType.get(type).peek();
             currEdge = cNode.poll();
 
-            nodesOrdered.remove(cNode);
+            nodesOrderedByType.get(type).remove(cNode);
             if (cNode.getDegree() > 0) {
-                nodesOrdered.add(cNode);
+                nodesOrderedByType.get(type).add(cNode);
             }
         } while (currEdge != null && visited.contains(currEdge.getTo().getId())
-                && !nodesOrdered.isEmpty());
+                && !nodesOrderedByType.get(type).isEmpty());
 
-        if (currEdge == null
-                && (!cTree.isEmpty() || !nodesOrdered.isEmpty())) {
+        if ((currEdge == null || visited.contains(currEdge.getTo().getId()))
+                && (!cTree.isEmpty() || !nodesOrderedByType.get(type).isEmpty())) {
+            if (currentIdx == 0) {
+                return false;
+            }
+            currentIdx = --currentIdx % types.size();
             hasNext();
         }
 
-        return !cTree.isEmpty() || !nodesOrdered.isEmpty();
+        return (currEdge != null && !visited.contains(currEdge.getTo().getId()))
+                && (!cTree.isEmpty() || !nodesOrderedByType.get(type).isEmpty());
     }
 
     @Override
     public Edge next() {
         if (currEdge != null) {
             visited.add(currEdge.getTo().getId());
+            currentIdx = ++currentIdx % types.size();
         }
 
-        ConcurrentMap<String, CNode> nodes = cTree.getNodes();
-        if (nodes.containsKey(currEdge.getTo().getId())) {
-            CNode cNodeTo = cTree.getNodes().get(currEdge.getTo().getId());
-            nodesOrdered.add(cNodeTo);
+        CNode cNodeTo = cTree.getNode(currEdge.getTo().getId());
+
+        if (cNodeTo != null) {
+            Node node = cNodeTo.getNode();
+            if (node.getType() == null) {
+                node = new Node(node.getId(), DEFAULT_TYPE);
+            }
+            nodesOrderedByType.get(node.getType()).add(cNodeTo);
+            cTree.remove(cNodeTo);
         }
         return currEdge;
+    }
+
+    public List<String> getTypes() {
+        return types;
     }
 
 }

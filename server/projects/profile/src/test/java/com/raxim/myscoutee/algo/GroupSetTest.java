@@ -23,7 +23,7 @@ import com.raxim.myscoutee.algo.generator.EdgeGenerator;
 import com.raxim.myscoutee.algo.generator.IGenerator;
 import com.raxim.myscoutee.algo.generator.NodeGenerator;
 
-public class GroupSetTest extends AbstractAlgoTest {
+/*public class GroupSetTest extends AbstractAlgoTest {
 
     private final static int NODE_NUM = 1000;
     private final static int EDGE_NUM = 1000;
@@ -163,4 +163,4 @@ public class GroupSetTest extends AbstractAlgoTest {
         long elapsedTime = endTime - startTime;
         System.out.println("Elapsed time: " + elapsedTime / 1000 + " seconds");
     }
-}
+}*/

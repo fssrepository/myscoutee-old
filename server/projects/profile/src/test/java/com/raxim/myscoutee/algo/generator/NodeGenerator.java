@@ -15,7 +15,8 @@ public class NodeGenerator implements IGenerator<Node> {
         Set<Node> nodeSet = new HashSet<>();
         while (nodeSet.size() < num) {
             int nodeId = random.nextInt(Integer.MAX_VALUE);
-            nodeSet.add(new Node(String.valueOf(nodeId), "m"));
+            boolean isMan = random.nextBoolean();
+            nodeSet.add(new Node(String.valueOf(nodeId), isMan ? "m" : "w"));
         }
         return nodeSet;
     }

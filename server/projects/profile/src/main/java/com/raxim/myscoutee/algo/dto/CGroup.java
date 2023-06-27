@@ -1,37 +1,34 @@
 package com.raxim.myscoutee.algo.dto;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class CGroup {
+public class CGroup extends LinkedHashSet<Node> {
     private final AtomicLong weight;
-    private final List<Node> nodes;
-    private int partition;
 
-    public CGroup(List<Node> nodes) {
+    public CGroup() {
+        this(new HashSet<>());
+    }
+
+    public CGroup(Set<Node> nodes) {
+        super(nodes);
         this.weight = new AtomicLong(0L);
-        this.nodes = nodes;
-        this.partition = -1;
     }
 
-    public AtomicLong getWeight() {
-        return weight;
-    }
-
-    public List<Node> getNodes() {
-        return nodes;
-    }
-
-    public void setPartition(int partition) {
-        this.partition = partition;
-    }
-
-    public int getPartition() {
-        return partition;
+    public void add(Edge edge) {
+        this.weight.addAndGet(edge.getWeight());
+        if (edge.getFrom() != null) {
+            super.add(edge.getFrom());
+        }
+        if (edge.getTo() != null) {
+            super.add(edge.getTo());
+        }
     }
 
     @Override
     public String toString() {
-        return "Group [weight=" + weight + ", nodes=" + nodes + ", partition=" + partition + "]";
+        return "Group [weight=" + weight + ", nodes=" + super.toString() + "]";
     }
 }

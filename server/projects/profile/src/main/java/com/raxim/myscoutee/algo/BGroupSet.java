@@ -6,7 +6,7 @@ import java.util.List;
 import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.Range;
 
-public class BGroupSet extends GroupSet {
+/*public class BGroupSet extends GroupSet {
     private final List<String> types;
 
     public BGroupSet(final NodeRepository nodeRepository, final Range range, final List<String> types) {
@@ -23,4 +23,4 @@ public class BGroupSet extends GroupSet {
         return types;
     }
 
-}
+}*/
