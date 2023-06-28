@@ -5,7 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.google.common.util.concurrent.AtomicDouble;
@@ -41,11 +40,16 @@ public class CGroup extends LinkedHashSet<Node> {
         }
     }
 
-    public int balance() {
-        if (types.isEmpty() || types.size() < 2) {
+    public int balance(List<String> pTypes) {
+        if (pTypes.isEmpty() || pTypes.size() < 2) {
             return 0;
         }
+
         int oldSize = this.size();
+        if (pTypes.size() != types.size()) {
+            super.clear();
+            return oldSize;
+        }
 
         Map<String, List<Node>> nodesByType = this.stream()
                 .collect(Collectors.groupingBy(Node::getType));

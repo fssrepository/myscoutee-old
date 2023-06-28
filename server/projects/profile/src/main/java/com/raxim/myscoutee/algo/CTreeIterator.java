@@ -86,10 +86,7 @@ public class CTreeIterator implements Iterator<Edge> {
 
         if ((currEdge == null || visited.contains(currEdge.getTo().getId()))
                 && (!cTree.isEmpty() || !nodesOrderedByType.get(type).isEmpty())) {
-            if (currentIdx == 0) {
-                return false;
-            }
-            currentIdx = --currentIdx % types.size();
+            currentIdx = ++currentIdx % types.size();
             hasNext();
         }
 

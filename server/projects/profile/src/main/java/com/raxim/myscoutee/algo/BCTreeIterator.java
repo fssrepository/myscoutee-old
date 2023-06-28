@@ -49,7 +49,7 @@ public class BCTreeIterator implements Iterator<CGroup> {
             cTree.add(edge);
         }
 
-        System.out.println(cGroup.balance());
+        System.out.println(cGroup.balance(cTreeIterator.getTypes()));
 
         return cGroup.size() >= this.range.getMin()
                 && (cGroup.size() % cTreeIterator.getTypes().size() == 0);
