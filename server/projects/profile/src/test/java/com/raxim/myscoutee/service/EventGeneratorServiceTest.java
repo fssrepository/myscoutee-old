@@ -98,7 +98,7 @@ public class EventGeneratorServiceTest {
                 Set<Profile> group1 = profilesByGroup.get(0);
                 assertEquals(2, group1.size());
 
-                List<UUID> expectedUuidsForGroup1 = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_AVA);
+                List<UUID> expectedUuidsForGroup1 = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
                 assertTrue(expectedUuidsForGroup1.stream().allMatch(
                                 id -> group1.stream().anyMatch(
                                                 group -> group.getId().equals(id))));
@@ -106,7 +106,7 @@ public class EventGeneratorServiceTest {
                 Set<Profile> group2 = profilesByGroup.get(1);
                 assertEquals(2, group2.size());
 
-                List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_SOPHIA, UUID_PROFILE_OLIVER);
+                List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_AVA, UUID_PROFILE_OLIVER);
                 assertTrue(expectedUuidsForGroup2.stream().allMatch(
                                 id -> group2.stream().anyMatch(
                                                 group -> group.getId().equals(id))));
