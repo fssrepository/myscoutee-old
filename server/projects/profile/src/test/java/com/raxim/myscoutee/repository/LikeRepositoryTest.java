@@ -52,20 +52,20 @@ public class LikeRepositoryTest {
                 List<LikeGroup> pLikes = likes.stream().filter(
                                 like -> like.getLikes()
                                                 .stream()
-                                                .filter(pLike -> "A".equals(pLike.getStatus()))
+                                                .filter(pLike -> "A".equals(pLike.getStatus()) || "G".equals(pLike.getStatus()))
                                                 .count() == 2)
                                 .toList();
                 assertEquals(2, pLikes.size());
 
                 LikeGroup likeGroup1 = pLikes.get(0);
-                assertEquals(2, likeGroup1.getLikes().size());
+                assertEquals(3, likeGroup1.getLikes().size());
 
                 assertTrue(likeGroup1.getLikes().stream().anyMatch(
                                 like -> "Evelyn".equals(like.getFrom().getFirstName())
                                                 && "Liam".equals(like.getTo().getFirstName())));
 
                 LikeGroup likeGroup2 = pLikes.get(1);
-                assertEquals(2, likeGroup1.getLikes().size());
+                assertEquals(2, likeGroup2.getLikes().size());
                 assertTrue(likeGroup2.getLikes().stream().anyMatch(
                                 like -> "Oliver".equals(like.getFrom().getFirstName())
                                                 && "Mia".equals(like.getTo().getFirstName())));

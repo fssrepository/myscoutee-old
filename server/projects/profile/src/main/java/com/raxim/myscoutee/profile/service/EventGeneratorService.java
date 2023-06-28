@@ -63,19 +63,13 @@ public class EventGeneratorService {
 
         List<Like> likesBoth = reduceLikeGroups(likeGroups);
 
-        // nodes
-        Map<String, Profile> nodes = new HashMap<>();
-        likesBoth.forEach(likeBoth -> {
-            nodes.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
-            nodes.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
-        });
-
         // edges
         List<Edge> edges = likesBoth.stream().map(likeBoth -> {
             Node fromNode = new Node(likeBoth.getFrom().getId().toString(), likeBoth.getFrom().getGender());
             Node toNode = new Node(likeBoth.getTo().getId().toString(), likeBoth.getTo().getGender());
             double weight = (double) (likeBoth.getRate() * likeBoth.getDistance());
-            return new Edge(fromNode, toNode, weight);
+            boolean isIgnored = "G".equals(likeBoth.getStatus()) ? true : false;
+            return new Edge(fromNode, toNode, weight, isIgnored);
         }).toList();
 
         DGraph dGraph = new DGraph();
@@ -86,6 +80,13 @@ public class EventGeneratorService {
             CTree cTree = new CTree(cGraph, List.of(AppConstants.MAN, AppConstants.WOMAN));
             return new BCTree(cTree, range);
         }).toList();
+
+        // nodes
+        Map<String, Profile> nodes = new HashMap<>();
+        likesBoth.forEach(likeBoth -> {
+            nodes.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
+            nodes.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
+        });
 
         List<Set<Profile>> profileList = new ArrayList<>();
         bcTrees.forEach(bcTree -> bcTree.forEach(cGroup -> {
@@ -103,7 +104,7 @@ public class EventGeneratorService {
         List<Like> likesBoth = likeGroups
                 .stream().map(group -> {
                     List<Like> likesWithStatusP = group.getLikes().stream()
-                            .filter(like -> "A".equals(like.getStatus()))
+                            .filter(like -> "A".equals(like.getStatus()) || "G".equals(like.getStatus()))
                             .toList();
                     if (likesWithStatusP.size() == 2) {
                         Like firstLike = likesWithStatusP.get(0);

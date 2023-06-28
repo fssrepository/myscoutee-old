@@ -110,7 +110,7 @@
             "$type": "03"
         },
         "type": "P",
-        "status": "A",
+        "status": "G",
         "cnt": 4,
         "from": {
             "$ref": "profiles",
@@ -132,6 +132,41 @@
             "$ref": "profiles",
             "$id": {
                 "$binary": "xwe5I2hsjEK3vRoAC3LncQ==",
+                "$type": "03"
+            }
+        },
+        "createdDate": {
+            "$date": "2023-01-28T09:15:55Z"
+        }
+    },
+    {
+        "_id": {
+            "$binary": "skpfkCLlL0kYvvDXhi+4kQ==",
+            "$type": "03"
+        },
+        "type": "P",
+        "status": "D",
+        "cnt": 4,
+        "from": {
+            "$ref": "profiles",
+            "$id": {
+                "$binary": "xwe5I2hsjEK3vRoAC3LncQ==",
+                "$type": "03"
+            }
+        },
+        "to": {
+            "$ref": "profiles",
+            "$id": {
+                "$binary": "sAGVEajTS4+CWS8FT6AqFw==",
+                "$type": "03"
+            }
+        },
+        "rate": 6,
+        "comment": "D4) Evelyn (ID: xwe5I2hsjEK3vRoAC3LncQ==) likes Liam (ID: sAGVEajTS4+CWS8FT6AqFw==)",
+        "createdBy": {
+            "$ref": "profiles",
+            "$id": {
+                "$binary": "2y2DXeZ9g0+8kPQ5JcFF9Q==",
                 "$type": "03"
             }
         },
@@ -985,7 +1020,7 @@
             "$type": "03"
         },
         "type": "P",
-        "status": "A",
+        "status": "G",
         "cnt": 4,
         "from": {
             "$ref": "profiles",
