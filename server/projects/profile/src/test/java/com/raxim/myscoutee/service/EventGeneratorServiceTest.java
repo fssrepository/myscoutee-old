@@ -92,7 +92,7 @@ public class EventGeneratorServiceTest {
 
                 List<Set<Profile>> profilesByGroup = eventGeneratorService.generate();
 
-                assertEquals(2, profilesByGroup.size());
+                assertEquals(3, profilesByGroup.size());
 
                 // group1
                 Set<Profile> group1 = profilesByGroup.get(0);
@@ -103,22 +103,21 @@ public class EventGeneratorServiceTest {
                                 id -> group1.stream().anyMatch(
                                                 group -> group.getId().equals(id))));
 
-                // group2
                 Set<Profile> group2 = profilesByGroup.get(1);
                 assertEquals(2, group2.size());
 
-                List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
+                List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_SOPHIA, UUID_PROFILE_OLIVER);
                 assertTrue(expectedUuidsForGroup2.stream().allMatch(
                                 id -> group2.stream().anyMatch(
                                                 group -> group.getId().equals(id))));
-
-                /*Set<Profile> group3 = profilesByGroup.get(2);
+                // group3
+                Set<Profile> group3 = profilesByGroup.get(2);
                 assertEquals(2, group3.size());
 
-                List<UUID> expectedUuidsForGroup3 = List.of(UUID_PROFILE_SOPHIA, UUID_PROFILE_OLIVER);
+                List<UUID> expectedUuidsForGroup3 = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
                 assertTrue(expectedUuidsForGroup3.stream().allMatch(
                                 id -> group3.stream().anyMatch(
-                                                group -> group.getId().equals(id))));*/
+                                                group -> group.getId().equals(id))));
 
         }
 }

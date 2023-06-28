@@ -114,6 +114,7 @@ public class CTreeIterator implements Iterator<Edge> {
             nodesOrderedByType.get(node.getType()).add(cNodeTo);
             cTree.remove(cNodeTo);
         }
+        System.out.println(currEdge);
         return currEdge;
     }
 

@@ -29,8 +29,8 @@ public class BCTreeIterator implements Iterator<CGroup> {
     @Override
     public boolean hasNext() {
 
-        while (cTreeIterator.hasNext()
-                && cGroup.size() < this.range.getMax()) {
+        while (cGroup.size() < this.range.getMax()
+                && cTreeIterator.hasNext()) {
             Edge edge = cTreeIterator.next();
 
             Node from = edge.getFrom();
