@@ -107,8 +107,7 @@
                                                         "$in": [
                                                             "$status",
                                                             [
-                                                                "A",
-                                                                "G"
+                                                                "A"
                                                             ]
                                                         ]
                                                     }
@@ -129,8 +128,7 @@
                                                         "$in": [
                                                             "$status",
                                                             [
-                                                                "A",
-                                                                "G"
+                                                                "A"
                                                             ]
                                                         ]
                                                     }
@@ -154,8 +152,7 @@
                                                         "$in": [
                                                             "$status",
                                                             [
-                                                                "A",
-                                                                "G"
+                                                                "A"
                                                             ]
                                                         ]
                                                     }
@@ -218,8 +215,7 @@
                                         "$in": [
                                             "$status",
                                             [
-                                                "A",
-                                                "G"
+                                                "A"
                                             ]
                                         ]
                                     },
@@ -381,6 +377,107 @@
         }
     },
     {
+        "$lookup": {
+            "from": "items",
+            "let": {
+                "p_id": "$_id"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$in": [
+                                        "$$p_id",
+                                        "$members.profile.$id"
+                                    ]
+                                },
+                                {
+                                    "$in": [
+                                        "?4",
+                                        "$members.profile.$id"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$sort": {
+                        "createdDate": -1
+                    }
+                },
+                {
+                    "$limit": 1
+                }
+            ],
+            "as": "items"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$items",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$addFields": {
+            "met": {
+                "$cond": {
+                    "if": {
+                        "$not": {
+                            "$in": [
+                                {
+                                    "$ifNull": [
+                                        "$items",
+                                        null
+                                    ]
+                                },
+                                [
+                                    null,
+                                    []
+                                ]
+                            ]
+                        }
+                    },
+                    "then": true,
+                    "else": false
+                }
+            }
+        }
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$or": [
+                    {
+                        "$and": [
+                            {
+                                "$ne": [
+                                    1.5,
+                                    ":#{#direction}"
+                                ]
+                            },
+                            {
+                                "$eq": [
+                                    false,
+                                    "$met"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "$eq": [
+                            1.5,
+                            ":#{#direction}"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
         "$limit": "?2"
     },
     {
@@ -428,6 +525,7 @@
                     {
                         "rate": "$likes.rate",
                         "groupKey": "$groupKey",
+                        "met": "$met",
                         "offset": [
                             "$distance",
                             "$likes.rate",

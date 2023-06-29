@@ -45,6 +45,10 @@ public class Member {
     @JsonIgnore
     private UUID eventRef;
 
+    public Member(Profile profile) {
+        this(profile, "A", "U");
+    }
+
     public Member(Profile profile, String status, String role) {
         this.id = profile.getId(); // it might not be needed
         this.profile = profile;

@@ -1,12 +1,13 @@
 package com.raxim.myscoutee.profile.data.dto.rest;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-
-import java.util.List;
-import java.util.UUID;
 
 @JsonRootName("profile")
 public class ProfileDTO {
@@ -27,6 +28,9 @@ public class ProfileDTO {
 
     @JsonProperty(value = "role")
     private String role;
+
+    @JsonProperty(value = "met")
+    private Boolean met;
 
     public ProfileDTO() {
     }
@@ -81,6 +85,14 @@ public class ProfileDTO {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Boolean getMet() {
+        return met;
+    }
+
+    public void setMet(Boolean met) {
+        this.met = met;
     }
 
     @Override
