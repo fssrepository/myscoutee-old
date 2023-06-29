@@ -17,6 +17,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.common.config.JsonConfig;
 import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
@@ -24,7 +25,6 @@ import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
-import com.raxim.myscoutee.util.TestJsonUtil;
 
 @DataMongoTest
 @DirtiesContext
@@ -33,7 +33,7 @@ import com.raxim.myscoutee.util.TestJsonUtil;
                 "logging.level.org.springframework.data.mongodb=DEBUG" })
 @TestData({ "mongo/profiles.json", "mongo/likes.json" })
 @TestExecutionListeners(value = MongoDataLoaderTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
-public class LikeRepositoryTest {
+public class LikeRepositoryTest extends AbstractAlgoTest {
 
         private final static UUID UUID_PROFILE_SOPHIA = UUID.fromString("39402632-a452-57be-2518-53cc117b1abc");
 
@@ -52,7 +52,8 @@ public class LikeRepositoryTest {
                 List<LikeGroup> pLikes = likes.stream().filter(
                                 like -> like.getLikes()
                                                 .stream()
-                                                .filter(pLike -> "A".equals(pLike.getStatus()) || "G".equals(pLike.getStatus()))
+                                                .filter(pLike -> "A".equals(pLike.getStatus())
+                                                                || "G".equals(pLike.getStatus()))
                                                 .count() == 2)
                                 .toList();
                 assertEquals(2, pLikes.size());
@@ -73,7 +74,7 @@ public class LikeRepositoryTest {
 
         @Test
         public void testShouldFindByParty() throws IOException {
-                LikeDTO[] likeArray = TestJsonUtil.loadJson(this, "rest/likes.json", LikeDTO[].class, objectMapper);
+                LikeDTO[] likeArray = loadJson(this, "rest/likes.json", LikeDTO[].class, objectMapper);
                 List<LikeDTO> likeDTOs = Arrays.asList(likeArray);
                 List<LikeGroup> likes = this.likeRepository.findByParty(UUID_PROFILE_SOPHIA, likeDTOs);
 

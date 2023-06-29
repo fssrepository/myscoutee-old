@@ -46,7 +46,7 @@ public class Member {
     private UUID eventRef;
 
     public Member(Profile profile, String status, String role) {
-        this.id = this.profile.getId(); //it might not be needed
+        this.id = profile.getId(); // it might not be needed
         this.profile = profile;
         this.status = status;
         this.role = role;

@@ -25,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.common.config.JsonConfig;
 import com.raxim.myscoutee.data.mongo.TestEventItem;
 import com.raxim.myscoutee.data.mongo.TestProfile;
@@ -34,11 +35,10 @@ import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.service.EventServiceForGenerator;
-import com.raxim.myscoutee.util.TestJsonUtil;
 
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
-public class EventServiceForGeneratorTest {
+public class EventServiceForGeneratorTest extends AbstractAlgoTest {
 
         private static final UUID UUID_PROFILE_SOPHIA = UUID.fromString("39402632-a452-57be-2518-53cc117b1abc");
         private static final UUID UUID_PROFILE_OLIVER = UUID.fromString("534ccc6b-2547-4bf0-ad91-dca739943ea4");
@@ -70,10 +70,10 @@ public class EventServiceForGeneratorTest {
                 // json property override
                 objectMapper.addMixIn(EventItem.class, TestEventItem.class);
 
-                Profile[] profileArray = TestJsonUtil.loadJson(this, "rest/profiles.json",
+                Profile[] profileArray = loadJson(this, "rest/profiles.json",
                                 TestProfile[].class,
                                 objectMapper);
-                EventItem[] eventItemArray = TestJsonUtil.loadJson(this, "rest/eventItems.json",
+                EventItem[] eventItemArray = loadJson(this, "rest/eventItems.json",
                                 EventItem[].class,
                                 objectMapper);
 

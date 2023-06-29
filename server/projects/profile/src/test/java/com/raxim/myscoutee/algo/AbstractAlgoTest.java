@@ -2,6 +2,8 @@ package com.raxim.myscoutee.algo;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import com.raxim.myscoutee.algo.dto.DGraph;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Graph;
 import com.raxim.myscoutee.algo.dto.Node;
+import com.raxim.myscoutee.common.util.FileUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 
 public abstract class AbstractAlgoTest {
@@ -74,5 +77,23 @@ public abstract class AbstractAlgoTest {
             });
         });
         return edges;
+    }
+
+    public <T> T loadJson(Object obj, String jsonFile, Class<T> targetClass, ObjectMapper objectMapper)
+            throws IOException {
+        Path filePath = FileUtil.getResourcePath(obj, jsonFile);
+        String jsonData = new String(Files.readAllBytes(filePath));
+
+        return objectMapper.readValue(jsonData, targetClass);
+    }
+
+    public String jsonToString(Object object, ObjectMapper objectMapper) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (IOException e) {
+            // Handle the exception appropriately
+            e.printStackTrace();
+            return null;
+        }
     }
 }

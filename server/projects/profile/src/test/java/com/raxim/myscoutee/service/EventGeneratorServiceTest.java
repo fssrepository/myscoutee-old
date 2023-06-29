@@ -37,7 +37,6 @@ import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorService;
-import com.raxim.myscoutee.util.TestJsonUtil;
 
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
@@ -78,7 +77,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 objectMapper.addMixIn(Profile.class, TestProfile.class);
                 objectMapper.addMixIn(Like.class, TestLike.class);
 
-                Like[] likeArray = TestJsonUtil.loadJson(this, "algo/likes.json",
+                Like[] likeArray = loadJson(this, "algo/likes.json",
                                 Like[].class, objectMapper);
 
                 List<LikeGroup> likesBoth = Arrays.asList(likeArray)
@@ -87,7 +86,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                                 .map(entry -> new LikeGroup(entry.getKey(), entry.getValue()))
                                 .collect(Collectors.toList());
 
-                String flags = TestJsonUtil.jsonToString(FLAGS_DEFAULT,
+                String flags = jsonToString(FLAGS_DEFAULT,
                                 objectMapper);
                 Optional<Schedule> scheduleResp = Optional.of(
                                 new Schedule(0L, 1000L,
@@ -126,7 +125,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 // ignored
                 objectMapper.addMixIn(EventItem.class, TestEventItem.class);
 
-                EventItem[] eventItemArray = TestJsonUtil.loadJson(this, "rest/eventItems.json",
+                EventItem[] eventItemArray = loadJson(this, "rest/eventItems.json",
                                 EventItem[].class,
                                 objectMapper);
                 List<EventItem> eventItems = Arrays.asList(eventItemArray);
