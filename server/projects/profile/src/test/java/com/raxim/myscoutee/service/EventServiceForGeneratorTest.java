@@ -38,7 +38,7 @@ import com.raxim.myscoutee.util.TestJsonUtil;
 
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
-public class EventServiceTestForGenerator {
+public class EventServiceForGeneratorTest {
 
         private static final UUID UUID_PROFILE_SOPHIA = UUID.fromString("39402632-a452-57be-2518-53cc117b1abc");
         private static final UUID UUID_PROFILE_OLIVER = UUID.fromString("534ccc6b-2547-4bf0-ad91-dca739943ea4");

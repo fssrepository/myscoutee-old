@@ -7,10 +7,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.bson.BsonBinary;
 import org.bson.BsonBinarySubType;
@@ -108,5 +114,24 @@ public class CommonUtil {
     public static double exp(double pValue, double maxPValue) {
         double value = pValue < 1 ? 1 : pValue > 50 ? 50 : pValue;
         return Math.log(value + 1) / Math.log(maxPValue + 1);
+    }
+
+    public static List<Integer> randomRange(int min, int max, int size) {
+        List<Integer> numbers = IntStream.rangeClosed(min, max)
+                .boxed()
+                .collect(Collectors.toList());
+
+        Collections.shuffle(numbers);
+
+        return numbers.subList(0, size);
+    }
+
+    @SafeVarargs
+    public static <T> List<List<List<T>>> permutation(Set<T>... sets) {
+        return Arrays.stream(sets).map(subSet -> subSet.stream()
+                .flatMap(a -> subSet.stream()
+                        .filter(b -> !a.equals(b))
+                        .map(b -> Arrays.asList(a, b)))
+                .distinct().toList()).toList();
     }
 }

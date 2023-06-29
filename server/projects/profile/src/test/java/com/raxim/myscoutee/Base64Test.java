@@ -1,5 +1,7 @@
 package com.raxim.myscoutee;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -9,12 +11,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
@@ -122,5 +127,25 @@ public class Base64Test {
         double monthsBetween = ChronoUnit.MONTHS.between(profile1YM, profile2YM);
 
         System.out.println(monthsBetween);
+    }
+
+    @Test
+    public void shouldPermutate() {
+        List<List<List<String>>> nodes = CommonUtil.permutation(Set.of("2", "4", "5", "7", "8", "9"));
+        System.out.println(nodes);
+        List<Set<Edge>> edges = nodes.stream()
+                .map(group -> group.stream().map(pair -> new Edge(pair.get(0), pair.get(1)))
+                        .collect(Collectors.toSet()))
+                .toList();
+
+        Set<Edge> group1 = edges.get(0);
+        assertEquals(15, group1.size());
+
+        group1.add(new Edge("5", "4"));
+        assertEquals(15, group1.size());
+
+        group1.add(new Edge("11", "4"));
+        assertEquals(16, group1.size());
+
     }
 }

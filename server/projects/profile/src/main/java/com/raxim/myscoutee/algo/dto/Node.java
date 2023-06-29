@@ -5,6 +5,10 @@ public class Node implements Comparable<Node> {
 	private final String id;
 	private final String type;
 
+	public Node(String id) {
+		this(id, null);
+	}
+
 	public Node(String id, String type) {
 		this.id = id;
 		this.type = type;

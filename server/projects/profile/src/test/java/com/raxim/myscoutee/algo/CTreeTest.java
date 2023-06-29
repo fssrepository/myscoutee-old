@@ -27,8 +27,8 @@ import com.raxim.myscoutee.profile.util.AppConstants;
 
 public class CTreeTest extends AbstractAlgoTest {
 
-    private final static int NODE_NUM = 100;
-    private final static int EDGE_NUM = 100;
+    private final static int NODE_NUM = 5000;
+    private final static int EDGE_NUM = 5000;
 
     @Test
     public void shouldBalancedGroup() throws AlgoLoadException {
@@ -78,7 +78,7 @@ public class CTreeTest extends AbstractAlgoTest {
         boolean hasMatch = cGroup.stream().allMatch(cNode -> ids.contains(cNode.getId()));
         assertTrue(hasMatch);
 
-        while(nodeIterator.hasNext()) {
+        while (nodeIterator.hasNext()) {
             System.out.println(nodeIterator.next());
         }
     }

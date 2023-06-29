@@ -24,7 +24,6 @@ public class CTreeIterator implements Iterator<Edge> {
 
     private final Set<String> visited = new HashSet<>();
 
-    // BCTree requires nodes disabling
     private final Set<Node> used = new HashSet<>();
 
     private int currentIdx = 0;

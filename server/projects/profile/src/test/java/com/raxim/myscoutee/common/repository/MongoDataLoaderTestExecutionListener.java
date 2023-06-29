@@ -9,23 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bson.BsonBinary;
 import org.bson.BsonBinarySubType;
-import org.bson.BsonType;
 import org.bson.Document;
-import org.bson.UuidRepresentation;
-import org.bson.codecs.BsonTypeClassMap;
-import org.bson.codecs.BsonValueCodecProvider;
-import org.bson.codecs.Codec;
-import org.bson.codecs.CollectionCodecProvider;
-import org.bson.codecs.DocumentCodecProvider;
-import org.bson.codecs.IterableCodecProvider;
-import org.bson.codecs.MapCodecProvider;
-import org.bson.codecs.ValueCodecProvider;
-import org.bson.codecs.configuration.CodecRegistries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -39,17 +27,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.InsertManyOptions;
 import com.raxim.myscoutee.common.util.FileUtil;
+import com.raxim.myscoutee.profile.util.AppConstants;
 
 public class MongoDataLoaderTestExecutionListener extends AbstractTestExecutionListener {
-
-    private final static BsonTypeClassMap TYPE_MAP = new BsonTypeClassMap(Map.of(BsonType.BINARY, UUID.class));
-    private static final Codec<Document> UUID_CODEC = CodecRegistries
-            .withUuidRepresentation(CodecRegistries.fromProviders(Arrays.asList(new ValueCodecProvider(),
-                    new CollectionCodecProvider(TYPE_MAP), new IterableCodecProvider(TYPE_MAP),
-                    new BsonValueCodecProvider(), new DocumentCodecProvider(TYPE_MAP),
-                    new MapCodecProvider(TYPE_MAP))),
-                    UuidRepresentation.JAVA_LEGACY)
-            .get(Document.class);
 
     private boolean setupRequired = true;
 
@@ -98,7 +78,7 @@ public class MongoDataLoaderTestExecutionListener extends AbstractTestExecutionL
         List<Document> documents = new ArrayList<>();
         for (Object docuObject : documentObjects) {
             String docuString = objectMapper.writeValueAsString(docuObject);
-            Document document = Document.parse(docuString, UUID_CODEC);
+            Document document = Document.parse(docuString, AppConstants.UUID_CODEC);
             documents.add(document);
         }
 

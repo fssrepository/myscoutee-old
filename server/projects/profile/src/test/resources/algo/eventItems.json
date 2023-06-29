@@ -1,0 +1,62 @@
+[
+    {
+        "key": "dabb2765-e749-4e45-8716-a93caa812ea8",
+        "type": "g",
+        "category": "l",
+        "name": "Generated Event!",
+        "desc": "Generated Event for strangers!",
+        "range": {
+            "start": "2023-07-03T21:17:01.110",
+            "end": "2023-07-04T00:17:01.110"
+        },
+        "status": "A",
+        "createdDate": "2023-06-29T00:17:01.110",
+        "num": 0,
+        "members": [
+            {
+                "profile": {
+                    "key": "8e460978-b1ac-a551-d01f-70abb291cb98",
+                    "firstName": "Alexander",
+                    "gender": "m",
+                    "birthday": 748656000000,
+                    "smoker": true,
+                    "marital": "Single",
+                    "hasChild": false,
+                    "height": 175,
+                    "physique": "Average",
+                    "languages": [
+                        "English",
+                        "Spanish"
+                    ],
+                    "religion": "Christian",
+                    "profession": "Architect",
+                    "status": "A"
+                },
+                "status": "A",
+                "role": "U"
+            },
+            {
+                "profile": {
+                    "key": "2b418324-7733-97ed-6730-bd1e3d589aa8",
+                    "firstName": "Charlotte",
+                    "gender": "w",
+                    "birthday": 765244800000,
+                    "smoker": false,
+                    "marital": "Single",
+                    "hasChild": false,
+                    "height": 168,
+                    "physique": "Slim",
+                    "languages": [
+                        "English",
+                        "Spanish"
+                    ],
+                    "religion": "Christian",
+                    "profession": "Teacher",
+                    "status": "A"
+                },
+                "status": "A",
+                "role": "U"
+            }
+        ]
+    }
+]

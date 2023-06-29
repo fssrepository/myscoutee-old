@@ -23,6 +23,14 @@ public class Edge {
         return weight;
     }
 
+    public Edge(String from, String to) {
+        this(new Node(from), new Node(to), 0, false);
+    }
+
+    public Edge(Node from, Node to) {
+        this(from, to, 0d);
+    }
+
     public Edge(Node from, Node to, double weight) {
         this(from, to, weight, false);
     }
