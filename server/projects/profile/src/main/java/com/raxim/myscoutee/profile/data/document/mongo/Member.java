@@ -1,7 +1,6 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
 import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -14,7 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 // role for event
 @Document(collection = "members")
 public class Member {
-    // profile id - only for the query?? it might not be needed, we can get profile.id
+    // profile id - only for the query?? it might not be needed, we can get
+    // profile.id
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -23,8 +23,10 @@ public class Member {
     @JsonProperty(value = "profile")
     private Profile profile;
 
-    // A (Accepted), R (rejected), I (invited), K (kicked)?? - maybe by more members than one, L (left) V (Verified)
-    // T (Timed-Out), M (manager), P (promoter), LL (late leave), W (on waiting list)
+    // A (Accepted), R (rejected), I (invited), K (kicked)?? - maybe by more members
+    // than one, L (left) V (Verified)
+    // T (Timed-Out), M (manager), P (promoter), LL (late leave), W (on waiting
+    // list)
     @JsonProperty(value = "status")
     private String status;
 
@@ -44,6 +46,7 @@ public class Member {
     private UUID eventRef;
 
     public Member(Profile profile, String status, String role) {
+        this.id = this.profile.getId(); //it might not be needed
         this.profile = profile;
         this.status = status;
         this.role = role;
