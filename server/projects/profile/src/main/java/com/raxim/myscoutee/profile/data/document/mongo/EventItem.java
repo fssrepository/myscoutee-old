@@ -49,11 +49,11 @@ public class EventItem {
     @JsonProperty(value = "capacity")
     private RangeInt capacity;
 
-    //price
+    // price
     @JsonProperty(value = "amount")
     private Amount amount;
 
-    //qr code generation
+    // qr code generation
     @JsonProperty(value = "ticket")
     private Boolean ticket;
 
@@ -81,6 +81,20 @@ public class EventItem {
     @JsonProperty(value = "rule")
     private Rule rule;
 
+    //?? - no idea what is it
+    @JsonProperty(value = "memberRange")
+    private RangeLocal memberRange;
+
+    // number of members, nem tudom, hogy kell-e...
+    @JsonProperty(value = "num")
+    private int num;
+
+    // opcionalis esemenyek - car is egy esemeny, amihez lehet csatlakozni
+    // memberek telefonszama nincs itt mentve, egyelore
+    @JsonIgnore
+    @JsonProperty(value = "members")
+    private Set<Member> members;
+
     // -------------nem kell--------------
 
     // ez nem lesz,sajat google notification chat, kesobb web socket
@@ -95,25 +109,6 @@ public class EventItem {
     // nem kell urlRef lefedi
     @JsonProperty(value = "car")
     private Car car;
-
-    // when you met with a member, random calculation, ez nem kell like tabla oldja
-    // meg (updatedTime)
-    @JsonProperty(value = "memberRange")
-    private RangeLocal memberRange;
-
-    // number of members, nem tudom, hogy kell-e...
-    @JsonProperty(value = "num")
-    private int num;
-
-    // opcionalis esemenyek - car is egy esemeny, amihez lehet csatlakozni
-    // memberek telefonszama nincs itt mentve, egyelore
-    // forditott viszony Member should contain eventItemId es nem forditva, members
-    // nem kell
-    // a lekerdezeseket checkoljuk, de nem valoszinu, hogy kell ez az optimalizacio
-    // ide
-    @JsonIgnore
-    @JsonProperty(value = "members")
-    private Set<Member> members;
 
     // Add getters and setters for all fields
 
