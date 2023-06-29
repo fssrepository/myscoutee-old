@@ -55,7 +55,7 @@ public class EventGeneratorService {
         Range flags = schedule.map(sch -> JsonUtil.jsonToObject(sch.getFlags(), Range.class, objectMapper))
                 .orElse(new Range(6, 12));
 
-        //bacthed version of query does exist -> just to simplify for the time being
+        // batched version of query does exist -> just to simplify for the time being
         List<LikeGroup> likeGroups = likeRepository.findLikeGroups();
 
         // get all generated events
@@ -70,6 +70,15 @@ public class EventGeneratorService {
             return group.reduce();
         }).filter(like -> like != null).toList();
 
+        // nodes
+        Map<String, Profile> nodes = new HashMap<>();
+        likesBoth.forEach(likeBoth -> {
+            nodes.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
+            nodes.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
+        });
+
+        System.out.println("Num of nodes " + nodes.keySet().size());
+
         // edges
         List<Edge> edges = likesBoth.stream().map(likeBoth -> {
             Node fromNode = new Node(likeBoth.getFrom().getId().toString(), likeBoth.getFrom().getGender());
@@ -77,6 +86,8 @@ public class EventGeneratorService {
             double weight = (double) (likeBoth.getRate() * likeBoth.getDistance());
             return new Edge(fromNode, toNode, weight);
         }).toList();
+
+        System.out.println("Num of edges " + edges.size());
 
         DGraph dGraph = new DGraph();
         dGraph.addAll(edges);
@@ -86,13 +97,6 @@ public class EventGeneratorService {
             CTree cTree = new CTree(cGraph, List.of(AppConstants.MAN, AppConstants.WOMAN), ignoredEdges);
             return new BCTree(cTree, range);
         }).toList();
-
-        // nodes
-        Map<String, Profile> nodes = new HashMap<>();
-        likesBoth.forEach(likeBoth -> {
-            nodes.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
-            nodes.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
-        });
 
         List<Set<Profile>> profileList = new ArrayList<>();
         bcTrees.forEach(bcTree -> bcTree.forEach(cGroup -> {
