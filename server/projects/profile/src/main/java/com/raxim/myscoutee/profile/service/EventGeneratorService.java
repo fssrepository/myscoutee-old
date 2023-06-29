@@ -18,14 +18,16 @@ import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.util.JsonUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
+import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
-import com.raxim.myscoutee.profile.util.LikeUtil;
+import com.raxim.myscoutee.profile.util.EventItemUtil;
 
 @Service
 public class EventGeneratorService {
@@ -34,13 +36,15 @@ public class EventGeneratorService {
 
     private final ScheduleRepository scheduleRepository;
     private final LikeRepository likeRepository;
+    private final EventItemRepository eventItemRepository;
     private final ObjectMapper objectMapper;
 
     public EventGeneratorService(ScheduleRepository scheduleRepository,
-            LikeRepository likeRepository,
+            LikeRepository likeRepository, EventItemRepository eventItemRepository,
             ObjectMapper objectMapper) {
         this.scheduleRepository = scheduleRepository;
         this.likeRepository = likeRepository;
+        this.eventItemRepository = eventItemRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -52,16 +56,18 @@ public class EventGeneratorService {
                 .orElse(new Range(6, 12));
 
         List<LikeGroup> likeGroups = likeRepository.findAll(lastIdx, batchSize);
-        /*
-         * filter out all the edges between profiles being added to the same group, and
-         * save it to G
-         */
-        /*
-         * that likes should show that certain people met with each other, can't met
-         * again
-         */
 
-        List<Like> likesBoth = reduceLikeGroups(likeGroups);
+        // get all generated events
+        List<EventItem> eventItems = eventItemRepository.findEventItemsByType("g");
+
+        List<Set<Edge>> ignoredEdges = eventItems.stream().map(eventItem -> EventItemUtil.permutate(eventItem))
+                .toList();
+        System.out.println(ignoredEdges);
+
+        // merge likes
+        List<Like> likesBoth = likeGroups.stream().map(group -> {
+            return group.reduce();
+        }).filter(like -> like != null).toList();
 
         // edges
         List<Edge> edges = likesBoth.stream().map(likeBoth -> {
@@ -76,7 +82,7 @@ public class EventGeneratorService {
 
         Range range = new Range(flags.getMin(), flags.getMax());
         List<BCTree> bcTrees = dGraph.stream().map(cGraph -> {
-            CTree cTree = new CTree(cGraph, List.of(AppConstants.MAN, AppConstants.WOMAN));
+            CTree cTree = new CTree(cGraph, List.of(AppConstants.MAN, AppConstants.WOMAN), ignoredEdges);
             return new BCTree(cTree, range);
         }).toList();
 
@@ -97,36 +103,5 @@ public class EventGeneratorService {
         }));
 
         return profileList;
-    }
-
-    private List<Like> reduceLikeGroups(List<LikeGroup> likeGroups) {
-        List<Like> likesBoth = likeGroups
-                .stream().map(group -> {
-                    List<Like> likesWithStatusP = group.getLikes().stream()
-                            .filter(like -> "A".equals(like.getStatus()) || "G".equals(like.getStatus()))
-                            .toList();
-                    if (likesWithStatusP.size() == 2) {
-                        Like firstLike = likesWithStatusP.get(0);
-
-                        List<Double> ratesForStatusP = likesWithStatusP
-                                .stream()
-                                .map(like -> like.getRate())
-                                .toList();
-
-                        List<Double> ratesForStatusD = group.getLikes()
-                                .stream()
-                                .filter(like -> "D".equals(like.getStatus()))
-                                .map(like -> like.getRate())
-                                .toList();
-
-                        double rate = LikeUtil.calcAdjustedHarmonicMean(ratesForStatusP, ratesForStatusD);
-                        firstLike.setRate(rate);
-                        return firstLike;
-                    } else {
-                        return null;
-                    }
-                }).filter(like -> like != null)
-                .toList();
-        return likesBoth;
     }
 }

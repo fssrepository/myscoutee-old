@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -14,6 +15,7 @@ import com.raxim.myscoutee.algo.dto.DGraph;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Graph;
 import com.raxim.myscoutee.algo.dto.Node;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 
 public abstract class AbstractAlgoTest {
 
@@ -44,6 +46,13 @@ public abstract class AbstractAlgoTest {
         boolean allEdgesMatched = IntStream.range(0, Math.min(edges.size(), ids.size()))
                 .allMatch(i -> ids.get(i).get(0).equals(edges.get(i).getFrom().getId())
                         && ids.get(i).get(1).equals(edges.get(i).getTo().getId()));
+        return allEdgesMatched;
+    }
+
+    public boolean matchAll(Set<Profile> profiles, List<UUID> uuids) {
+        boolean allEdgesMatched = uuids.stream().allMatch(
+                id -> profiles.stream().anyMatch(
+                        group -> group.getId().equals(id)));
         return allEdgesMatched;
     }
 

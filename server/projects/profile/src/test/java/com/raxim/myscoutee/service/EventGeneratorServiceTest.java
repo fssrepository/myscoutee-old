@@ -22,14 +22,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.config.JsonConfig;
+import com.raxim.myscoutee.data.mongo.TestEventItem;
 import com.raxim.myscoutee.data.mongo.TestLike;
 import com.raxim.myscoutee.data.mongo.TestProfile;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
+import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorService;
@@ -37,7 +41,7 @@ import com.raxim.myscoutee.util.TestJsonUtil;
 
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
-public class EventGeneratorServiceTest {
+public class EventGeneratorServiceTest extends AbstractAlgoTest {
 
         private static final Range FLAGS_DEFAULT = new Range(2, 3);
 
@@ -60,6 +64,9 @@ public class EventGeneratorServiceTest {
 
         @Mock
         private LikeRepository likeRepository;
+
+        @Mock
+        private EventItemRepository eventItemRepository;
 
         @Autowired
         @Spy
@@ -91,7 +98,6 @@ public class EventGeneratorServiceTest {
                                 .thenReturn(likesBoth);
 
                 List<Set<Profile>> profilesByGroup = eventGeneratorService.generate();
-
                 assertEquals(3, profilesByGroup.size());
 
                 // group1
@@ -99,25 +105,51 @@ public class EventGeneratorServiceTest {
                 assertEquals(2, group1.size());
 
                 List<UUID> expectedUuidsForGroup1 = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
-                assertTrue(expectedUuidsForGroup1.stream().allMatch(
-                                id -> group1.stream().anyMatch(
-                                                group -> group.getId().equals(id))));
+                boolean allProfilesMatched = matchAll(group1, expectedUuidsForGroup1);
+                assertTrue(allProfilesMatched);
 
                 Set<Profile> group2 = profilesByGroup.get(1);
                 assertEquals(2, group2.size());
 
                 List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_AVA, UUID_PROFILE_OLIVER);
-                assertTrue(expectedUuidsForGroup2.stream().allMatch(
-                                id -> group2.stream().anyMatch(
-                                                group -> group.getId().equals(id))));
+                allProfilesMatched = matchAll(group2, expectedUuidsForGroup2);
+                assertTrue(allProfilesMatched);
+
                 // group3
                 Set<Profile> group3 = profilesByGroup.get(2);
                 assertEquals(2, group3.size());
 
                 List<UUID> expectedUuidsForGroup3 = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
-                assertTrue(expectedUuidsForGroup3.stream().allMatch(
-                                id -> group3.stream().anyMatch(
-                                                group -> group.getId().equals(id))));
+                allProfilesMatched = matchAll(group3, expectedUuidsForGroup3);
+                assertTrue(allProfilesMatched);
+
+                // ignored
+                objectMapper.addMixIn(EventItem.class, TestEventItem.class);
+
+                EventItem[] eventItemArray = TestJsonUtil.loadJson(this, "rest/eventItems.json",
+                                EventItem[].class,
+                                objectMapper);
+                List<EventItem> eventItems = Arrays.asList(eventItemArray);
+
+                when(eventItemRepository.findEventItemsByType("g")).thenReturn(eventItems);
+
+                profilesByGroup = eventGeneratorService.generate();
+                assertEquals(2, profilesByGroup.size());
+
+                // group1
+                Set<Profile> group1F = profilesByGroup.get(0);
+                assertEquals(2, group1F.size());
+
+                List<UUID> expectedUuidsForGroup1F = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
+                allProfilesMatched = matchAll(group1F, expectedUuidsForGroup1F);
+                assertTrue(allProfilesMatched);
+
+                Set<Profile> group2F = profilesByGroup.get(1);
+                assertEquals(2, group2F.size());
+
+                List<UUID> expectedUuidsForGroup2F = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
+                allProfilesMatched = matchAll(group2F, expectedUuidsForGroup2F);
+                assertTrue(allProfilesMatched);
 
         }
 }
