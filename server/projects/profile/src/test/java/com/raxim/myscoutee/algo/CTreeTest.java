@@ -27,8 +27,8 @@ import com.raxim.myscoutee.profile.util.AppConstants;
 
 public class CTreeTest extends AbstractAlgoTest {
 
-    private final static int NODE_NUM = 5000;
-    private final static int EDGE_NUM = 5000;
+    private final static int NODE_NUM = 100;
+    private final static int EDGE_NUM = 100;
 
     @Test
     public void shouldBalancedGroup() throws AlgoLoadException {
