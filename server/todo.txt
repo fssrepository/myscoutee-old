@@ -9,7 +9,7 @@ Priority event list screen
 
 Priority algorithm
 ------------------
-1) it's non paginated
+1) it's non paginated -> it's only grabbing the next X members to be invited to reach the capacity, and balance
 
 Event list screen
 -----------------
