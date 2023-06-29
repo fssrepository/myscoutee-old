@@ -34,6 +34,10 @@ public class EventItem {
     private String type;
 
     /* local, global */
+    /*
+     * google map is complicated to get the coordinates to search for,
+     * but to differentiate local and global based on that is ridiculous
+     */
     @JsonProperty(value = "category")
     private String category;
 
@@ -81,7 +85,10 @@ public class EventItem {
     @JsonProperty(value = "rule")
     private Rule rule;
 
-    //?? - no idea what is it
+    @JsonIgnore
+    private UUID createdBy; // can be system uuid also, not only a valid profile
+
+    // ?? - no idea what is it
     @JsonProperty(value = "memberRange")
     private RangeLocal memberRange;
 
@@ -262,6 +269,14 @@ public class EventItem {
 
     public void setRule(Rule rule) {
         this.rule = rule;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getStatus() {

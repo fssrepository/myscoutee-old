@@ -23,6 +23,7 @@ public class EventPriorityService {
     }
 
     /*public List<Set<Profile>> generate() {
-        //find all eventItem where capacity hasn't been filled, status is A
+        //find all eventItem where capacity hasn't been filled, status is A, type is 'g' general, and priority is true
+        //the data structure will be refactored, but the calculation shouldn't change that much
     }*/
 }
