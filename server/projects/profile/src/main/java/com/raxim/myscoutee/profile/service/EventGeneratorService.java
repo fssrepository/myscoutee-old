@@ -49,6 +49,8 @@ public class EventGeneratorService {
     }
 
     public List<Set<Profile>> generate() {
+        System.out.println("---- generate start -----");
+
         Optional<Schedule> schedule = scheduleRepository.findByKey(SCHEDULE_RANDOM_GROUP);
         long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
         long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
@@ -58,12 +60,13 @@ public class EventGeneratorService {
         // batched version of query does exist -> just to simplify for the time being
         List<LikeGroup> likeGroups = likeRepository.findLikeGroups();
 
-        // get all generated events - created by is system_uuid -> for the time being 'g' general is enough
+        // get all generated events - created by is system_uuid -> for the time being
+        // 'g' general is enough
         List<EventItem> eventItems = eventItemRepository.findEventItemsByType("g");
 
         List<Set<Edge>> ignoredEdges = eventItems.stream().map(eventItem -> EventItemUtil.permutate(eventItem))
                 .toList();
-        System.out.println(ignoredEdges);
+        System.out.println("ignored edges -----" + ignoredEdges);
 
         // merge likes
         List<Like> likesBoth = likeGroups.stream().map(group -> {
@@ -100,12 +103,13 @@ public class EventGeneratorService {
 
         List<Set<Profile>> profileList = new ArrayList<>();
         bcTrees.forEach(bcTree -> bcTree.forEach(cGroup -> {
-            System.out.println(cGroup);
             Set<Profile> profiles = cGroup.stream()
                     .map(node -> nodes.get(node.getId()))
                     .collect(Collectors.toSet());
             profileList.add(profiles);
         }));
+
+        System.out.println("---- generate end -----");
 
         return profileList;
     }

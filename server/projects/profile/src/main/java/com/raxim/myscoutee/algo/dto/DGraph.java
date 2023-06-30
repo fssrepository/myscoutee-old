@@ -8,7 +8,7 @@ import com.raxim.myscoutee.common.merge.MergingSet;
  * disjoint graph
  */
 public class DGraph extends MergingSet<CGraph> {
-    private int counter;
+    //private int counter;
 
     public void addAll(List<Edge> edges) {
         edges.forEach(edge -> {
@@ -17,7 +17,7 @@ public class DGraph extends MergingSet<CGraph> {
     }
 
     public void add(Edge edge) {
-        System.out.println(counter++);
+        //System.out.println(counter++);
 
         CGraph aTree = new CGraph();
         aTree.add(edge);

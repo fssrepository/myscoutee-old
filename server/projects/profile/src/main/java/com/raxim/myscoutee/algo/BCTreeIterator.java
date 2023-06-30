@@ -31,6 +31,7 @@ public class BCTreeIterator implements Iterator<CGroup> {
 
     @Override
     public boolean hasNext() {
+        System.out.println("--------- start -------");
         Set<Edge> edges = new HashSet<>();
 
         while (cGroup.size() < this.range.getMax()
@@ -38,10 +39,8 @@ public class BCTreeIterator implements Iterator<CGroup> {
 
             Node from = null;
             Node to = null;
-            double weight = 0;
 
             Edge edge;
-            int counter = 0;
             do {
                 edge = cTreeIterator.next();
                 edges.add(edge);
@@ -54,35 +53,47 @@ public class BCTreeIterator implements Iterator<CGroup> {
                     to = edge.getTo();
                 }
 
-                weight += edge.getWeight();
-                counter++;
+                cGroup.add(edge);
+
             } while ((edge.getFrom() == null || edge.getTo() == null)
                     && cTreeIterator.hasNext());
 
-            edge = new Edge(from, to, weight / counter);
-
-            cGroup.add(edge);
-            cTree.add(edge);
+            cGroup.add(from);
+            cGroup.add(to);
+            cTree.addAll(cGroup);
         }
+        // System.out.println(cGroup);
         int oldSize = cGroup.size();
         Set<Node> nodes = cGroup.balance(cTreeIterator.getTypes());
         int newSize = nodes.size();
-        System.out.println("---------------" + (oldSize - newSize));
+
+        System.out.println(oldSize - newSize);
 
         // edges not used - it might be needed to put it back
         Set<Edge> rEdges = edges.stream().filter(edge -> !nodes.contains(edge.getFrom())
                 && !nodes.contains(edge.getTo())).collect(Collectors.toSet());
-        System.out.println(rEdges);
         // cTreeIterator.getUsed().addAll(nodes);
 
+        if (!hasRemaining()) {
+            System.out.println("--------- end -------");
+        }
+
+        return hasRemaining();
+    }
+
+    private boolean hasRemaining() {
         return cGroup.size() >= this.range.getMin()
                 && (cGroup.size() % cTreeIterator.getTypes().size() == 0);
     }
 
     @Override
     public CGroup next() {
+        System.out.println(cGroup);
+
         CGroup result = (CGroup) cGroup.clone();
         cGroup = new CGroup();
+
+        System.out.println("--------- end -------");
         return result;
     }
 }

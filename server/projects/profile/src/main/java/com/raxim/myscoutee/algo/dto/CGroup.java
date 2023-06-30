@@ -26,23 +26,21 @@ public class CGroup extends LinkedHashSet<Node> {
         this.weight = 0d;
     }
 
-    public void add(Edge edge) {
-        if (edge.getFrom() != null) {
-            super.add(edge.getFrom());
-            if (edge.getFrom().getType() != null) {
-                types.add(edge.getFrom().getType());
+    public boolean add(Node node) {
+        if (node != null) {
+            super.add(node);
+            if (node.getType() != null) {
+                types.add(node.getType());
             }
         }
-        if (edge.getTo() != null) {
-            super.add(edge.getTo());
+        return true;
+    }
 
-            if (edge.getTo().getType() != null) {
-                types.add(edge.getTo().getType());
-            }
-        }
+    public boolean add(Edge edge) {
         edges.add(edge);
 
         this.weight = edges.stream().mapToDouble(Edge::getWeight).average().getAsDouble();
+        return true;
     }
 
     public Set<Node> balance(List<String> pTypes) {
