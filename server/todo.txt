@@ -1,13 +1,3 @@
-Priority event list screen - ongoing
---------------------------
-1) eventItem rule section should be moved to an inner list screen as filter bar
-2) when rule filter bar gets saved, it will be saved to eventItem.rule also
-3) when we set the rule filter, it filters out all the candidates, what we met (balanced, or user with same gender can be choosen)
-4) we can rate man/women in that filtered list, and based on that the priority algorithm will work
-5) the list is paginated, and shows, which members has been notified, and who is accepted and rejected, left etc.
-6) on the event panel it's a new button next to the members (members is showing the list of active members only)
-7) mutual friends, friends of friends in the Rule
-
 Priority algorithm -> seems have been figured out
 ------------------
 1) it's non paginated -> it's only grabbing the next X members to be invited to reach the capacity, and balance
@@ -15,3 +5,15 @@ Priority algorithm -> seems have been figured out
 Event list screen
 -----------------
 1) groupKey can be eventName + eventDate, and the list can show the members who were present over there
+
+double rated profile list screen
+--------------------------------
+2) filter by gender, and whether we have met or not, that one can be opened for the priority
+   event also, instead of a separate priority event list screen
+
+event editor (event item editor is not needed for the time being, simplified version)
+-----------
+1) event.info is not in the list of eventItems, to add eventItems to an event is optional
+2) the rule should be moved to event, instead if eventItem, the priority flag etc. also
+3) event has status P (Pending), or T (timed out), eventItem has not
+4) for optional eventItems, the members of event can request permission (like car, which can be accepted)
