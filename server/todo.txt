@@ -6,6 +6,7 @@ Priority event list screen
 4) we can rate man/women in that filtered list, and based on that the priority algorithm will work
 5) the list is paginated, and shows, which members has been notified, and who is accepted and rejected, left etc.
 6) on the event panel it's a new button next to the members (members is showing the list of active members only)
+7) mutual friends, friends of friends in the Rule
 
 Priority algorithm
 ------------------
