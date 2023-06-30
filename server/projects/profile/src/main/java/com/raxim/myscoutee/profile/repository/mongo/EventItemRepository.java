@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItemWithCandidates;
 import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
 
 @RepositoryRestResource(collectionResourceRel = "items", path = "items")
@@ -17,6 +18,9 @@ public interface EventItemRepository extends MongoRepository<EventItem, UUID> {
 
         @Query("{'type': ?0}")
         List<EventItem> findEventItemsByType(String type);
+
+        @Aggregation(pipeline = "findCandidates")
+        List<EventItemWithCandidates> findCandidates();
 
         @Aggregation(pipeline = "findMembersByItem")
         List<MemberDTO> findMembersByItem(

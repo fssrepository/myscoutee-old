@@ -1,4 +1,4 @@
-Priority event list screen
+Priority event list screen - ongoing
 --------------------------
 1) eventItem rule section should be moved to an inner list screen as filter bar
 2) when rule filter bar gets saved, it will be saved to eventItem.rule also
@@ -8,7 +8,7 @@ Priority event list screen
 6) on the event panel it's a new button next to the members (members is showing the list of active members only)
 7) mutual friends, friends of friends in the Rule
 
-Priority algorithm
+Priority algorithm -> seems have been figured out
 ------------------
 1) it's non paginated -> it's only grabbing the next X members to be invited to reach the capacity, and balance
 

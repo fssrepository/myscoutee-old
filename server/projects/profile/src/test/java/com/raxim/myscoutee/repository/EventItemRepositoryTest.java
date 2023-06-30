@@ -14,6 +14,7 @@ import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItemWithCandidates;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 
 @DataMongoTest
@@ -32,5 +33,11 @@ public class EventItemRepositoryTest {
     public void shouldFindEventItemsByType() {
         List<EventItem> eventItems = eventItemRepository.findEventItemsByType("g");
         System.out.println("----" + eventItems.size());
+    }
+
+    @Test
+    public void shouldFindCandidates() {
+        List<EventItemWithCandidates> eventItems = eventItemRepository.findCandidates();
+        System.out.println(eventItems.size());
     }
 }

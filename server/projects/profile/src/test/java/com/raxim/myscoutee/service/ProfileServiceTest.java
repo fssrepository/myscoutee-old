@@ -44,7 +44,7 @@ import com.raxim.myscoutee.profile.util.ProfileUtil;
 
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
-public class ProfileServiceRepositoryTest extends AbstractAlgoTest {
+public class ProfileServiceTest extends AbstractAlgoTest {
 
         @InjectMocks
         private ProfileService profileService;

@@ -51,6 +51,7 @@ public class EventServiceForGenerator {
                                         eventItem.setDesc("Generated Event for strangers!");
                                         eventItem.setMembers(new HashSet<>(members));
                                         eventItem.setCreatedBy(AppConstants.UUID_SYSTEM);
+                                        eventItem.setStatus("A");
 
                                         LocalDateTime fromDT = LocalDateTime.now()
                                                         .with(TemporalAdjusters.next(DayOfWeek.MONDAY))

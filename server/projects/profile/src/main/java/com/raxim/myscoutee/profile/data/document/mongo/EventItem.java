@@ -37,7 +37,8 @@ public class EventItem {
     /*
      * google map is complicated to get the coordinates to search for,
      * but to differentiate local and global based on that is ridiculous
-     * the category will be reused to identify the real category (sport, reading etc.)
+     * the category will be reused to identify the real category (sport, reading
+     * etc.)
      */
     @JsonProperty(value = "category")
     private String category;
@@ -72,9 +73,10 @@ public class EventItem {
     @JsonProperty(value = "position")
     private GeoJsonPoint position;
 
-    // Active (A), Deleted (D)
+    // Active (A), Deleted (D), Timed Out (T), Pending (P)
+    //(T, P will be moved to event - it's needed for priority algorithm now)
     @JsonProperty(value = "status")
-    private String status = "A";
+    private String status = "P";
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonProperty(value = "createdDate")
@@ -82,6 +84,11 @@ public class EventItem {
 
     @JsonProperty(value = "priority")
     private Boolean priority;
+
+    // the capacity should be fulfilled before the event starts with the grace
+    // period
+    @JsonProperty(value = "gracePeriod")
+    private int gracePeriod;
 
     @JsonProperty(value = "rule")
     private Rule rule;
@@ -302,5 +309,13 @@ public class EventItem {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public int getGracePeriod() {
+        return gracePeriod;
+    }
+
+    public void setGracePeriod(int gracePeriod) {
+        this.gracePeriod = gracePeriod;
     }
 }
