@@ -11,6 +11,15 @@ double rated profile list screen
 2) filter by gender, and whether we have met or not, that one can be opened for the priority
    event also, instead of a separate priority event list screen
 
+met + gender (man/woman/both)
+not met (no gender parameter)
+
+findProfile query (gender filter optional + if met, 
+a) check whether any eventItems does exist, where currentUser and other profile are present)
+- it's inside the query, but needs to make it optional for double rated
+
+true/false slide, like on the rule page (priority, and show gender filter accordingly)
+
 event editor (event item editor is not needed for the time being, simplified version)
 -----------
 1) event.info is not in the list of eventItems, to add eventItems to an event is optional
