@@ -97,7 +97,8 @@ public class CampaignEventRestController {
         return ResponseEntity.ok(new PageDTO<>(events, lOffset));
     }
 
-    @PatchMapping("{promoId}/events/{id}")
+    //TODO: to be fixed 
+    /*@PatchMapping("{promoId}/events/{id}")
     @Transactional
     public ResponseEntity<?> patchPromotionEvent(
             @PathVariable String promoId,
@@ -114,7 +115,7 @@ public class CampaignEventRestController {
         PromotionUtil.update(campaignService, promotion, profile, true);
 
         return eventResp;
-    }
+    }*/
 
     @GetMapping("{promoId}/events/{id}/items")
     public ResponseEntity<PageDTO<EventItemDTO>> eventItems(
@@ -144,7 +145,8 @@ public class CampaignEventRestController {
         return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }
 
-    @PostMapping("{promoId}/events/{id}/items")
+    //TODO: to be fixed 
+    /*@PostMapping("{promoId}/events/{id}/items")
     public ResponseEntity<EventItemDTO> addPromoEventItem(
             @PathVariable String promoId,
             @PathVariable String id,
@@ -160,9 +162,10 @@ public class CampaignEventRestController {
         PromotionUtil.update(campaignService, promotion, profile, true);
 
         return eventResp;
-    }
+    }*/
 
-    @PatchMapping("{promoId}/events/{id}/items/{itemId}")
+    //TODO: to be fixed 
+    /*@PatchMapping("{promoId}/events/{id}/items/{itemId}")
     public ResponseEntity<EventItemDTO> patchPromoEventItem(
             @PathVariable String promoId,
             @PathVariable String id,
@@ -179,9 +182,10 @@ public class CampaignEventRestController {
         PromotionUtil.update(campaignService, promotion, profile, true);
 
         return eventResp;
-    }
+    }*/
 
-    @DeleteMapping("{promoId}/events/{id}/items/{itemId}")
+    //TODO: to be fixed
+    /*@DeleteMapping("{promoId}/events/{id}/items/{itemId}")
     public ResponseEntity<?> deletePromoItem(
             @PathVariable String id,
             @PathVariable String itemId) {
@@ -195,7 +199,7 @@ public class CampaignEventRestController {
         this.eventItemRepository.save(item);
 
         return ResponseEntity.noContent().build();
-    }
+    }*/
 
     @GetMapping("{promoId}/events/{id}/members")
     public ResponseEntity<PageDTO<ProfileDTO>> eventMembers(

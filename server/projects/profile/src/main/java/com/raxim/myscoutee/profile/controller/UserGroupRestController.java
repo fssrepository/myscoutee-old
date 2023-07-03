@@ -120,30 +120,33 @@ public class UserGroupRestController {
         }
     }
 
-    @PatchMapping("/groups/{groupId}/events/{id}")
+    //TODO: to be fixed 
+    /*@PatchMapping("/groups/{groupId}/events/{id}")
     @Transactional
     public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody EventItem eventItem,
             Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.update(eventService, eventItem, id, profile);
-    }
+    }*/
 
-    @PostMapping("/groups/{groupId}/events/{id}/items")
+    //TODO: to be fixed 
+    /*@PostMapping("/groups/{groupId}/events/{id}/items")
     public ResponseEntity<EventItemDTO> addItem(@PathVariable String id, @RequestBody EventItem eventItem,
             Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.save(eventService, eventItem, id, profile);
-    }
+    }*/
 
-    @PatchMapping("/groups/{groupId}/events/{id}/items/{itemId}")
+    //TODO: to be fixed 
+    /*@PatchMapping("/groups/{groupId}/events/{id}/items/{itemId}")
     public ResponseEntity<EventItemDTO> patchItem(@PathVariable String id, @PathVariable String itemId,
             @RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.update(eventService, eventItem, id, itemId, profile);
-    }
+    }*/
 
     @GetMapping("/groups/{groupId}/events/{id}/items")
     public ResponseEntity<PageDTO<EventItemDTO>> items(@PathVariable String id, @RequestParam("step") Integer step,

@@ -2,8 +2,6 @@ package com.raxim.myscoutee.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,21 +19,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.common.config.JsonConfig;
-import com.raxim.myscoutee.data.mongo.TestEventItem;
+import com.raxim.myscoutee.data.mongo.TestEvent;
 import com.raxim.myscoutee.data.mongo.TestProfile;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.service.EventServiceForGenerator;
 
+@DirtiesContext
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
 public class EventServiceForGeneratorTest extends AbstractAlgoTest {
@@ -60,27 +59,18 @@ public class EventServiceForGeneratorTest extends AbstractAlgoTest {
         private ObjectMapper objectMapper;
 
         @Captor
-        private ArgumentCaptor<List<EventItem>> captorEventItems;
-
-        @Captor
         private ArgumentCaptor<List<Event>> captorEvents;
 
         @Test
         public void shouldSaveEvents() throws IOException {
                 // json property override
-                objectMapper.addMixIn(EventItem.class, TestEventItem.class);
+                objectMapper.addMixIn(Event.class, TestEvent.class);
 
                 Profile[] profileArray = loadJson(this, "rest/profiles.json",
                                 TestProfile[].class,
                                 objectMapper);
-                EventItem[] eventItemArray = loadJson(this, "rest/eventItems.json",
-                                EventItem[].class,
-                                objectMapper);
 
                 List<Profile> profiles = Arrays.asList(profileArray);
-                List<EventItem> eventItems = Arrays.asList(eventItemArray);
-
-                when(eventItemRepository.saveAll(anyList())).thenReturn(eventItems);
 
                 // build parameters
                 List<Set<Profile>> profileByGroups = new ArrayList<>();
@@ -89,11 +79,6 @@ public class EventServiceForGeneratorTest extends AbstractAlgoTest {
 
                 eventServiceForGenerator.saveEvents(profileByGroups);
 
-                Mockito.verify(eventItemRepository).saveAll(captorEventItems.capture());
-
-                List<EventItem> capturedEventItems = captorEventItems.getValue();
-                assertEquals(2, capturedEventItems.size());
-
                 Mockito.verify(eventRepository).saveAll(captorEvents.capture());
 
                 List<Event> capturedEvents = (List<Event>) captorEvents.getValue();
@@ -101,26 +86,20 @@ public class EventServiceForGeneratorTest extends AbstractAlgoTest {
 
                 // event1
                 Event event1 = capturedEvents.get(0);
-                assertEquals(1, event1.getItems().size());
-
-                EventItem eventInfo1 = event1.getInfo();
-                assertEquals(2, eventInfo1.getMembers().size());
+                assertEquals(2, event1.getMembers().size());
 
                 List<UUID> memberUuids1 = List.of(UUID_PROFILE_SOPHIA, UUID_PROFILE_OLIVER);
                 assertTrue(memberUuids1.stream().allMatch(
-                                id -> eventInfo1.getMembers().stream().anyMatch(
+                                id -> event1.getMembers().stream().anyMatch(
                                                 member -> member.getProfile().getId().equals(id))));
 
                 // event2
                 Event event2 = capturedEvents.get(1);
-                assertEquals(1, event2.getItems().size());
-
-                EventItem eventInfo2 = event2.getInfo();
-                assertEquals(2, eventInfo2.getMembers().size());
+                assertEquals(2, event2.getMembers().size());
 
                 List<UUID> memberUuids2 = List.of(UUID_PROFILE_ETHAN, UUID_PROFILE_EMMA);
                 assertTrue(memberUuids2.stream().allMatch(
-                                id -> eventInfo2.getMembers().stream().anyMatch(
+                                id -> event2.getMembers().stream().anyMatch(
                                                 member -> member.getProfile().getId().equals(id))));
 
         }

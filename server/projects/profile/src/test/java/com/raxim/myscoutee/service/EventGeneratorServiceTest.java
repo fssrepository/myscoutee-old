@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -25,19 +26,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.config.JsonConfig;
-import com.raxim.myscoutee.data.mongo.TestEventItem;
+import com.raxim.myscoutee.data.mongo.TestEvent;
 import com.raxim.myscoutee.data.mongo.TestLike;
 import com.raxim.myscoutee.data.mongo.TestProfile;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
-import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorService;
 
+@DirtiesContext
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
 public class EventGeneratorServiceTest extends AbstractAlgoTest {
@@ -65,7 +67,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
         private LikeRepository likeRepository;
 
         @Mock
-        private EventItemRepository eventItemRepository;
+        private EventRepository eventRepository;
 
         @Autowired
         @Spy
@@ -128,14 +130,14 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 assertTrue(allProfilesMatched);
 
                 // ignored
-                objectMapper.addMixIn(EventItem.class, TestEventItem.class);
+                objectMapper.addMixIn(Event.class, TestEvent.class);
 
-                EventItem[] eventItemArray = loadJson(this, "rest/eventItems.json",
-                                EventItem[].class,
+                Event[] eventArray = loadJson(this, "rest/events.json",
+                                Event[].class,
                                 objectMapper);
-                List<EventItem> eventItems = Arrays.asList(eventItemArray);
+                List<Event> events = Arrays.asList(eventArray);
 
-                when(eventItemRepository.findEventItemsByType("g")).thenReturn(eventItems);
+                when(eventRepository.findAll()).thenReturn(events);
 
                 profilesByGroup = eventGeneratorService.generate();
                 assertEquals(2, profilesByGroup.size());

@@ -24,10 +24,9 @@ import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListene
 import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
-import com.raxim.myscoutee.data.mongo.TestEventItem;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.data.mongo.TestEvent;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.service.EventServiceForGenerator;
@@ -45,9 +44,6 @@ public class EventServiceForGeneratorIntTest {
     private EventRepository eventRepository;
 
     @Autowired
-    private EventItemRepository eventItemRepository;
-
-    @Autowired
     private ProfileRepository profileRepository;
 
     @Autowired
@@ -55,10 +51,9 @@ public class EventServiceForGeneratorIntTest {
 
     @Test
     public void shouldSaveGeneratedEvents() {
-        objectMapper.addMixIn(EventItem.class, TestEventItem.class);
+        objectMapper.addMixIn(Event.class, TestEvent.class);
 
-        EventServiceForGenerator eventServiceForGenerator = new EventServiceForGenerator(eventRepository,
-                eventItemRepository);
+        EventServiceForGenerator eventServiceForGenerator = new EventServiceForGenerator(eventRepository);
 
         List<Profile> profiles = profileRepository.findProfileByStatus("A");
 
@@ -79,11 +74,12 @@ public class EventServiceForGeneratorIntTest {
 
         eventServiceForGenerator.saveEvents(groups);
 
-        List<EventItem> eventItems = this.eventItemRepository.findEventItemsByType("g");
+        List<Event> events = this.eventRepository.findAll();
 
-        assertEquals(groups.size(), eventItems.size());
+        assertEquals(groups.size(), events.size());
+        assertEquals(profiles.get(0).getGroup(), events.get(0).getGroup());
 
-        String eventItemsJson = JsonUtil.toMongoJsonArray(eventItems, objectMapper);
-        System.out.println(eventItemsJson);
+        String eventsJson = JsonUtil.toMongoJsonArray(events, objectMapper);
+        System.out.println(eventsJson);
     }
 }

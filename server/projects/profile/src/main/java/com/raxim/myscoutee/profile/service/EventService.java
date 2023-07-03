@@ -61,7 +61,8 @@ public class EventService {
         return eventRepository.findTokensByEvent(refIds);
     }
 
-    public List<EventDTO> getEvents(String step, Integer direction, String[] tOffset,
+    //TODO: to be fixed
+    /*public List<EventDTO> getEvents(String step, Integer direction, String[] tOffset,
             UUID profileId, String[] status) {
         List<EventDTO> events = Collections.emptyList();
 
@@ -103,9 +104,10 @@ public class EventService {
             }
         }
         return events;
-    }
+    }*/
 
-    public Optional<Event> cloneEvent(UUID eventId, Profile profile) {
+    //TODO: to be fixed
+    /*public Optional<Event> cloneEvent(UUID eventId, Profile profile) {
         Optional<Event> eventRes = eventRepository.findById(eventId);
 
         if (eventRes.isPresent()) {
@@ -118,9 +120,10 @@ public class EventService {
         } else {
             return Optional.empty();
         }
-    }
+    }*/
 
-    public Optional<EventDTO> recommendEvent(UUID eventId) {
+    //TODO: to be fixed
+    /*public Optional<EventDTO> recommendEvent(UUID eventId) {
         Optional<Event> eventRes = eventRepository.findById(eventId);
 
         if (eventRes.isPresent()) {
@@ -156,13 +159,15 @@ public class EventService {
         } else {
             return Optional.empty();
         }
-    }
+    }*/
 
-    public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status) {
+    //TODO: to be fixed
+    /*public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status) {
         return getEvent(eventItem, profile, status, null, false);
-    }
+    }*/
 
-    public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status,
+    //TODO: to be fixed
+    /*public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status,
             UUID eventId, boolean isUpdate) {
         Optional<Event> eventRes = eventId != null ? eventRepository.findById(eventId) : Optional.empty();
 
@@ -200,9 +205,10 @@ public class EventService {
                 return Optional.empty();
             }
         }
-    }
+    }*/
 
-    public Optional<Pair<Event, EventItem>> saveEvent(Event pEvent, EventItem pEventItem) {
+    //TODO: to be fixed
+    /*public Optional<Pair<Event, EventItem>> saveEvent(Event pEvent, EventItem pEventItem) {
         Event event = pEvent;
         EventItem eventItem = event.getItems().stream()
                 .filter(item -> pEventItem.getId().equals(item.getId()))
@@ -229,7 +235,7 @@ public class EventService {
                 .orElse(null);
 
         return Optional.of(Pair.of(event, eventItem));
-    }
+    }*/
 
     public List<EventItemDTO> getEventItems(UUID eventId, Integer step, Object[] tOffset, UUID profileId) {
         return eventRepository.findItemsByEvent(eventId, 20, step != null ? step : 5, "%Y-%m-%d", profileId, tOffset);

@@ -10,6 +10,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.algo.dto.Edge;
+import com.raxim.myscoutee.algo.dto.Node;
+import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
@@ -23,7 +26,8 @@ public class EventUtil {
     public static final String EVENT_TYPE_PRIVATE = "pr";
     public static final String DELETED = "D";
 
-    public static Event shiftBy(Event event, EventItem eventItem, ObjectMapper objectMapper) {
+    //TODO: to be fixed 
+    /*public static Event shiftBy(Event event, EventItem eventItem, ObjectMapper objectMapper) {
         long minutes;
         RangeLocal evtRange;
         if (eventItem.getId().equals(event.getInfo().getId())) {
@@ -90,9 +94,10 @@ public class EventUtil {
         event.setItems(updatedItems);
 
         return event;
-    }
+    }*/
 
-    public static Event cloneBy(Event event, Profile profile, Slot slot, boolean isRef, ObjectMapper objectMapper) {
+    //TODO: to be fixed 
+    /*public static Event cloneBy(Event event, Profile profile, Slot slot, boolean isRef, ObjectMapper objectMapper) {
         Event clonedEvent = JsonUtil.clone(event, objectMapper);
         clonedEvent.setId(UUID.randomUUID());
         if (slot != null) {
@@ -166,14 +171,32 @@ public class EventUtil {
         clonedEvent.setRef(ref);
 
         return clonedEvent;
-    }
+    }*/
 
-    public static EventDTO transform(Event event) {
+    //TODO: to be fixed 
+    /*public static EventDTO transform(Event event) {
         LocalDateTime eventStart = event.getInfo().getRange().getStart();
         LocalDate groupKey = eventStart != null ? eventStart.toLocalDate() : null;
         Long sortKey = eventStart != null ? eventStart.toInstant(ZoneOffset.UTC).toEpochMilli() : null;
 
         return new EventDTO(event, groupKey, sortKey);
-    }
+    }*/
 
+    public static Set<Edge> permutate(Event event) {
+        List<List<List<Member>>> nodes = CommonUtil.permutation(event.getMembers());
+
+        Set<Edge> edges = nodes.stream()
+                .flatMap(group -> group.stream()
+                        .map(pair -> {
+                            Profile profile1 = pair.get(0).getProfile();
+                            Profile profile2 = pair.get(1).getProfile();
+
+                            Node node1 = new Node(profile1.getId().toString(), profile1.getGender());
+                            Node node2 = new Node(profile2.getId().toString(), profile2.getGender());
+                            Edge edge = new Edge(node1, node2);
+                            return edge;
+                        }))
+                .collect(Collectors.toSet());
+        return edges;
+    }
 }

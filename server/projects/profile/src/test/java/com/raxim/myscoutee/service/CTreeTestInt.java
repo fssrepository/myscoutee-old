@@ -10,6 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -18,10 +19,11 @@ import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.algo.AlgoLoadException;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.common.config.JsonConfig;
-import com.raxim.myscoutee.data.mongo.TestEventItem;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
-import com.raxim.myscoutee.profile.util.EventItemUtil;
+import com.raxim.myscoutee.data.mongo.TestEvent;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.util.EventUtil;
 
+@DirtiesContext
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
 public class CTreeTestInt extends AbstractAlgoTest {
@@ -30,14 +32,14 @@ public class CTreeTestInt extends AbstractAlgoTest {
 
         @Test
         public void shouldFilteredGroup() throws IOException, AlgoLoadException {
-                objectMapper.addMixIn(EventItem.class, TestEventItem.class);
-
-                EventItem[] eventItemArray = loadJson(this, "algo/eventItems.json",
-                                EventItem[].class,
+                objectMapper.addMixIn(Event.class, TestEvent.class);
+                
+                Event[] eventArray = loadJson(this, "algo/events.json",
+                                Event[].class,
                                 objectMapper);
-                List<EventItem> eventItems = Arrays.asList(eventItemArray);
+                List<Event> events = Arrays.asList(eventArray);
 
-                List<Set<Edge>> ignoredEdges = eventItems.stream().map(eventItem -> EventItemUtil.permutate(eventItem))
+                List<Set<Edge>> ignoredEdges = events.stream().map(event -> EventUtil.permutate(event))
                                 .toList();
                 System.out.println(ignoredEdges);
 

@@ -21,7 +21,7 @@
         ],
         "status": "A",
         "createdDate": "2022-11-01T00:00:00Z",
-        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "groupId": "b33ec186-aea8-4636-b635-4a2f620a0c54",
         "score": 75,
         "lastLogin": "2023-06-10T09:15:00Z"
     },
@@ -47,7 +47,7 @@
         ],
         "status": "A",
         "createdDate": "2022-09-20T00:00:00Z",
-        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "groupId": "b33ec186-aea8-4636-b635-4a2f620a0c54",
         "score": 90,
         "lastLogin": "2023-06-11T15:30:00Z"
     },
@@ -73,7 +73,7 @@
         ],
         "status": "A",
         "createdDate": "2022-08-23T00:00:00Z",
-        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "groupId": "b33ec186-aea8-4636-b635-4a2f620a0c54",
         "score": 80,
         "lastLogin": "2023-06-12T12:30:00Z"
     },
@@ -99,7 +99,7 @@
         ],
         "status": "A",
         "createdDate": "2022-10-10T00:00:00Z",
-        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "groupId": "b33ec186-aea8-4636-b635-4a2f620a0c54",
         "score": 75,
         "lastLogin": "2023-06-10T09:15:00Z"
     },
@@ -125,7 +125,7 @@
         ],
         "status": "A",
         "createdDate": "2022-11-01T00:00:00Z",
-        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "groupId": "b33ec186-aea8-4636-b635-4a2f620a0c54",
         "score": 75,
         "lastLogin": "2023-06-10T09:15:00Z"
     },
@@ -151,7 +151,7 @@
         ],
         "status": "A",
         "createdDate": "2022-10-05T00:00:00Z",
-        "group": "b33ec186-aea8-4636-b635-4a2f620a0c54",
+        "groupId": "b33ec186-aea8-4636-b635-4a2f620a0c54",
         "score": 70,
         "lastLogin": "2023-06-11T10:10:00Z"
     }

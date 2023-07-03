@@ -49,7 +49,8 @@ public class StatusService {
         this.promotionRepository = promotionRepository;
     }
 
-    public ResponseEntity<?> itemStatus(String itemId, String status, UUID profileUid) {
+    //TODO: to be fixed
+    /*public ResponseEntity<?> itemStatus(String itemId, String status, UUID profileUid) {
         Optional<com.raxim.myscoutee.profile.data.document.mongo.Profile> profileOp = profileRepository
                 .findById(profileUid);
         if (profileOp.isPresent()) {
@@ -138,9 +139,10 @@ public class StatusService {
             }).orElse(ResponseEntity.notFound().build());
         }
         return ResponseEntity.badRequest().build();
-    }
+    }*/
 
-    public ResponseEntity<?> status(String id, String status, UUID profileUid) {
+    //TODO: to be fixed 
+    /*public ResponseEntity<?> status(String id, String status, UUID profileUid) {
         Optional<Profile> profileOp = profileRepository.findById(profileUid);
         if (profileOp.isPresent()) {
             Profile profile = profileOp.get();
@@ -244,5 +246,5 @@ public class StatusService {
             }).orElse(ResponseEntity.notFound().build());
         }
         return ResponseEntity.badRequest().build();
-    }
+    }*/
 }

@@ -69,7 +69,8 @@ public class ActivityRestController {
         this.groupRepository = groupRepository;
     }
 
-    @GetMapping("events")
+    //TODO: to be fixed
+    /*@GetMapping("events")
     @Transactional
     public ResponseEntity<Object> getEvents(@RequestParam(value = "step", required = false) String pStep,
             @RequestParam(value = "direction", required = false, defaultValue = "1") Integer direction,
@@ -127,43 +128,48 @@ public class ActivityRestController {
         } else {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
         }
-    }
+    }*/
 
-    @PostMapping("events")
+    //TODO: to be fixed 
+    /*@PostMapping("events")
     @Transactional
     public ResponseEntity<EventDTO> createEvent(@RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.save(eventService, eventItem, profile, false);
-    }
+    }*/
 
-    @PatchMapping("events/{id}")
+    //TODO: to be fixed 
+    /*@PatchMapping("events/{id}")
     @Transactional
     public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody EventItem eventItem,
             Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.update(eventService, eventItem, id, profile);
-    }
+    }*/
 
-    @PostMapping("events/{id}/items")
+    //TODO: to be fixed 
+    /*@PostMapping("events/{id}/items")
     public ResponseEntity<EventItemDTO> addItem(@PathVariable String id, @RequestBody EventItem eventItem,
             Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.save(eventService, eventItem, id, profile);
-    }
+    }*/
 
-    @PatchMapping("events/{id}/items/{itemId}")
+    //TODO: to be fixed 
+    /*@PatchMapping("events/{id}/items/{itemId}")
     public ResponseEntity<EventItemDTO> patchItem(@PathVariable String id, @PathVariable String itemId,
             @RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return EventItemUtil.update(eventService, eventItem, id, itemId, profile);
-    }
+    }*/
 
     // delete date align
-    @DeleteMapping("events/{id}/items/{itemId}")
+    //TODO: to be fixed
+    /*@DeleteMapping("events/{id}/items/{itemId}")
     public ResponseEntity<Object> deleteItem(@PathVariable String id, @PathVariable String itemId) {
         Event event = eventRepository.findById(UUID.fromString(id)).get();
         if (event.getInfo().getId().equals(UUID.fromString(itemId))) {
@@ -175,7 +181,7 @@ public class ActivityRestController {
         eventItemRepository.save(item);
 
         return ResponseEntity.noContent().build();
-    }
+    }*/
 
     @GetMapping(value = { "events/{id}/items", "invitations/{id}/items", "promotions/{id}/items" })
     public ResponseEntity<PageDTO<EventItemDTO>> items(@PathVariable String id,
@@ -195,14 +201,15 @@ public class ActivityRestController {
         return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }
 
-    @PostMapping("events/{id}/recommend")
+    //TODO: to be fixed
+    /*@PostMapping("events/{id}/recommend")
     public ResponseEntity<EventDTO> recommend(@PathVariable String id,
             @RequestParam(value = "step", required = false) Integer step) {
         Optional<EventDTO> eventDto = eventService.recommendEvent(UUID.fromString(id));
 
         return eventDto.map(event -> ResponseEntity.ok(event))
                 .orElse(ResponseEntity.badRequest().build());
-    }
+    }*/
 
     @GetMapping("invitations")
     @Transactional

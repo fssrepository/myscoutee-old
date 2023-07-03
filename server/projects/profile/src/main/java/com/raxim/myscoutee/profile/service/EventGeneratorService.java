@@ -18,16 +18,16 @@ import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.util.JsonUtil;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
-import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
-import com.raxim.myscoutee.profile.util.EventItemUtil;
+import com.raxim.myscoutee.profile.util.EventUtil;
 
 @Service
 public class EventGeneratorService {
@@ -36,15 +36,15 @@ public class EventGeneratorService {
 
     private final ScheduleRepository scheduleRepository;
     private final LikeRepository likeRepository;
-    private final EventItemRepository eventItemRepository;
+    private final EventRepository eventRepository;
     private final ObjectMapper objectMapper;
 
     public EventGeneratorService(ScheduleRepository scheduleRepository,
-            LikeRepository likeRepository, EventItemRepository eventItemRepository,
+            LikeRepository likeRepository, EventRepository eventRepository,
             ObjectMapper objectMapper) {
         this.scheduleRepository = scheduleRepository;
         this.likeRepository = likeRepository;
-        this.eventItemRepository = eventItemRepository;
+        this.eventRepository = eventRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -60,11 +60,9 @@ public class EventGeneratorService {
         // batched version of query does exist -> just to simplify for the time being
         List<LikeGroup> likeGroups = likeRepository.findLikeGroups();
 
-        // get all generated events - created by is system_uuid -> for the time being
-        // 'g' general is enough
-        List<EventItem> eventItems = eventItemRepository.findEventItemsByType("g");
+        List<Event> events = eventRepository.findAll();
 
-        List<Set<Edge>> ignoredEdges = eventItems.stream().map(eventItem -> EventItemUtil.permutate(eventItem))
+        List<Set<Edge>> ignoredEdges = events.stream().map(event -> EventUtil.permutate(event))
                 .toList();
         System.out.println("ignored edges -----" + ignoredEdges);
 

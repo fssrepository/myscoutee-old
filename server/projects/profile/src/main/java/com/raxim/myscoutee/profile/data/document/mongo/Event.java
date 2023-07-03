@@ -1,6 +1,5 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,15 +7,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 
 @Document(collection = "events")
-public class Event {
+public class Event extends EventBase {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -25,10 +21,26 @@ public class Event {
     @JsonIgnore
     private UUID group;
 
-    // idea, job, event for template
-    @JsonIgnore
-    private String type;
+    @JsonProperty(value = "rule")
+    private Rule rule;
 
+    // qr code generation
+    @JsonProperty(value = "ticket")
+    private Boolean ticket;
+
+    // type = person, idea, job, event for template
+
+    /* local, global */
+    /*
+     * google map is complicated to get the coordinates to search for,
+     * but to differentiate local and global based on that is ridiculous
+     * the category will be reused to identify the real category (sport, reading
+     * etc.)
+     */
+    @JsonProperty(value = "category")
+    private String category;
+
+    // status
     // Accepted (A) (by Organizer), Published/Promotion/Pending (P),
     // Inactive (I), Template (T), Under Review (U), Reviewed/Recommended (R),
     // Rejected/Deleted (D)
@@ -36,18 +48,6 @@ public class Event {
     // auto publish when general has been added
     // inactive means, just edited locally, before being published
     // when accepted by organizer, create chat room
-    // accept form needs to have chat url
-    @JsonProperty(value = "status")
-    private String status;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @JsonProperty(value = "createdDate")
-    private LocalDateTime createdDate = LocalDateTime.now();
-
-    @JsonProperty(value = "createdBy")
-    private UUID createdBy;
-
-    // -------------??
 
     // ref counter
     @JsonIgnore
@@ -57,14 +57,6 @@ public class Event {
     @DBRef
     @JsonIgnore
     private Event ref;
-
-    // ----------------lehet nem kell----------------
-
-    // if you change dateFrom of general than every other item's date will slip,
-    // first event item of the items list, which contains the signal chat url
-    // lehet nem kell
-    @JsonIgnore
-    private EventItem info;
 
     // ??, lehet, hogy az eventItem-nek kell az event.id tartalmaznia es ez ide nem
     // kell
@@ -79,15 +71,8 @@ public class Event {
     @JsonIgnore
     private List<Feedback> feedbacks;
 
-    // lehet, hogy az eventItemhez kellene rakni
     @JsonIgnore
     private GeoJsonPoint position;
-
-    // lehet, hogy az eventItemhez kellene rakni
-    @JsonDeserialize(using = GeoJsonPointDeserializer.class)
-    @JsonIgnore
-    @JsonProperty(value = "positions")
-    private List<GeoJsonPoint> positions;
 
     public UUID getId() {
         return id;
@@ -97,12 +82,12 @@ public class Event {
         this.id = id;
     }
 
-    public EventItem getInfo() {
-        return info;
+    public String getCategory() {
+        return category;
     }
 
-    public void setInfo(EventItem info) {
-        this.info = info;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public List<EventItem> getItems() {
@@ -153,44 +138,19 @@ public class Event {
         this.ref = ref;
     }
 
-    public String getStatus() {
-        return status;
+    public Rule getRule() {
+        return rule;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setRule(Rule rule) {
+        this.rule = rule;
     }
 
-    public String getType() {
-        return type;
+    public Boolean getTicket() {
+        return ticket;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTicket(Boolean ticket) {
+        this.ticket = ticket;
     }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public UUID getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(UUID createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public List<GeoJsonPoint> getPositions() {
-        return positions;
-    }
-
-    public void setPositions(List<GeoJsonPoint> positions) {
-        this.positions = positions;
-    }
-
 }

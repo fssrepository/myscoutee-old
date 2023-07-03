@@ -202,7 +202,8 @@ public class RecommendationRestController {
         }
     }
 
-    @PostMapping("events/{id}/clone")
+    //TODO: to be fixed
+    /*@PostMapping("events/{id}/clone")
     public ResponseEntity<EventDTO> cloneEvent(
             @PathVariable String id,
             @RequestParam("step") Integer step,
@@ -217,7 +218,7 @@ public class RecommendationRestController {
         } else {
             return ResponseEntity.badRequest().build();
         }
-    }
+    }*/
 
     // People who you haven't met, but your surroundings are ordered by rate
     @Deprecated

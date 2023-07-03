@@ -17,6 +17,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "rules")
 public class Rule {
+    @JsonProperty(value = "priority")
+    private Boolean priority;
+
+    // the capacity should be fulfilled before the event starts with the grace
+    // period
+    @JsonProperty(value = "gracePeriod")
+    private int gracePeriod;
 
     /*
      * kesobb boviteni lehet
@@ -72,5 +79,21 @@ public class Rule {
 
     public void setFrom(LocalDateTime from) {
         this.from = from;
+    }
+
+    public Boolean getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Boolean priority) {
+        this.priority = priority;
+    }
+
+    public int getGracePeriod() {
+        return gracePeriod;
+    }
+
+    public void setGracePeriod(int gracePeriod) {
+        this.gracePeriod = gracePeriod;
     }
 }

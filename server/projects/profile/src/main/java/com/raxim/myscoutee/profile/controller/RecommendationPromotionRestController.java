@@ -142,7 +142,8 @@ public class RecommendationPromotionRestController {
         return ResponseEntity.ok(new PageDTO<>(events, lastOffset));
     }
 
-    @PostMapping("/promotions/{promoId}/events/{id}/clone")
+    //TODO: to be fixed
+    /*@PostMapping("/promotions/{promoId}/events/{id}/clone")
     public ResponseEntity<?> cloneEvent(
             @PathVariable String promoId,
             @PathVariable String id,
@@ -170,7 +171,7 @@ public class RecommendationPromotionRestController {
         } else {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.clone_not_allowed"));
         }
-    }
+    }*/
 
     @GetMapping("/promotions/{promoId}/events/{id}/feedbacks")
     public ResponseEntity<PageDTO<FeedbackDTO>> getEventFeedbacks(

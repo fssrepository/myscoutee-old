@@ -49,7 +49,8 @@ public class CampaignTemplateRestController {
         this.eventItemRepository = eventItemRepository;
     }
 
-    @GetMapping("/templates")
+    //TODO: to be fixed
+    /*@GetMapping("/templates")
     @Transactional
     public ResponseEntity<PageDTO<EventDTO>> getEvents(
             @RequestParam("step") String step,
@@ -95,9 +96,10 @@ public class CampaignTemplateRestController {
         }
 
         return ResponseEntity.ok(new PageDTO<>(events, newOffset, 0));
-    }
+    }*/
 
-    @PostMapping("/templates")
+    //TODO: to be fixed 
+    /*@PostMapping("/templates")
     @Transactional
     public ResponseEntity<EventDTO> createEvent(
             @RequestBody EventItem eventItem,
@@ -106,9 +108,10 @@ public class CampaignTemplateRestController {
         ResponseEntity<EventDTO> savedEventItem = EventItemUtil.save(eventService, eventItem,
                 principal.getUser().getProfile(), true);
         return savedEventItem;
-    }
+    }*/
 
-    @PatchMapping("/templates/{id}")
+    //TODO: to be fixed 
+    /*@PatchMapping("/templates/{id}")
     @Transactional
     public ResponseEntity<?> patchEvent(
             @PathVariable String id,
@@ -118,9 +121,10 @@ public class CampaignTemplateRestController {
         ResponseEntity<?> response = EventItemUtil.update(eventService, eventItem, id,
                 principal.getUser().getProfile());
         return response;
-    }
+    }*/
 
-    @PostMapping("/templates/{id}/items")
+    //TODO: to be fixed 
+    /*@PostMapping("/templates/{id}/items")
     public ResponseEntity<EventItemDTO> addItem(
             @PathVariable String id,
             @RequestBody EventItem eventItem,
@@ -129,9 +133,10 @@ public class CampaignTemplateRestController {
         ResponseEntity<EventItemDTO> savedEventItem = EventItemUtil.save(eventService, eventItem, id,
                 principal.getUser().getProfile());
         return savedEventItem;
-    }
+    }*/
 
-    @PatchMapping("/templates/{id}/items/{itemId}")
+    //TODO: to be fixed 
+    /*@PatchMapping("/templates/{id}/items/{itemId}")
     public ResponseEntity<EventItemDTO> patchItem(
             @PathVariable String id,
             @PathVariable String itemId,
@@ -141,9 +146,10 @@ public class CampaignTemplateRestController {
         ResponseEntity<EventItemDTO> updatedEventItem = EventItemUtil.update(eventService, eventItem, id, itemId,
                 principal.getUser().getProfile());
         return updatedEventItem;
-    }
+    }*/
 
-    @DeleteMapping("templates/{id}/items/{itemId}")
+    //TODO: to be fixed
+    /*@DeleteMapping("templates/{id}/items/{itemId}")
     public ResponseEntity<?> deleteItem(
             @PathVariable String id,
             @PathVariable String itemId) {
@@ -165,7 +171,7 @@ public class CampaignTemplateRestController {
         }
 
         return ResponseEntity.noContent().build();
-    }
+    }*/
 
     @GetMapping(value = { "/templates/{id}/items" })
     public ResponseEntity<PageDTO<EventItemDTO>> items(

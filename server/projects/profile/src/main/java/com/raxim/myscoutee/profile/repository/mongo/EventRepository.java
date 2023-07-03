@@ -12,6 +12,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.mongodb.client.model.geojson.Point;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
 import com.raxim.myscoutee.profile.data.dto.rest.CodeDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
@@ -22,6 +23,12 @@ import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 
 @RepositoryRestResource(collectionResourceRel = "events", path = "events")
 public interface EventRepository extends MongoRepository<Event, UUID> {
+
+        @Query("{'type': ?0}")
+        List<Event> findEventItemsByType(String type);
+
+        @Aggregation(pipeline = "findCandidates")
+        List<EventWithCandidates> findCandidates();
 
         @Query("{'status': 'P', 'ref.$id': ?0, 'info.members.profile.$id': ?1}")
         List<Event> findPendingEvents(UUID eventId, UUID profileId);

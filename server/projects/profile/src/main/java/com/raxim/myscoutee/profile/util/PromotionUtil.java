@@ -17,7 +17,8 @@ import com.raxim.myscoutee.profile.service.CampaignService;
 
 public class PromotionUtil {
 
-    public static ResponseEntity<PromotionDTO> save(CampaignService campaignService, Promotion pPromotion, Profile profile) {
+    //TODO: to be fixed 
+    /*public static ResponseEntity<PromotionDTO> save(CampaignService campaignService, Promotion pPromotion, Profile profile) {
         Optional<Pair<Promotion, Boolean>> promotion = campaignService.getPromotion(pPromotion, profile, false, false);
         if (promotion.isPresent()) {
             Promotion oldPromotion = promotion.get().getFirst();
@@ -32,9 +33,10 @@ public class PromotionUtil {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
+    }*/
 
-    public static ResponseEntity<?> update(CampaignService campaignService, Promotion pPromotion, Profile profile,
+    //TODO: to be fixed 
+    /*public static ResponseEntity<?> update(CampaignService campaignService, Promotion pPromotion, Profile profile,
             boolean isEvent) {
         Optional<Pair<Promotion, Boolean>> promotion = campaignService.getPromotion(pPromotion, profile, true, isEvent);
         if (promotion.isPresent()) {
@@ -65,5 +67,5 @@ public class PromotionUtil {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
+    }*/
 }

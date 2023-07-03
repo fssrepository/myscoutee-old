@@ -61,29 +61,32 @@ public class ActivityMemberRestController {
         this.objectMapper = objectMapper;
     }
 
-    @PostMapping("events/{id}/items/{itemId}/join")
+    //TODO: to be fixed 
+    /*@PostMapping("events/{id}/items/{itemId}/join")
     public ResponseEntity<?> joinItem(@PathVariable String id, @PathVariable String itemId,
             @RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.itemStatus(itemId, "A", profile.getId());
-    }
+    }*/
 
-    @PostMapping("events/{id}/items/{itemId}/wait")
+    //TODO: to be fixed
+    /*@PostMapping("events/{id}/items/{itemId}/wait")
     public ResponseEntity<?> waitItem(@PathVariable String id, @PathVariable String itemId,
             @RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.itemStatus(itemId, "W", profile.getId());
-    }
+    }*/
 
-    @PostMapping("events/{id}/items/{itemId}/leave")
+    //TODO: to be fixed
+    /*@PostMapping("events/{id}/items/{itemId}/leave")
     public ResponseEntity<?> leaveItem(@PathVariable String id, @PathVariable String itemId,
             @RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.itemStatus(itemId, "L", profile.getId());
-    }
+    }*/
 
     @GetMapping(value = { "events/{eventId}/items/{id}/members" })
     public ResponseEntity<PageDTO<MemberDTO>> itemMembers(@PathVariable String id, @RequestParam("step") Integer step,
@@ -158,35 +161,40 @@ public class ActivityMemberRestController {
         return member.map(m -> ResponseEntity.ok(m)).orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("events/{id}/leave")
+    //TODO: to be fixed
+    /*@PostMapping("events/{id}/leave")
     public ResponseEntity<?> leave(@PathVariable String id, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.status(id, "L", profile.getId());
-    }
+    }*/
 
-    @PostMapping(value = { "invitations/{id}/accept", "promotions/{id}/accept" })
+    //TODO: to be fixed
+    /*@PostMapping(value = { "invitations/{id}/accept", "promotions/{id}/accept" })
     public ResponseEntity<?> join(@PathVariable String id, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.status(id, "A", profile.getId());
-    }
+    }*/
 
-    @PostMapping(value = { "invitations/{id}/wait" })
+    //TODO: to be fixed
+    /*@PostMapping(value = { "invitations/{id}/wait" })
     public ResponseEntity<?> wait(@PathVariable String id, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.status(id, "W", profile.getId());
-    }
+    }*/
 
-    @PostMapping(value = { "invitations/{id}/reject", "promotions/{id}/reject" })
+    //TODO: to be fixed
+    /*@PostMapping(value = { "invitations/{id}/reject", "promotions/{id}/reject" })
     public ResponseEntity<?> reject(@PathVariable String id, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
         return statusService.status(id, "R", profile.getId());
-    }
+    }*/
 
-    @PostMapping("events/{id}/members")
+    //TODO: to be fixed    
+    /*@PostMapping("events/{id}/members")
     @Transactional
     public ResponseEntity<List<MemberDTO>> addMember(
             @PathVariable String id,
@@ -242,6 +250,6 @@ public class ActivityMemberRestController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(membersDto);
         }).orElse(ResponseEntity.notFound().build());
-    }
+    }*/
 
 }

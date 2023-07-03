@@ -129,7 +129,8 @@ public class CampaignService {
         }
     }
 
-    public Optional<Promotion> savePromotion(
+    //TODO: to be fixed
+    /*public Optional<Promotion> savePromotion(
             Promotion promotion,
             Profile profile,
             boolean isEvent,
@@ -214,7 +215,7 @@ public class CampaignService {
         promotionToSave = this.promotionRepository.save(promotionToSave);
 
         return Optional.of(promotionToSave);
-    }
+    }*/
 
     public List<IdeaDTO> getIdeas(UUID profileId, Integer step, Object[] tOffset) {
         return this.ideaRepository.findIdeasByProfile(

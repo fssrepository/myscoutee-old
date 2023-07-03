@@ -13,7 +13,7 @@ import com.raxim.myscoutee.algo.dto.Node;
 
 public class GeneratorTest {
 
-    private final static int NODE_NUM = 4;
+    private final static int NODE_NUM = 5;
     private final static int EDGE_NUM = 4;
 
     @Test

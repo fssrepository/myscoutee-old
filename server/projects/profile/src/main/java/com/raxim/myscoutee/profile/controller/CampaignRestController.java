@@ -81,22 +81,24 @@ public class CampaignRestController {
         }
     }
 
-    @PostMapping("")
+    //TODO: to be fixed 
+    /*@PostMapping("")
     @Transactional
     public ResponseEntity<PromotionDTO> addPromotion(Authentication auth, @RequestBody Promotion promotion) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return PromotionUtil.save(this.campaignService, promotion, profile);
-    }
+    }*/
 
-    @PatchMapping("/{id}")
+    //TODO: to be fixed 
+    /*@PatchMapping("/{id}")
     @Transactional
     public ResponseEntity<?> patchPromotion(Authentication auth, @PathVariable String id,
             @RequestBody Promotion promotion) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
         return PromotionUtil.update(this.campaignService, promotion, profile, false);
-    }
+    }*/
 
     @GetMapping("/{promoId}/members")
     public ResponseEntity<PageDTO<ProfileDTO>> members(@PathVariable String promoId,

@@ -25,7 +25,8 @@ public class EventItemUtil {
         return new EventItemDTO(item, item.getType());
     }
 
-    public static ResponseEntity<EventDTO> save(EventService eventService, EventItem eventItem, Profile profile,
+    //TODO: to be fixed
+    /*public static ResponseEntity<EventDTO> save(EventService eventService, EventItem eventItem, Profile profile,
             boolean isTemplate) {
         String status = isTemplate ? "T" : "A";
 
@@ -41,9 +42,10 @@ public class EventItemUtil {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
+    }*/
 
-    public static ResponseEntity<?> update(EventService eventService, EventItem eventItem, String id, Profile profile) {
+    //TODO: to be fixed
+    /*public static ResponseEntity<?> update(EventService eventService, EventItem eventItem, String id, Profile profile) {
         Optional<Event> event = eventService.getEvent(eventItem, profile, "A", CommonUtil.parseUUID(id), true);
         if (event.isPresent()) {
             Optional<Pair<Event, EventItem>> savedEvent = eventService.saveEvent(event.get(), eventItem);
@@ -56,9 +58,10 @@ public class EventItemUtil {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
+    }*/
 
-    public static ResponseEntity<EventItemDTO> update(EventService eventService, EventItem eventItem, String id,
+    //TODO: to be fixed
+    /*public static ResponseEntity<EventItemDTO> update(EventService eventService, EventItem eventItem, String id,
             String itemId,
             Profile profile) {
         Optional<Event> event = eventService.getEvent(eventItem, profile, "A", CommonUtil.parseUUID(id), true);
@@ -73,9 +76,10 @@ public class EventItemUtil {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
+    }*/
 
-    public static ResponseEntity<EventItemDTO> save(EventService eventService, EventItem eventItem, String id,
+    //TODO: to be fixed
+    /*public static ResponseEntity<EventItemDTO> save(EventService eventService, EventItem eventItem, String id,
             Profile profile) {
         Optional<Event> event = eventService.getEvent(eventItem, profile, "A", CommonUtil.parseUUID(id), false);
         if (event.isPresent()) {
@@ -89,23 +93,5 @@ public class EventItemUtil {
         } else {
             return ResponseEntity.badRequest().build();
         }
-    }
-
-    public static Set<Edge> permutate(EventItem eventItem) {
-        List<List<List<Member>>> nodes = CommonUtil.permutation(eventItem.getMembers());
-
-        Set<Edge> edges = nodes.stream()
-                .flatMap(group -> group.stream()
-                        .map(pair -> {
-                            Profile profile1 = pair.get(0).getProfile();
-                            Profile profile2 = pair.get(1).getProfile();
-
-                            Node node1 = new Node(profile1.getId().toString(), profile1.getGender());
-                            Node node2 = new Node(profile2.getId().toString(), profile2.getGender());
-                            Edge edge = new Edge(node1, node2);
-                            return edge;
-                        }))
-                .collect(Collectors.toSet());
-        return edges;
-    }
+    }*/
 }
