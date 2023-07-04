@@ -48,7 +48,6 @@ public class CGroup extends LinkedHashSet<Node> {
             return this;
         }
 
-        // TODO: behavior review
         if (pTypes.size() != types.size()) {
             super.clear();
             return Set.of();

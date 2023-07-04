@@ -73,13 +73,13 @@ public class ActivityRestController {
         pageParam = paramHandlers.handle(profile, pageParam, EventParamHandler.EVENT);
 
         if (profile.getPosition() != null) {
-            List<EventDTO> events = eventService.getEvents(step, direction, tOffset, profile.getId(),
+            List<EventDTO> events = eventService.getEvents(pageParam, profile.getId(),
                     new String[] { "A", "P", "C" });
 
             List<Object> lOffset = !events.isEmpty() ? events.get(events.size() - 1).getOffset() : List.of();
 
             return ResponseEntity.ok(
-                    new PageDTO<>(events, lOffset, 0, step));
+                    new PageDTO<>(events, lOffset, 0, pageParam.getStep()));
         } else {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
         }
