@@ -18,7 +18,7 @@ import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Graph;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.common.util.FileUtil;
-import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.Member;
 
 public abstract class AbstractAlgoTest {
 
@@ -52,10 +52,10 @@ public abstract class AbstractAlgoTest {
         return allEdgesMatched;
     }
 
-    public boolean matchAll(Set<Profile> profiles, List<UUID> uuids) {
+    public boolean matchAll(Set<Member> members, List<UUID> uuids) {
         boolean allEdgesMatched = uuids.stream().allMatch(
-                id -> profiles.stream().anyMatch(
-                        group -> group.getId().equals(id)));
+                id -> members.stream().anyMatch(
+                        group -> group.getProfile().getId().equals(id)));
         return allEdgesMatched;
     }
 

@@ -182,8 +182,8 @@ public class EventUtil {
         return new EventDTO(event, groupKey, sortKey);
     }*/
 
-    public static Set<Edge> permutate(Event event) {
-        List<List<List<Member>>> nodes = CommonUtil.permutation(event.getMembers());
+    public static Set<Edge> permutate(Set<Member> members) {
+        List<List<List<Member>>> nodes = CommonUtil.permutation(members);
 
         Set<Edge> edges = nodes.stream()
                 .flatMap(group -> group.stream()

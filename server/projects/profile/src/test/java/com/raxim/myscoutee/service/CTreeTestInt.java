@@ -39,7 +39,7 @@ public class CTreeTestInt extends AbstractAlgoTest {
                                 objectMapper);
                 List<Event> events = Arrays.asList(eventArray);
 
-                List<Set<Edge>> ignoredEdges = events.stream().map(event -> EventUtil.permutate(event))
+                List<Set<Edge>> ignoredEdges = events.stream().map(event -> EventUtil.permutate(event.getMembers()))
                                 .toList();
                 System.out.println(ignoredEdges);
 

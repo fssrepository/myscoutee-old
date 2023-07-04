@@ -1,8 +1,5 @@
 package com.raxim.myscoutee.profile.service;
 
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,7 +9,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Notification;
 import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
-import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 
 @Service
@@ -20,15 +16,12 @@ public class EventScheduler {
 
     private final UserRepository userRepository;
     private final EventGeneratorService eventGeneratorService;
-    private final EventServiceForGenerator eventServiceForGenerator;
 
     public EventScheduler(
             UserRepository userRepository,
-            EventGeneratorService eventGeneratorService,
-            EventServiceForGenerator eventServiceForGenerator) {
+            EventGeneratorService eventGeneratorService) {
         this.userRepository = userRepository;
         this.eventGeneratorService = eventGeneratorService;
-        this.eventServiceForGenerator = eventServiceForGenerator;
     }
 
     @Scheduled(cron = "0 0 3 * * MON")
@@ -97,9 +90,7 @@ public class EventScheduler {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        List<Set<Profile>> profilesByGroup = eventGeneratorService.generate();
-        //save likes with G
-        eventServiceForGenerator.saveEvents(profilesByGroup);
+        eventGeneratorService.generate();
 
         sendRandomEventNotification();
 

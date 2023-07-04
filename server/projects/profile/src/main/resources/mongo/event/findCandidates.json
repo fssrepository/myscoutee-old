@@ -6,19 +6,60 @@
         }
     },
     {
-        "$addFields": {
-            "currentMembers": {
-                "$filter": {
-                    "input": "$members",
-                    "as": "member",
-                    "cond": {
-                        "$eq": [
-                            "$$member.status",
-                            "A"
-                        ]
+        "$lookup": {
+            "from": "profiles",
+            "let": {
+                "members": "$members"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$in": [
+                                        "$status",
+                                        [
+                                            "A",
+                                            "F"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "$in": [
+                                        "$_id",
+                                        {
+                                            "$map": {
+                                                "input": {
+                                                    "$filter": {
+                                                        "input": "$$members",
+                                                        "as": "member",
+                                                        "cond": {
+                                                            "$in": [
+                                                                "$$member.status",
+                                                                [
+                                                                    "A"
+                                                                ]
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "as": "member",
+                                                "in": "$$member.profile.$id"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
                     }
                 }
-            },
+            ],
+            "as": "currentProfiles"
+        }
+    },
+    {
+        "$addFields": {
             "validUntil": {
                 "$dateSubtract": {
                     "startDate": {
@@ -45,7 +86,7 @@
                             {
                                 "$lt": [
                                     {
-                                        "$size": "$currentMembers"
+                                        "$size": "$currentProfiles"
                                     },
                                     "$capacity.min"
                                 ]
@@ -56,19 +97,41 @@
                     {
                         "$cond": [
                             {
-                                "$and": [
+                                "$or": [
                                     {
-                                        "$gte": [
-                                            "$range.start",
-                                            "$validUntil"
+                                        "$and": [
+                                            {
+                                                "$lt": [
+                                                    "$range.start",
+                                                    "$validUntil"
+                                                ]
+                                            },
+                                            {
+                                                "$gte": [
+                                                    {
+                                                        "$size": "$currentProfiles"
+                                                    },
+                                                    "$capacity.min"
+                                                ]
+                                            }
                                         ]
                                     },
                                     {
-                                        "$eq": [
+                                        "$and": [
                                             {
-                                                "$size": "$currentMembers"
+                                                "$gte": [
+                                                    "$range.start",
+                                                    "$validUntil"
+                                                ]
                                             },
-                                            "$capacity.max"
+                                            {
+                                                "$eq": [
+                                                    {
+                                                        "$size": "$currentProfiles"
+                                                    },
+                                                    "$capacity.max"
+                                                ]
+                                            }
                                         ]
                                     }
                                 ]

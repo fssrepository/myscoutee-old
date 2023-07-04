@@ -1,6 +1,8 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -12,6 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 // role for event
 @Document(collection = "members")
 public class Member {
+
+    public static final Set<String> MET = Set.of("A", "L", "LL", "V", "LD");
+
     @DBRef
     @JsonProperty(value = "profile")
     private Profile profile;
@@ -19,7 +24,7 @@ public class Member {
     // A (Accepted), R (rejected), I (invited), K (kicked)?? - maybe by more members
     // than one, L (left) V (Verified)
     // T (Timed-Out), M (manager), P (promoter), LL (late leave), W (on waiting
-    // list)
+    // list), LD (left deleted), D (deleted)
     @JsonProperty(value = "status")
     private String status;
 
@@ -32,7 +37,7 @@ public class Member {
     private String code;
 
     @JsonIgnore
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
     // event item ref - members will be removed from event item
     @JsonIgnore
@@ -83,11 +88,11 @@ public class Member {
         this.code = code;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 

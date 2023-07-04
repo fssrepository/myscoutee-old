@@ -32,6 +32,7 @@ import com.raxim.myscoutee.data.mongo.TestProfile;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
+import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
@@ -103,18 +104,18 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                  * .thenReturn(likesBoth);
                  */
 
-                List<Set<Profile>> profilesByGroup = eventGeneratorService.generate();
-                assertEquals(3, profilesByGroup.size());
+                List<Event> generatedEvents = eventGeneratorService.generate();
+                assertEquals(3, generatedEvents.size());
 
                 // group1
-                Set<Profile> group1 = profilesByGroup.get(0);
+                Set<Member> group1 = generatedEvents.get(0).getMembers();
                 assertEquals(2, group1.size());
 
                 List<UUID> expectedUuidsForGroup1 = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
                 boolean allProfilesMatched = matchAll(group1, expectedUuidsForGroup1);
                 assertTrue(allProfilesMatched);
 
-                Set<Profile> group2 = profilesByGroup.get(1);
+                Set<Member> group2 = generatedEvents.get(1).getMembers();
                 assertEquals(2, group2.size());
 
                 List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_AVA, UUID_PROFILE_OLIVER);
@@ -122,7 +123,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 assertTrue(allProfilesMatched);
 
                 // group3
-                Set<Profile> group3 = profilesByGroup.get(2);
+                Set<Member> group3 = generatedEvents.get(2).getMembers();
                 assertEquals(2, group3.size());
 
                 List<UUID> expectedUuidsForGroup3 = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
@@ -139,18 +140,18 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
 
                 when(eventRepository.findAll()).thenReturn(events);
 
-                profilesByGroup = eventGeneratorService.generate();
-                assertEquals(2, profilesByGroup.size());
+                generatedEvents = eventGeneratorService.generate();
+                assertEquals(2, generatedEvents.size());
 
                 // group1
-                Set<Profile> group1F = profilesByGroup.get(0);
+                Set<Member> group1F = generatedEvents.get(0).getMembers();
                 assertEquals(2, group1F.size());
 
                 List<UUID> expectedUuidsForGroup1F = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
                 allProfilesMatched = matchAll(group1F, expectedUuidsForGroup1F);
                 assertTrue(allProfilesMatched);
 
-                Set<Profile> group2F = profilesByGroup.get(1);
+                Set<Member> group2F = generatedEvents.get(1).getMembers();
                 assertEquals(2, group2F.size());
 
                 List<UUID> expectedUuidsForGroup2F = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
