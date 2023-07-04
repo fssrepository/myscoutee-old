@@ -25,7 +25,8 @@ public class Rule {
     @JsonProperty(value = "eventGrace")
     private int eventGrace;
 
-    // invited, but didn't respond within the grace period, new candidates are invited, but that ones are not timed out
+    // invited, but didn't respond within the grace period, new candidates are
+    // invited, but that ones are not timed out
     @JsonProperty(value = "memberGrace")
     private int memberGrace;
 
@@ -49,7 +50,7 @@ public class Rule {
 
     // Balanced Female/Male Ratio
     @JsonProperty(value = "balanced")
-    private String balanced;
+    private Boolean balanced;
 
     public Integer getRate() {
         return rate;
@@ -60,11 +61,11 @@ public class Rule {
     }
 
     // Balanced Female/Male Ratio
-    public String getBalanced() {
+    public Boolean getBalanced() {
         return balanced;
     }
 
-    public void setBalanced(String balanced) {
+    public void setBalanced(Boolean balanced) {
         this.balanced = balanced;
     }
 

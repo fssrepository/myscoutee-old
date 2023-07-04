@@ -84,10 +84,12 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
                 return event.getEvent();
             }
 
+            Rule rule = event.getEvent().getRule();
+
             // status "P"
             // update members who deleted their profiles
             LocalDateTime validUntil = LocalDateTime.now()
-                    .minus(event.getEvent().getRule().getMemberGrace(),
+                    .minus(rule.getMemberGrace(),
                             ChronoUnit.MINUTES);
 
             Set<Member> members = event.getEvent().getMembers().stream().map(member -> {
@@ -102,7 +104,6 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
 
             Set<Edge> tIgnoredEdges = EventUtil.permutate(event.getEvent().getMembers());
 
-            Rule rule = event.getEvent().getRule();
             List<Edge> tIgnoredEdgesByRate = edges.stream()
                     .filter(edge -> rule.getRate() != null &&
                             edge.getWeight() >= rule.getRate())
@@ -125,8 +126,16 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
                     .count();
             Range range = new Range(event.getEvent().getCapacity().getMin(),
                     event.getEvent().getCapacity().getMax() - numOfMembers);
+
+            List<String> types;
+            if (Boolean.TRUE.equals(rule.getBalanced())) {
+                types = List.of(AppConstants.MAN, AppConstants.WOMAN);
+            } else {
+                types = List.of();
+            }
+
             List<BCTree> bcTrees = dGraph.stream().map(cGraph -> {
-                CTree cTree = new CTree(cGraph, List.of(AppConstants.MAN, AppConstants.WOMAN), ignoredEdges);
+                CTree cTree = new CTree(cGraph, types, ignoredEdges);
                 return new BCTree(cTree, range);
             }).toList();
 
