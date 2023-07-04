@@ -2,7 +2,6 @@ package com.raxim.myscoutee.profile.service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -120,12 +119,17 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
             DGraph dGraph = new DGraph();
             dGraph.addAll(validEdges);
 
-            int numOfMembers = (int) event.getEvent().getMembers().stream()
+            Set<Node> activeNodes = event.getEvent().getMembers().stream()
                     .filter(member -> "A".equals(member.getStatus())
                             && "I".equals(member.getStatus()))
-                    .count();
+                    .map(member -> {
+                        Profile profile = nodes.get(member.getProfile().getId().toString());
+                        return new Node(profile.getId().toString(), profile.getGender());
+                    })
+                    .collect(Collectors.toSet());
+            
             Range range = new Range(event.getEvent().getCapacity().getMin(),
-                    event.getEvent().getCapacity().getMax() - numOfMembers);
+                    event.getEvent().getCapacity().getMax() - activeNodes.size());
 
             List<String> types;
             if (Boolean.TRUE.equals(rule.getBalanced())) {
@@ -136,7 +140,7 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
 
             List<BCTree> bcTrees = dGraph.stream().map(cGraph -> {
                 CTree cTree = new CTree(cGraph, types, ignoredEdges);
-                return new BCTree(cTree, range);
+                return new BCTree(cTree, range, activeNodes);
             }).toList();
 
             Iterator<BCTree> itBCTree = bcTrees.iterator();

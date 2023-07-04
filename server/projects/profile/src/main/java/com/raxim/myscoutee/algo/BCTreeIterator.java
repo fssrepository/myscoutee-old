@@ -12,16 +12,18 @@ import com.raxim.myscoutee.algo.dto.Range;
 
 public class BCTreeIterator implements Iterator<CGroup> {
 
+    private final BCTree bcTree;
     private final Range range;
     private final CTreeIterator cTreeIterator;
 
     private CGroup cGroup = new CGroup();
     private CGroup cTree = new CGroup();
 
-    public BCTreeIterator(CTreeIterator cTreeIterator,
+    public BCTreeIterator(BCTree bcTree,
             final Range range) {
 
-        this.cTreeIterator = cTreeIterator;
+        this.bcTree = bcTree;
+        this.cTreeIterator = (CTreeIterator) bcTree.getcTree().iterator();
 
         int min = range.getMin() < 2 ? 2 : range.getMin() + (range.getMin() % cTreeIterator.getTypes().size());
         int max = range.getMax() - (range.getMax() % cTreeIterator.getTypes().size());
@@ -58,8 +60,12 @@ public class BCTreeIterator implements Iterator<CGroup> {
             } while ((edge.getFrom() == null || edge.getTo() == null)
                     && cTreeIterator.hasNext());
 
-            cGroup.add(from);
-            cGroup.add(to);
+            if (!bcTree.getUsedNodes().contains(from)) {
+                cGroup.add(from);
+            }
+            if (!bcTree.getUsedNodes().contains(to)) {
+                cGroup.add(to);
+            }
             cTree.addAll(cGroup);
         }
         // System.out.println(cGroup);
