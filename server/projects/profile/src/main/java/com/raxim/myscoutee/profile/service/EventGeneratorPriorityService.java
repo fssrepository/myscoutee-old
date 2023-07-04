@@ -75,8 +75,9 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
 
             // status "P"
             // update members who deleted their profiles
-            LocalDateTime validUntil = LocalDateTime.now().minus(event.getEvent().getRule().getMemberGrace(),
-                    ChronoUnit.MINUTES);
+            LocalDateTime validUntil = LocalDateTime.now()
+                    .minus(event.getEvent().getRule().getMemberGrace(),
+                            ChronoUnit.MINUTES);
 
             Set<Member> members = event.getEvent().getMembers().stream().map(member -> {
                 Profile profile = nodes.get(member.getProfile().getId().toString());
