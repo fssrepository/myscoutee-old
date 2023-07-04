@@ -1,9 +1,7 @@
 package com.raxim.myscoutee.profile.controller;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -13,28 +11,22 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
-import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
-import com.raxim.myscoutee.profile.data.document.mongo.FormItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.document.mongo.Setting;
-import com.raxim.myscoutee.profile.data.document.mongo.User;
 import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventItemDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
+import com.raxim.myscoutee.profile.handler.EventParamHandler;
+import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
@@ -42,7 +34,7 @@ import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.repository.mongo.SettingRepository;
 import com.raxim.myscoutee.profile.service.EventService;
-import com.raxim.myscoutee.profile.util.EventItemUtil;
+import com.raxim.myscoutee.profile.util.EventUtil;
 
 @RepositoryRestController
 @RequestMapping("activity")
@@ -55,11 +47,12 @@ public class ActivityRestController {
     private final EventService eventService;
     private final PromotionRepository promotionRepository;
     private final GroupRepository groupRepository;
+    private final ParamHandlers paramHandlers;
 
     public ActivityRestController(ProfileRepository profileRepository, EventRepository eventRepository,
             EventItemRepository eventItemRepository,
             SettingRepository settingRepository, EventService eventService, PromotionRepository promotionRepository,
-            GroupRepository groupRepository) {
+            GroupRepository groupRepository, ParamHandlers paramHandlers) {
         this.profileRepository = profileRepository;
         this.eventRepository = eventRepository;
         this.eventItemRepository = eventItemRepository;
@@ -67,55 +60,17 @@ public class ActivityRestController {
         this.eventService = eventService;
         this.promotionRepository = promotionRepository;
         this.groupRepository = groupRepository;
+        this.paramHandlers = paramHandlers;
     }
 
-    //TODO: to be fixed
-    /*@GetMapping("events")
+    @GetMapping("events")
     @Transactional
-    public ResponseEntity<Object> getEvents(@RequestParam(value = "step", required = false) String pStep,
-            @RequestParam(value = "direction", required = false, defaultValue = "1") Integer direction,
-            @RequestParam(value = "offset", required = false) String[] offset,
-            Authentication auth) {
-
+    public ResponseEntity<Object> getEvents(PageParam pageParam, Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        User user = principal.getUser();
-        Profile profile = user.getProfile();
+        Profile profile = principal.getUser().getProfile();
 
-        Setting setting = settingRepository.findSettingByProfileAndKey(profile.getId(), "/activity/events");
-
-        String step = pStep;
-        if (setting != null) {
-            FormItem group = setting.getItems().stream()
-                    .filter(item -> item.getName().equals("group"))
-                    .findFirst().orElse(null);
-
-            if (group != null) {
-                Integer key = ((ArrayList<Integer>) group.getData()).get(0);
-                step = setting.getItems().get(0).getOptions().get(key).getValue();
-            }
-        }
-
-        String[] tOffset;
-        if (offset != null && offset.length == 2) {
-            if (step.equals("m")) {
-                LocalDateTime from = LocalDate.parse(CommonUtil.decode(offset[0]), DateTimeFormatter.ISO_DATE_TIME)
-                        .withDayOfMonth(1).atStartOfDay();
-                String fromFormatted = from.format(DateTimeFormatter.ISO_DATE_TIME);
-
-                tOffset = new String[] { fromFormatted, CommonUtil.decode(offset[1]) };
-            } else {
-                tOffset = new String[] { CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]) };
-            }
-        } else {
-            if (step.equals("m")) {
-                LocalDateTime from = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-                String fromFormatted = from.format(DateTimeFormatter.ISO_DATE_TIME);
-                tOffset = new String[] { fromFormatted, "1900-01-01" };
-            } else {
-                tOffset = new String[] { LocalDate.now().atStartOfDay().format(DateTimeFormatter.ISO_DATE_TIME),
-                        "1900-01-01" };
-            }
-        }
+        //override page param
+        pageParam = paramHandlers.handle(profile, pageParam, EventParamHandler.EVENT);
 
         if (profile.getPosition() != null) {
             List<EventDTO> events = eventService.getEvents(step, direction, tOffset, profile.getId(),
@@ -128,60 +83,78 @@ public class ActivityRestController {
         } else {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
         }
-    }*/
+    }
 
-    //TODO: to be fixed 
-    /*@PostMapping("events")
-    @Transactional
-    public ResponseEntity<EventDTO> createEvent(@RequestBody EventItem eventItem, Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-        return EventItemUtil.save(eventService, eventItem, profile, false);
-    }*/
+    // TODO: to be fixed
+    /*
+     * @PostMapping("events")
+     * 
+     * @Transactional
+     * public ResponseEntity<EventDTO> createEvent(@RequestBody EventItem eventItem,
+     * Authentication auth) {
+     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+     * Profile profile = principal.getUser().getProfile();
+     * return EventItemUtil.save(eventService, eventItem, profile, false);
+     * }
+     */
 
-    //TODO: to be fixed 
-    /*@PatchMapping("events/{id}")
-    @Transactional
-    public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody EventItem eventItem,
-            Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-        return EventItemUtil.update(eventService, eventItem, id, profile);
-    }*/
+    // TODO: to be fixed
+    /*
+     * @PatchMapping("events/{id}")
+     * 
+     * @Transactional
+     * public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody
+     * EventItem eventItem,
+     * Authentication auth) {
+     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+     * Profile profile = principal.getUser().getProfile();
+     * return EventItemUtil.update(eventService, eventItem, id, profile);
+     * }
+     */
 
-    //TODO: to be fixed 
-    /*@PostMapping("events/{id}/items")
-    public ResponseEntity<EventItemDTO> addItem(@PathVariable String id, @RequestBody EventItem eventItem,
-            Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-        return EventItemUtil.save(eventService, eventItem, id, profile);
-    }*/
+    // TODO: to be fixed
+    /*
+     * @PostMapping("events/{id}/items")
+     * public ResponseEntity<EventItemDTO> addItem(@PathVariable String
+     * id, @RequestBody EventItem eventItem,
+     * Authentication auth) {
+     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+     * Profile profile = principal.getUser().getProfile();
+     * return EventItemUtil.save(eventService, eventItem, id, profile);
+     * }
+     */
 
-    //TODO: to be fixed 
-    /*@PatchMapping("events/{id}/items/{itemId}")
-    public ResponseEntity<EventItemDTO> patchItem(@PathVariable String id, @PathVariable String itemId,
-            @RequestBody EventItem eventItem, Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-        return EventItemUtil.update(eventService, eventItem, id, itemId, profile);
-    }*/
+    // TODO: to be fixed
+    /*
+     * @PatchMapping("events/{id}/items/{itemId}")
+     * public ResponseEntity<EventItemDTO> patchItem(@PathVariable String
+     * id, @PathVariable String itemId,
+     * 
+     * @RequestBody EventItem eventItem, Authentication auth) {
+     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+     * Profile profile = principal.getUser().getProfile();
+     * return EventItemUtil.update(eventService, eventItem, id, itemId, profile);
+     * }
+     */
 
     // delete date align
-    //TODO: to be fixed
-    /*@DeleteMapping("events/{id}/items/{itemId}")
-    public ResponseEntity<Object> deleteItem(@PathVariable String id, @PathVariable String itemId) {
-        Event event = eventRepository.findById(UUID.fromString(id)).get();
-        if (event.getInfo().getId().equals(UUID.fromString(itemId))) {
-            return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.first_item"));
-        }
-
-        EventItem item = eventItemRepository.findById(UUID.fromString(itemId)).get();
-        item.setStatus("D");
-        eventItemRepository.save(item);
-
-        return ResponseEntity.noContent().build();
-    }*/
+    // TODO: to be fixed
+    /*
+     * @DeleteMapping("events/{id}/items/{itemId}")
+     * public ResponseEntity<Object> deleteItem(@PathVariable String
+     * id, @PathVariable String itemId) {
+     * Event event = eventRepository.findById(UUID.fromString(id)).get();
+     * if (event.getInfo().getId().equals(UUID.fromString(itemId))) {
+     * return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.first_item"));
+     * }
+     * 
+     * EventItem item = eventItemRepository.findById(UUID.fromString(itemId)).get();
+     * item.setStatus("D");
+     * eventItemRepository.save(item);
+     * 
+     * return ResponseEntity.noContent().build();
+     * }
+     */
 
     @GetMapping(value = { "events/{id}/items", "invitations/{id}/items", "promotions/{id}/items" })
     public ResponseEntity<PageDTO<EventItemDTO>> items(@PathVariable String id,
@@ -201,15 +174,19 @@ public class ActivityRestController {
         return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }
 
-    //TODO: to be fixed
-    /*@PostMapping("events/{id}/recommend")
-    public ResponseEntity<EventDTO> recommend(@PathVariable String id,
-            @RequestParam(value = "step", required = false) Integer step) {
-        Optional<EventDTO> eventDto = eventService.recommendEvent(UUID.fromString(id));
-
-        return eventDto.map(event -> ResponseEntity.ok(event))
-                .orElse(ResponseEntity.badRequest().build());
-    }*/
+    // TODO: to be fixed
+    /*
+     * @PostMapping("events/{id}/recommend")
+     * public ResponseEntity<EventDTO> recommend(@PathVariable String id,
+     * 
+     * @RequestParam(value = "step", required = false) Integer step) {
+     * Optional<EventDTO> eventDto =
+     * eventService.recommendEvent(UUID.fromString(id));
+     * 
+     * return eventDto.map(event -> ResponseEntity.ok(event))
+     * .orElse(ResponseEntity.badRequest().build());
+     * }
+     */
 
     @GetMapping("invitations")
     @Transactional

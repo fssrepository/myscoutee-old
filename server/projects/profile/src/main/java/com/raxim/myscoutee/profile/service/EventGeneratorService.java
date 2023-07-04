@@ -33,6 +33,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
+import com.raxim.myscoutee.profile.service.iface.IEventGeneratorService;
 import com.raxim.myscoutee.profile.util.AppConstants;
 import com.raxim.myscoutee.profile.util.EventUtil;
 

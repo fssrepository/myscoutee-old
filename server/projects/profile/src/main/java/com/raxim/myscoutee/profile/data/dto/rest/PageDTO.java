@@ -1,10 +1,10 @@
 package com.raxim.myscoutee.profile.data.dto.rest;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
-
-import java.util.List;
 
 @JsonRootName("page")
 public class PageDTO<T> {
@@ -23,17 +23,19 @@ public class PageDTO<T> {
     @JsonProperty(value = "role")
     private Object role;
 
-    public PageDTO(List<T> values, List<Object> offset, Integer scroll, Object step) {
-        this.values = values;
-        this.offset = offset;
-        this.scroll = scroll;
-        this.step = step;
+    public PageDTO() {
+    }
+
+    public PageDTO(List<T> values, List<Object> offset) {
+        this(values, offset, null);
     }
 
     public PageDTO(List<T> values, List<Object> offset, Integer scroll) {
-        this.values = values;
-        this.offset = offset;
-        this.scroll = scroll;
+        this(values, offset, scroll, null);
+    }
+
+    public PageDTO(List<T> values, List<Object> offset, Integer scroll, Object step) {
+        this(values, offset, scroll, step, null);
     }
 
     public PageDTO(List<T> values, List<Object> offset, Integer scroll, Object step, Object role) {
@@ -42,14 +44,6 @@ public class PageDTO<T> {
         this.scroll = scroll;
         this.step = step;
         this.role = role;
-    }
-
-    public PageDTO(List<T> values, List<Object> offset) {
-        this.values = values;
-        this.offset = offset;
-    }
-
-    public PageDTO() {
     }
 
     public List<T> getValues() {

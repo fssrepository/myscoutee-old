@@ -1,4 +1,4 @@
-package com.raxim.myscoutee.profile.service;
+package com.raxim.myscoutee.profile.service.iface;
 
 import java.util.List;
 

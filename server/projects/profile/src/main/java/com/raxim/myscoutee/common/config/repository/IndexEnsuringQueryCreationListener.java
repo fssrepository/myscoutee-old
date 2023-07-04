@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -30,7 +29,8 @@ import org.springframework.util.ReflectionUtils;
 import com.mongodb.MongoException;
 
 /**
- * {@link QueryCreationListener} inspecting {@link PartTreeMongoQuery}s and creating an index for the properties it
+ * {@link QueryCreationListener} inspecting {@link PartTreeMongoQuery}s and
+ * creating an index for the properties it
  * refers to.
  *
  * @author Oliver Gierke
@@ -45,7 +45,8 @@ public class IndexEnsuringQueryCreationListener implements QueryCreationListener
 	private final IndexOperationsProvider indexOperationsProvider;
 
 	/**
-	 * Creates a new {@link IndexEnsuringQueryCreationListener} using the given {@link MongoOperations}.
+	 * Creates a new {@link IndexEnsuringQueryCreationListener} using the given
+	 * {@link MongoOperations}.
 	 *
 	 * @param indexOperationsProvider must not be {@literal null}.
 	 */
@@ -104,13 +105,17 @@ public class IndexEnsuringQueryCreationListener implements QueryCreationListener
 			if (e.getCause() instanceof MongoException mongoException) {
 
 				/*
-				 * As of MongoDB 4.2 index creation raises an error when creating an index for the very same keys with
+				 * As of MongoDB 4.2 index creation raises an error when creating an index for
+				 * the very same keys with
 				 * different name, whereas previous versions silently ignored this.
-				 * Because an index is by default named after the repository finder method it is not uncommon that an index
-				 * for the very same property combination might already exist with a different name.
+				 * Because an index is by default named after the repository finder method it is
+				 * not uncommon that an index
+				 * for the very same property combination might already exist with a different
+				 * name.
 				 * So you see, that's why we need to ignore the error here.
 				 *
-				 * For details please see: https://docs.mongodb.com/master/release-notes/4.2-compatibility/#indexes
+				 * For details please see:
+				 * https://docs.mongodb.com/master/release-notes/4.2-compatibility/#indexes
 				 */
 				if (mongoException.getCode() != 85) {
 					throw e;
@@ -125,7 +130,6 @@ public class IndexEnsuringQueryCreationListener implements QueryCreationListener
 
 	public boolean isIndexOnUnwrappedType(Part part) {
 
-		// TODO we could do it for nested fields in the
 		Field field = ReflectionUtils.findField(part.getProperty().getOwningType().getType(),
 				part.getProperty().getSegment());
 

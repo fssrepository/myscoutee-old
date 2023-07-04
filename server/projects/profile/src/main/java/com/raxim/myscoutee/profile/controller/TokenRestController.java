@@ -1,6 +1,5 @@
 package com.raxim.myscoutee.profile.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,7 +22,6 @@ public class TokenRestController {
     private final TokenRepository tokenRepository;
     private final ObjectMapper objectMapper;
 
-    @Autowired
     public TokenRestController(TokenRepository tokenRepository, ObjectMapper objectMapper) {
         this.tokenRepository = tokenRepository;
         this.objectMapper = objectMapper;

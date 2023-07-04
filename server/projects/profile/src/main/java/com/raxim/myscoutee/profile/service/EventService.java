@@ -25,6 +25,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventItemDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.MemberRepository;
@@ -61,33 +62,34 @@ public class EventService {
         return eventRepository.findTokensByEvent(refIds);
     }
 
-    //TODO: to be fixed
-    /*public List<EventDTO> getEvents(String step, Integer direction, String[] tOffset,
+    public List<EventDTO> getEvents(PageParam pageParam,
             UUID profileId, String[] status) {
         List<EventDTO> events = Collections.emptyList();
 
-        if (step == null || step.equals("d")) {
-            if (direction == 1) {
-                events = eventRepository.findEventDown(profileId, 20, 5, "%Y-%m-%d", status, tOffset, "A");
+        if (pageParam.getStep() == null || pageParam.getStep().equals("d")) {
+            if (pageParam.getDirection() == 1) {
+                events = eventRepository.findEventDown(profileId, 20, 5, "%Y-%m-%d", status, pageParam.getOffset(),
+                        "A");
             } else {
-                events = eventRepository.findEventUp(profileId, 20, 5, "%Y-%m-%d", status, tOffset, "A");
+                events = eventRepository.findEventUp(profileId, 20, 5, "%Y-%m-%d", status, pageParam.getOffset(), "A");
             }
         } else {
-            if (step.equals("w")) {
-                events = eventRepository.findEventDown(profileId, 20, 5, "%Y %U", status, tOffset, "A");
-            } else if (step.equals("m")) {
-                LocalDateTime from = LocalDate.parse(tOffset[0], DateTimeFormatter.ISO_DATE_TIME)
+            if (pageParam.getStep().equals("w")) {
+                events = eventRepository.findEventDown(profileId, 20, 5, "%Y %U", status, pageParam.getOffset(), "A");
+            } else if (pageParam.getStep().equals("m")) {
+                LocalDateTime from = LocalDate.parse(pageParam.getOffset()[0], DateTimeFormatter.ISO_DATE_TIME)
                         .withDayOfMonth(1).atStartOfDay();
                 LocalDateTime until = from.plusMonths(1);
+                String untilS = until.format(DateTimeFormatter.ISO_DATE_TIME);
 
                 events = eventRepository.findEventByMonth(profileId, 20, 5, "%Y-%m", status,
-                        until.format(DateTimeFormatter.ISO_DATE_TIME), tOffset, "A");
+                        untilS, pageParam.getOffset(), "A");
 
                 events = events.stream().map(event -> {
                     String[] dateParts = event.getGroupKey().toString().split("-");
                     event.setGroupKey(dateParts[0] + " " + CommonUtil.months[Integer.parseInt(dateParts[1]) - 1]);
 
-                    RangeLocal range = event.getEvent().getInfo().getRange();
+                    RangeLocal range = event.getEvent().getRange();
                     if (range != null) {
                         LocalDateTime start = range.getStart();
                         if (start.isBefore(from)) {
@@ -97,145 +99,166 @@ public class EventService {
                         if (end.isAfter(until)) {
                             end = until.minusSeconds(1);
                         }
-                        event.getEvent().getInfo().setRange(new RangeLocal(start, end));
+                        event.getEvent().setRange(new RangeLocal(start, end));
                     }
                     return event;
                 }).collect(Collectors.toList());
             }
         }
         return events;
-    }*/
+    }
 
-    //TODO: to be fixed
-    /*public Optional<Event> cloneEvent(UUID eventId, Profile profile) {
-        Optional<Event> eventRes = eventRepository.findById(eventId);
+    // TODO: to be fixed
+    /*
+     * public Optional<Event> cloneEvent(UUID eventId, Profile profile) {
+     * Optional<Event> eventRes = eventRepository.findById(eventId);
+     * 
+     * if (eventRes.isPresent()) {
+     * Event clonedEvent = EventUtil.cloneBy(eventRes.get(), profile, null, false,
+     * objectMapper);
+     * 
+     * memberRepository.saveAll(clonedEvent.getInfo().getMembers());
+     * eventItemRepository.saveAll(clonedEvent.getItems());
+     * Event savedEvent = eventRepository.save(clonedEvent);
+     * return Optional.of(savedEvent);
+     * } else {
+     * return Optional.empty();
+     * }
+     * }
+     */
 
-        if (eventRes.isPresent()) {
-            Event clonedEvent = EventUtil.cloneBy(eventRes.get(), profile, null, false, objectMapper);
+    // TODO: to be fixed
+    /*
+     * public Optional<EventDTO> recommendEvent(UUID eventId) {
+     * Optional<Event> eventRes = eventRepository.findById(eventId);
+     * 
+     * if (eventRes.isPresent()) {
+     * EventDTO eventDto;
+     * 
+     * Event event = eventRes.get();
+     * List<EventItem> items = event.getItems().stream()
+     * .filter(item -> !"pr".equals(item.getType()) &&
+     * !"D".equals(item.getStatus()))
+     * .map(item -> {
+     * EventItem eventItem = JsonUtil.clone(item, objectMapper);
+     * eventItem.setId(UUID.randomUUID());
+     * return eventItem;
+     * })
+     * .collect(Collectors.toList());
+     * event.setItems(eventItemRepository.saveAll(items));
+     * 
+     * event.getInfo().setMembers(new HashSet<>());
+     * 
+     * Event clonedEvent = JsonUtil.clone(event, objectMapper);
+     * clonedEvent.setId(UUID.randomUUID());
+     * clonedEvent.setStatus("U");
+     * clonedEvent.setRef(event);
+     * // clonedEvent.setCreatedDate(LocalDateTime.now());
+     * 
+     * Event savedEvent = eventRepository.save(clonedEvent);
+     * 
+     * LocalDate groupKey =
+     * savedEvent.getInfo().getRange().getStart().toLocalDate();
+     * Long sortKey =
+     * savedEvent.getInfo().getRange().getStart().toInstant(ZoneOffset.UTC).
+     * toEpochMilli();
+     * 
+     * eventDto = new EventDTO(savedEvent, groupKey, sortKey);
+     * 
+     * return Optional.of(eventDto);
+     * } else {
+     * return Optional.empty();
+     * }
+     * }
+     */
 
-            memberRepository.saveAll(clonedEvent.getInfo().getMembers());
-            eventItemRepository.saveAll(clonedEvent.getItems());
-            Event savedEvent = eventRepository.save(clonedEvent);
-            return Optional.of(savedEvent);
-        } else {
-            return Optional.empty();
-        }
-    }*/
+    // TODO: to be fixed
+    /*
+     * public Optional<Event> getEvent(EventItem eventItem, Profile profile, String
+     * status) {
+     * return getEvent(eventItem, profile, status, null, false);
+     * }
+     */
 
-    //TODO: to be fixed
-    /*public Optional<EventDTO> recommendEvent(UUID eventId) {
-        Optional<Event> eventRes = eventRepository.findById(eventId);
+    // TODO: to be fixed
+    /*
+     * public Optional<Event> getEvent(EventItem eventItem, Profile profile, String
+     * status,
+     * UUID eventId, boolean isUpdate) {
+     * Optional<Event> eventRes = eventId != null ?
+     * eventRepository.findById(eventId) : Optional.empty();
+     * 
+     * if (eventRes.isPresent()) {
+     * Event event = eventRes.get();
+     * 
+     * if (isUpdate) {
+     * if (eventItem.getId() != null) {
+     * EventItem item = event.getItems().stream()
+     * .filter(i -> i.getId().equals(eventItem.getId()))
+     * .findFirst()
+     * .orElse(null);
+     * if (item != null) {
+     * return Optional.of(event);
+     * } else {
+     * return Optional.empty();
+     * }
+     * } else {
+     * return Optional.empty();
+     * }
+     * } else {
+     * return Optional.of(event);
+     * }
+     * } else {
+     * if (!isUpdate) {
+     * Event event = new Event();
+     * event.setInfo(eventItem);
+     * event.setPosition(eventItem.getPosition());
+     * event.setGroup(profile.getGroup());
+     * event.setStatus(status);
+     * event.setCreatedBy(profile.getId());
+     * event.setCreatedDate(LocalDateTime.now());
+     * return Optional.of(event);
+     * } else {
+     * return Optional.empty();
+     * }
+     * }
+     * }
+     */
 
-        if (eventRes.isPresent()) {
-            EventDTO eventDto;
-
-            Event event = eventRes.get();
-            List<EventItem> items = event.getItems().stream()
-                    .filter(item -> !"pr".equals(item.getType()) && !"D".equals(item.getStatus()))
-                    .map(item -> {
-                        EventItem eventItem = JsonUtil.clone(item, objectMapper);
-                        eventItem.setId(UUID.randomUUID());
-                        return eventItem;
-                    })
-                    .collect(Collectors.toList());
-            event.setItems(eventItemRepository.saveAll(items));
-
-            event.getInfo().setMembers(new HashSet<>());
-
-            Event clonedEvent = JsonUtil.clone(event, objectMapper);
-            clonedEvent.setId(UUID.randomUUID());
-            clonedEvent.setStatus("U");
-            clonedEvent.setRef(event);
-            // clonedEvent.setCreatedDate(LocalDateTime.now());
-
-            Event savedEvent = eventRepository.save(clonedEvent);
-
-            LocalDate groupKey = savedEvent.getInfo().getRange().getStart().toLocalDate();
-            Long sortKey = savedEvent.getInfo().getRange().getStart().toInstant(ZoneOffset.UTC).toEpochMilli();
-
-            eventDto = new EventDTO(savedEvent, groupKey, sortKey);
-
-            return Optional.of(eventDto);
-        } else {
-            return Optional.empty();
-        }
-    }*/
-
-    //TODO: to be fixed
-    /*public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status) {
-        return getEvent(eventItem, profile, status, null, false);
-    }*/
-
-    //TODO: to be fixed
-    /*public Optional<Event> getEvent(EventItem eventItem, Profile profile, String status,
-            UUID eventId, boolean isUpdate) {
-        Optional<Event> eventRes = eventId != null ? eventRepository.findById(eventId) : Optional.empty();
-
-        if (eventRes.isPresent()) {
-            Event event = eventRes.get();
-
-            if (isUpdate) {
-                if (eventItem.getId() != null) {
-                    EventItem item = event.getItems().stream()
-                            .filter(i -> i.getId().equals(eventItem.getId()))
-                            .findFirst()
-                            .orElse(null);
-                    if (item != null) {
-                        return Optional.of(event);
-                    } else {
-                        return Optional.empty();
-                    }
-                } else {
-                    return Optional.empty();
-                }
-            } else {
-                return Optional.of(event);
-            }
-        } else {
-            if (!isUpdate) {
-                Event event = new Event();
-                event.setInfo(eventItem);
-                event.setPosition(eventItem.getPosition());
-                event.setGroup(profile.getGroup());
-                event.setStatus(status);
-                event.setCreatedBy(profile.getId());
-                event.setCreatedDate(LocalDateTime.now());
-                return Optional.of(event);
-            } else {
-                return Optional.empty();
-            }
-        }
-    }*/
-
-    //TODO: to be fixed
-    /*public Optional<Pair<Event, EventItem>> saveEvent(Event pEvent, EventItem pEventItem) {
-        Event event = pEvent;
-        EventItem eventItem = event.getItems().stream()
-                .filter(item -> pEventItem.getId().equals(item.getId()))
-                .findFirst()
-                .orElse(null);
-        if (eventItem == null) {
-            event.getItems().add(pEventItem);
-        }
-
-        event.getItems().sort(Comparator.comparing(item -> item.getRange().getStart()));
-        event.setPositions(event.getItems().stream().map(EventItem::getPosition).collect(Collectors.toList()));
-
-        event = EventUtil.shiftBy(event, pEventItem, objectMapper);
-
-        List<EventItem> eventItems = eventItemRepository.saveAll(event.getItems());
-
-        event = JsonUtil.clone(event, objectMapper);
-        event.setItems(eventItems);
-
-        event = eventRepository.save(event);
-        eventItem = eventItems.stream()
-                .filter(item -> item.getId().equals(pEventItem.getId()))
-                .findFirst()
-                .orElse(null);
-
-        return Optional.of(Pair.of(event, eventItem));
-    }*/
+    // TODO: to be fixed
+    /*
+     * public Optional<Pair<Event, EventItem>> saveEvent(Event pEvent, EventItem
+     * pEventItem) {
+     * Event event = pEvent;
+     * EventItem eventItem = event.getItems().stream()
+     * .filter(item -> pEventItem.getId().equals(item.getId()))
+     * .findFirst()
+     * .orElse(null);
+     * if (eventItem == null) {
+     * event.getItems().add(pEventItem);
+     * }
+     * 
+     * event.getItems().sort(Comparator.comparing(item ->
+     * item.getRange().getStart()));
+     * event.setPositions(event.getItems().stream().map(EventItem::getPosition).
+     * collect(Collectors.toList()));
+     * 
+     * event = EventUtil.shiftBy(event, pEventItem, objectMapper);
+     * 
+     * List<EventItem> eventItems = eventItemRepository.saveAll(event.getItems());
+     * 
+     * event = JsonUtil.clone(event, objectMapper);
+     * event.setItems(eventItems);
+     * 
+     * event = eventRepository.save(event);
+     * eventItem = eventItems.stream()
+     * .filter(item -> item.getId().equals(pEventItem.getId()))
+     * .findFirst()
+     * .orElse(null);
+     * 
+     * return Optional.of(Pair.of(event, eventItem));
+     * }
+     */
 
     public List<EventItemDTO> getEventItems(UUID eventId, Integer step, Object[] tOffset, UUID profileId) {
         return eventRepository.findItemsByEvent(eventId, 20, step != null ? step : 5, "%Y-%m-%d", profileId, tOffset);
