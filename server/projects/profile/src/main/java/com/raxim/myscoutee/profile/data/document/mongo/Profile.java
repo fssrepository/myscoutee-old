@@ -3,6 +3,7 @@ package com.raxim.myscoutee.profile.data.document.mongo;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -20,6 +21,9 @@ import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 
 @Document(collection = "profiles")
 public class Profile implements Cloneable {
+
+    public static final Set<String> ACTIVE = Set.of("A", "F");
+
     @Id
     @JsonProperty(value = "key")
     private UUID id;

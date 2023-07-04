@@ -8,21 +8,11 @@
         }
     },
     {
-        "$match": {
-            "profileFrom.status": "A"
-        }
-    },
-    {
         "$lookup": {
             "from": "profiles",
             "localField": "to.$id",
             "foreignField": "_id",
             "as": "profileTo"
-        }
-    },
-    {
-        "$match": {
-            "profileTo.status": "A"
         }
     },
     {

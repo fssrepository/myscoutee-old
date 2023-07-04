@@ -232,6 +232,15 @@ public class UserGroupRestController {
         return ResponseEntity.ok(new UserDTO(userSaved, groups, likes));
     }
 
+    /*
+     * if ("A".equals(member.getStatus())) {
+                        member.setStatus("LD");
+                    } else if ("I".equals(member.getStatus())) {
+                        member.setStatus("RD");
+                    } else {
+                        member.setStatus("D");
+                    }
+     */
     // Suspend/activate account from a group or all groups managed by a particular
     // user
     @PatchMapping("/groups/{groupId}/profiles/{profileId}")

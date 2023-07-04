@@ -64,4 +64,9 @@ public class LikeGroup {
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return "LikeGroup [_id=" + _id + ", likes=" + likes + "]";
+    }
 }

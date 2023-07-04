@@ -2,6 +2,7 @@ package com.raxim.myscoutee.profile.service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +49,6 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
         }).filter(like -> like != null).toList();
 
         // nodes
-        // nodes should be with status 'A' or 'F'
         Map<String, Profile> nodes = new HashMap<>();
         likesBoth.forEach(likeBoth -> {
             nodes.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
@@ -62,6 +62,17 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
             double weight = (double) likeBoth.getRate();
             return new Edge(fromNode, toNode, weight);
         }).toList();
+
+        // ignoring edges, where the profile is not with status 'A' or F
+        Set<Edge> ignoredEdgesByStatus = likesBoth.stream()
+                .filter(ignoredLike -> !Profile.ACTIVE.contains(ignoredLike.getFrom().getStatus())
+                        || !Profile.ACTIVE.contains(ignoredLike.getTo().getStatus()))
+                .map(likeBoth -> {
+                    Node fromNode = new Node(likeBoth.getFrom().getId().toString(), likeBoth.getFrom().getGender());
+                    Node toNode = new Node(likeBoth.getTo().getId().toString(), likeBoth.getTo().getGender());
+                    double weight = (double) (likeBoth.getRate() * likeBoth.getDistance());
+                    return new Edge(fromNode, toNode, weight);
+                }).collect(Collectors.toSet());
 
         List<EventWithCandidates> eventWithCandidates = this.eventRepository.findCandidates();
 
@@ -80,16 +91,7 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
                             ChronoUnit.MINUTES);
 
             Set<Member> members = event.getEvent().getMembers().stream().map(member -> {
-                Profile profile = nodes.get(member.getProfile().getId().toString());
-                if (!"A".equals(profile.getStatus()) && !"F".equals(profile.getStatus())) {
-                    if ("A".equals(member.getStatus())) {
-                        member.setStatus("LD");
-                    } else if ("I".equals(member.getStatus())) {
-                        member.setStatus("RD");
-                    } else {
-                        member.setStatus("D");
-                    }
-                } else if ("I".equals(member.getStatus())
+                if ("I".equals(member.getStatus())
                         && member.getCreatedDate().isBefore(validUntil)) {
                     member.setStatus("T");
                 }
@@ -106,13 +108,9 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
                             edge.getWeight() >= rule.getRate())
                     .toList();
             tIgnoredEdges.addAll(tIgnoredEdgesByRate);
-            List<Set<Edge>> ignoredEdges = List.of(tIgnoredEdges);
+            List<Set<Edge>> ignoredEdges = List.of(tIgnoredEdges, ignoredEdgesByStatus);
 
-            Set<Member> validCandidates = event.getCandidates().stream()
-                    .filter(candidate -> "A".equals(candidate.getStatus())
-                            || "F".equals(candidate.getStatus()))
-                    .collect(Collectors.toSet());
-            Set<Edge> possibleEdges = EventUtil.permutate(validCandidates);
+            Set<Edge> possibleEdges = EventUtil.permutate(event.getCandidates());
 
             List<Edge> validEdges = edges.stream()
                     .filter(edge -> possibleEdges.contains(edge))

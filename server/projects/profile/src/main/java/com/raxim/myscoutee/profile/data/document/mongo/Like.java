@@ -179,4 +179,9 @@ public class Like {
     public void setRef(UUID ref) {
         this.ref = ref;
     }
+
+    @Override
+    public String toString() {
+        return "Like [id=" + id + ", from=" + from + ", to=" + to + "]";
+    }
 }
