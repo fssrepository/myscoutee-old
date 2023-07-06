@@ -174,6 +174,7 @@ public class UserGroupRestController {
         return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }*/
 
+    //TODO: group event, anyone from the group can join -> meetup.com style (only admin can create)
     @PostMapping("/groups/{id}/events/{eventId}/publish")
     public ResponseEntity<EventDTO> publish(@PathVariable String eventId, Authentication auth) {
         Event event = eventRepository.findById(UUID.fromString(eventId)).get();
