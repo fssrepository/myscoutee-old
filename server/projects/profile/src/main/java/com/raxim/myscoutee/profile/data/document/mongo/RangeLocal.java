@@ -15,6 +15,13 @@ public class RangeLocal {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime end;
 
+    public static RangeLocal of(LocalDateTime start, LocalDateTime end) {
+        RangeLocal rangeLocal = new RangeLocal();
+        rangeLocal.setStart(start);
+        rangeLocal.setEnd(end);
+        return rangeLocal;
+    }
+
     public RangeLocal() {
     }
 

@@ -1,5 +1,8 @@
 package com.raxim.myscoutee.profile.util;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,88 +11,14 @@ import java.util.stream.Collectors;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.common.util.CommonUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 
 public class EventUtil {
     public static final String EVENT_TYPE_PRIVATE = "pr";
     public static final String DELETED = "D";
-
-    // TODO: to be fixed
-    /*
-     * public static Event shiftBy(Event event, EventItem eventItem, ObjectMapper
-     * objectMapper) {
-     * long minutes;
-     * RangeLocal evtRange;
-     * if (eventItem.getId().equals(event.getInfo().getId())) {
-     * minutes = ChronoUnit.MINUTES.between(event.getInfo().getRange().getStart(),
-     * eventItem.getRange().getStart());
-     * evtRange = new RangeLocal(eventItem.getRange().getStart(),
-     * eventItem.getRange().getEnd());
-     * 
-     * EventItem clonedEventItem = JsonUtil.clone(eventItem, objectMapper);
-     * clonedEventItem.setRange(evtRange);
-     * clonedEventItem.setMembers(event.getInfo().getMembers());
-     * clonedEventItem.setNum(event.getInfo().getNum());
-     * event.setInfo(clonedEventItem);
-     * } else {
-     * minutes = 0L;
-     * RangeLocal maxRange = event.getItems().stream()
-     * .map(item -> item.getId().equals(eventItem.getId()) ? eventItem.getRange() :
-     * item.getRange())
-     * .reduce((acc, range) -> {
-     * LocalDateTime start = acc.getStart();
-     * if (range.getStart().isBefore(start)) {
-     * start = range.getStart();
-     * }
-     * LocalDateTime end = acc.getEnd();
-     * if (range.getEnd().isAfter(end)) {
-     * end = range.getEnd();
-     * }
-     * return new RangeLocal(start, end);
-     * })
-     * .orElse(null);
-     * evtRange = maxRange;
-     * 
-     * EventItem clonedEventItem = JsonUtil.clone(eventItem, objectMapper);
-     * clonedEventItem.setRange(evtRange);
-     * event.setInfo(clonedEventItem);
-     * }
-     * 
-     * List<EventItem> updatedItems = event.getItems().stream()
-     * .map(item -> {
-     * EventItem currItem;
-     * if (event.getItems().size() == 1 ||
-     * event.getInfo().getId().equals(item.getId())) {
-     * currItem = event.getInfo();
-     * } else if (item.getId().equals(eventItem.getId())) {
-     * EventItem clonedEventItem = JsonUtil.clone(item, objectMapper);
-     * clonedEventItem.setMembers(item.getMembers());
-     * clonedEventItem.setNum(item.getNum());
-     * currItem = clonedEventItem;
-     * } else {
-     * currItem = item;
-     * }
-     * 
-     * if (minutes > 0) {
-     * LocalDateTime start = item.getRange().getStart().plusMinutes(minutes);
-     * LocalDateTime end = item.getRange().getEnd().plusMinutes(minutes);
-     * RangeLocal range = new RangeLocal(start, end);
-     * 
-     * EventItem clonedEventItem = JsonUtil.clone(item, objectMapper);
-     * clonedEventItem.setRange(range);
-     * return clonedEventItem;
-     * } else {
-     * return currItem;
-     * }
-     * })
-     * .collect(Collectors.toList());
-     * 
-     * event.setItems(updatedItems);
-     * 
-     * return event;
-     * }
-     */
 
     // TODO: to be fixed
     /*
@@ -171,18 +100,6 @@ public class EventUtil {
      * clonedEvent.setRef(ref);
      * 
      * return clonedEvent;
-     * }
-     */
-
-    // TODO: to be fixed
-    /*
-     * public static EventDTO transform(Event event) {
-     * LocalDateTime eventStart = event.getInfo().getRange().getStart();
-     * LocalDate groupKey = eventStart != null ? eventStart.toLocalDate() : null;
-     * Long sortKey = eventStart != null ?
-     * eventStart.toInstant(ZoneOffset.UTC).toEpochMilli() : null;
-     * 
-     * return new EventDTO(event, groupKey, sortKey);
      * }
      */
 

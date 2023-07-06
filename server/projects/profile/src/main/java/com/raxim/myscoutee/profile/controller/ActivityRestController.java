@@ -8,16 +8,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
+import com.raxim.myscoutee.common.util.ControllerUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
@@ -84,76 +92,72 @@ public class ActivityRestController {
         }
     }
 
-    // TODO: to be fixed
-    /*
-     * @PostMapping("events")
-     * 
-     * @Transactional
-     * public ResponseEntity<EventDTO> createEvent(@RequestBody EventItem eventItem,
-     * Authentication auth) {
-     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-     * Profile profile = principal.getUser().getProfile();
-     * return EventItemUtil.save(eventService, eventItem, profile, false);
-     * }
-     */
+    // status needs to be filled in the event either T or P
+    @PostMapping("events")
+    @Transactional
+    public ResponseEntity<EventDTO> createEvent(@RequestBody Event event,
+            Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
 
-    // TODO: to be fixed
-    /*
-     * @PatchMapping("events/{id}")
-     * 
-     * @Transactional
-     * public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody
-     * EventItem eventItem,
-     * Authentication auth) {
-     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-     * Profile profile = principal.getUser().getProfile();
-     * return EventItemUtil.update(eventService, eventItem, id, profile);
-     * }
-     */
+        event.setStatus("P");
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.save(p, e), profile, event,
+                HttpStatus.CREATED);
+        return response;
+    }
 
-    // TODO: to be fixed
-    /*
-     * @PostMapping("events/{id}/items")
-     * public ResponseEntity<EventItemDTO> addItem(@PathVariable String
-     * id, @RequestBody EventItem eventItem,
-     * Authentication auth) {
-     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-     * Profile profile = principal.getUser().getProfile();
-     * return EventItemUtil.save(eventService, eventItem, id, profile);
-     * }
-     */
+    @PatchMapping("events/{id}")
+    @Transactional
+    public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody Event event,
+            Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
 
-    // TODO: to be fixed
-    /*
-     * @PatchMapping("events/{id}/items/{itemId}")
-     * public ResponseEntity<EventItemDTO> patchItem(@PathVariable String
-     * id, @PathVariable String itemId,
-     * 
-     * @RequestBody EventItem eventItem, Authentication auth) {
-     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-     * Profile profile = principal.getUser().getProfile();
-     * return EventItemUtil.update(eventService, eventItem, id, itemId, profile);
-     * }
-     */
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.save(p, e), profile, event,
+                HttpStatus.OK);
+        return response;
+    }
 
-    // delete date align
-    // TODO: to be fixed
-    /*
-     * @DeleteMapping("events/{id}/items/{itemId}")
-     * public ResponseEntity<Object> deleteItem(@PathVariable String
-     * id, @PathVariable String itemId) {
-     * Event event = eventRepository.findById(UUID.fromString(id)).get();
-     * if (event.getInfo().getId().equals(UUID.fromString(itemId))) {
-     * return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.first_item"));
-     * }
-     * 
-     * EventItem item = eventItemRepository.findById(UUID.fromString(itemId)).get();
-     * item.setStatus("D");
-     * eventItemRepository.save(item);
-     * 
-     * return ResponseEntity.noContent().build();
-     * }
-     */
+    @PostMapping("events/{id}/items")
+    public ResponseEntity<EventItemDTO> addItem(@PathVariable String id, @RequestBody EventItem eventItem,
+            Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
+
+        ResponseEntity<EventItemDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.saveItem(p, i, ei),
+                profile, id, eventItem,
+                HttpStatus.CREATED);
+        return response;
+    }
+
+    @PatchMapping("events/{id}/items/{itemId}")
+    public ResponseEntity<EventItemDTO> patchItem(@PathVariable String id, @PathVariable String itemId,
+            @RequestBody EventItem eventItem, Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
+
+        eventItem.setId(UUID.fromString(itemId));
+
+        ResponseEntity<EventItemDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.saveItem(p, i, ei),
+                profile, id, eventItem,
+                HttpStatus.OK);
+        return response;
+    }
+
+    @DeleteMapping("events/{id}/items/{itemId}")
+    public ResponseEntity<EventItemDTO> deleteItem(@PathVariable String id, @PathVariable String itemId,
+            Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
+
+        EventItem eventItem = new EventItem(UUID.fromString(itemId));
+        eventItem.setStatus("D");
+
+        ResponseEntity<EventItemDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.saveItem(p, i, ei),
+                profile, id, eventItem,
+                HttpStatus.NO_CONTENT);
+        return response;
+    }
 
     @GetMapping(value = { "events/{id}/items", "invitations/{id}/items", "promotions/{id}/items" })
     public ResponseEntity<PageDTO<EventItemDTO>> items(@PathVariable String id,
@@ -187,6 +191,7 @@ public class ActivityRestController {
      * }
      */
 
+    // TODO cleanup
     @GetMapping("invitations")
     @Transactional
     public ResponseEntity<?> getInvitations(@RequestParam(value = "step", required = false) Integer step,

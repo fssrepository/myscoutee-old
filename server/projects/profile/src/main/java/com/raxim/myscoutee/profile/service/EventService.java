@@ -1,13 +1,20 @@
 package com.raxim.myscoutee.profile.service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.profile.converter.Converters;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventItemDTO;
@@ -24,16 +31,18 @@ public class EventService {
     private final EventItemRepository eventItemRepository;
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
+    private final Converters converters;
 
     public EventService(EventRepository eventRepository,
             EventItemRepository eventItemRepository,
             PromotionRepository promotionRepository,
             MemberRepository memberRepository,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper, Converters converters) {
         this.eventRepository = eventRepository;
         this.eventItemRepository = eventItemRepository;
         this.memberRepository = memberRepository;
         this.objectMapper = objectMapper;
+        this.converters = converters;
     }
 
     public List<EventDTO> getEventsByStatus(String[] tOffset, UUID group, String status) {
@@ -158,93 +167,98 @@ public class EventService {
      * }
      */
 
-    // TODO: to be fixed
-    /*
-     * public Optional<Event> getEvent(EventItem eventItem, Profile profile, String
-     * status) {
-     * return getEvent(eventItem, profile, status, null, false);
-     * }
-     */
+    public Optional<EventDTO> save(Profile profile, Event pEvent) throws CloneNotSupportedException {
+        Optional<Event> eventRes = pEvent.getId() != null ? this.eventRepository.findById(pEvent.getId())
+                : Optional.empty();
 
-    // TODO: to be fixed
-    /*
-     * public Optional<Event> getEvent(EventItem eventItem, Profile profile, String
-     * status,
-     * UUID eventId, boolean isUpdate) {
-     * Optional<Event> eventRes = eventId != null ?
-     * eventRepository.findById(eventId) : Optional.empty();
-     * 
-     * if (eventRes.isPresent()) {
-     * Event event = eventRes.get();
-     * 
-     * if (isUpdate) {
-     * if (eventItem.getId() != null) {
-     * EventItem item = event.getItems().stream()
-     * .filter(i -> i.getId().equals(eventItem.getId()))
-     * .findFirst()
-     * .orElse(null);
-     * if (item != null) {
-     * return Optional.of(event);
-     * } else {
-     * return Optional.empty();
-     * }
-     * } else {
-     * return Optional.empty();
-     * }
-     * } else {
-     * return Optional.of(event);
-     * }
-     * } else {
-     * if (!isUpdate) {
-     * Event event = new Event();
-     * event.setInfo(eventItem);
-     * event.setPosition(eventItem.getPosition());
-     * event.setGroup(profile.getGroup());
-     * event.setStatus(status);
-     * event.setCreatedBy(profile.getId());
-     * event.setCreatedDate(LocalDateTime.now());
-     * return Optional.of(event);
-     * } else {
-     * return Optional.empty();
-     * }
-     * }
-     * }
-     */
+        if (!eventRes.isPresent()) {
+            Event lEvent = (Event) pEvent.clone();
+            lEvent.setId(UUID.randomUUID());
+            lEvent.setGroup(profile.getGroup());
+            lEvent.setCreatedDate(LocalDateTime.now());
+            lEvent.setCreatedBy(profile.getId());
+            lEvent.setStatus(pEvent.getStatus());
+            eventRes = Optional.of(lEvent);
+        } else {
+            Event dbEvent = eventRes.get();
+            Event lEvent = (Event) pEvent.clone();
+            lEvent.setId(dbEvent.getId());
+            lEvent.setGroup(dbEvent.getGroup());
+            lEvent.setCreatedDate(dbEvent.getCreatedDate());
+            lEvent.setCreatedBy(dbEvent.getCreatedBy());
+            lEvent.setStatus(dbEvent.getStatus());
 
-    // TODO: to be fixed
-    /*
-     * public Optional<Pair<Event, EventItem>> saveEvent(Event pEvent, EventItem
-     * pEventItem) {
-     * Event event = pEvent;
-     * EventItem eventItem = event.getItems().stream()
-     * .filter(item -> pEventItem.getId().equals(item.getId()))
-     * .findFirst()
-     * .orElse(null);
-     * if (eventItem == null) {
-     * event.getItems().add(pEventItem);
-     * }
-     * 
-     * event.getItems().sort(Comparator.comparing(item ->
-     * item.getRange().getStart()));
-     * event.setPositions(event.getItems().stream().map(EventItem::getPosition).
-     * collect(Collectors.toList()));
-     * 
-     * event = EventUtil.shiftBy(event, pEventItem, objectMapper);
-     * 
-     * List<EventItem> eventItems = eventItemRepository.saveAll(event.getItems());
-     * 
-     * event = JsonUtil.clone(event, objectMapper);
-     * event.setItems(eventItems);
-     * 
-     * event = eventRepository.save(event);
-     * eventItem = eventItems.stream()
-     * .filter(item -> item.getId().equals(pEventItem.getId()))
-     * .findFirst()
-     * .orElse(null);
-     * 
-     * return Optional.of(Pair.of(event, eventItem));
-     * }
-     */
+            lEvent.shift();
+            lEvent.sync(); // if dbEvent.range.end < dbEvent.items.range.end -> revert back
+                           // dbEvent.range.end change to dbEvent.items.range.end
+            eventRes = Optional.of(lEvent);
+        }
+
+        if (eventRes.isPresent()) {
+            Event lEvent = this.eventRepository.save(eventRes.get());
+            Optional.of((EventDTO) converters.convert(lEvent));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<EventItemDTO> saveItem(Profile profile, String eventId, EventItem pEventItem)
+            throws CloneNotSupportedException {
+        Optional<Event> eventRes = eventId != null ? this.eventRepository.findById(UUID.fromString(eventId))
+                : Optional.empty();
+
+        if (eventRes.isPresent()) {
+            Event dbEvent = eventRes.get();
+
+            Optional<EventItem> eventItemRes = dbEvent.getItems().stream()
+                    .filter(item -> pEventItem.getId().equals(item.getId()))
+                    .findFirst();
+
+            UUID eventItemId;
+            if (!eventItemRes.isPresent()) {
+                EventItem lEventItem = (EventItem) pEventItem.clone();
+                eventItemId = UUID.randomUUID();
+                lEventItem.setId(eventItemId);
+                lEventItem.setCreatedDate(LocalDateTime.now());
+                lEventItem.setCreatedBy(profile.getId());
+                lEventItem.setStatus(lEventItem.getNum() >= lEventItem.getCapacity().getMin() ? "A" : "P");
+                dbEvent.getItems().add(lEventItem);
+            } else {
+                EventItem lEventItem = (EventItem) pEventItem.clone();
+                EventItem dbEventItem = eventItemRes.get();
+
+                eventItemId = dbEventItem.getId();
+                lEventItem.setId(eventItemId);
+                lEventItem.setCreatedDate(dbEventItem.getCreatedDate());
+                lEventItem.setCreatedBy(dbEventItem.getCreatedBy());
+
+                if (!"D".equals(pEventItem.getStatus())) {
+                    lEventItem.setStatus(dbEventItem.getStatus());
+                } else {
+                    lEventItem.setStatus("D");
+                }
+
+                // event
+                dbEvent.sync();
+                dbEvent.getItems().add(lEventItem);
+            }
+
+            Set<EventItem> eventItems = new HashSet<>(eventItemRepository.saveAll(dbEvent.getItems()));
+
+            dbEvent.setItems(eventItems);
+            dbEvent = eventRepository.save(dbEvent);
+
+            Optional<EventItem> dbEventItem = dbEvent.getItems().stream()
+                    .filter(item -> item.getId().equals(eventItemId))
+                    .findFirst();
+
+            if (dbEventItem.isPresent()) {
+                EventItem lEventItem = dbEventItem.get();
+                return Optional.of((EventItemDTO) converters.convert(lEventItem));
+            }
+        }
+
+        return Optional.empty();
+    }
 
     public List<EventItemDTO> getEventItems(UUID eventId, Integer step, Object[] tOffset, UUID profileId) {
         return eventRepository.findItemsByEvent(eventId, 20, step != null ? step : 5, "%Y-%m-%d", profileId, tOffset);

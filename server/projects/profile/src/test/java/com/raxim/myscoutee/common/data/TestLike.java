@@ -1,4 +1,4 @@
-package com.raxim.myscoutee.data.mongo;
+package com.raxim.myscoutee.common.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;

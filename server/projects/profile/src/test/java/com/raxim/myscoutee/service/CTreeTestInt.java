@@ -19,7 +19,7 @@ import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.algo.AlgoLoadException;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.common.config.JsonConfig;
-import com.raxim.myscoutee.data.mongo.TestEvent;
+import com.raxim.myscoutee.common.data.TestEvent;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.util.EventUtil;
 

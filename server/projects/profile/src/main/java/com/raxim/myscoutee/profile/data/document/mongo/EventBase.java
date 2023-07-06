@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public abstract class EventBase {
+public abstract class EventBase implements Cloneable {
     @JsonProperty(value = "type")
     private String type;
 
@@ -136,4 +136,9 @@ public abstract class EventBase {
         this.createdDate = createdDate;
     }
 
+    @Override
+    protected Object clone()
+            throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

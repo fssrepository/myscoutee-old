@@ -1,19 +1,12 @@
-package com.raxim.myscoutee.data.mongo;
+package com.raxim.myscoutee.common.data;
 
-import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 
-public class TestEvent extends Event {
-    @Override
-    @JsonProperty("items")
-    public void setItems(List<EventItem> items) {
-        super.setItems(items);
-    }
+public class TestEventItem extends EventItem {
 
     @Override
     @JsonProperty("members")

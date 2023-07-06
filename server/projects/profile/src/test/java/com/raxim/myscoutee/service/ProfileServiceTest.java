@@ -35,7 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.common.config.JsonConfig;
-import com.raxim.myscoutee.data.mongo.TestProfile;
+import com.raxim.myscoutee.common.data.TestProfile;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileEventHandler;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;

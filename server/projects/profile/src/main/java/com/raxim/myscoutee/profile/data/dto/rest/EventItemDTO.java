@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -12,7 +11,7 @@ import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 
 @JsonRootName("eventItem")
-public class EventItemDTO {
+public class EventItemDTO extends PageItemDTO {
 
     @JsonProperty(value = "item")
     private com.raxim.myscoutee.profile.data.document.mongo.EventItem item;
@@ -22,9 +21,6 @@ public class EventItemDTO {
 
     @JsonProperty(value = "sortKey")
     private Object sortKey;
-
-    @JsonIgnore
-    private List<Object> offset;
 
     @JsonProperty(value = "main")
     private Boolean main;
@@ -75,14 +71,6 @@ public class EventItemDTO {
 
     public void setSortKey(Object sortKey) {
         this.sortKey = sortKey;
-    }
-
-    public List<Object> getOffset() {
-        return offset;
-    }
-
-    public void setOffset(List<Object> offset) {
-        this.offset = offset;
     }
 
     public Boolean getMain() {

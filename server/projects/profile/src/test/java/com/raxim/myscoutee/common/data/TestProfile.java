@@ -1,4 +1,4 @@
-package com.raxim.myscoutee.data.mongo;
+package com.raxim.myscoutee.common.data;
 
 import java.util.UUID;
 

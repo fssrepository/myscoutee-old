@@ -21,10 +21,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.EventItemDTO;
 import com.raxim.myscoutee.profile.service.EventService;
 
 public class EventItemUtil {
-    public static EventItemDTO transform(EventItem item) {
-        return new EventItemDTO(item, item.getType());
-    }
-
     //TODO: to be fixed
     /*public static ResponseEntity<EventDTO> save(EventService eventService, EventItem eventItem, Profile profile,
             boolean isTemplate) {
