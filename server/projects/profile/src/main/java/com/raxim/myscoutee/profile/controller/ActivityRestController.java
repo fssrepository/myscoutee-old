@@ -36,12 +36,10 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.handler.EventItemParamHandler;
 import com.raxim.myscoutee.profile.handler.EventParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
-import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
-import com.raxim.myscoutee.profile.repository.mongo.SettingRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 
 @RepositoryRestController
@@ -50,21 +48,16 @@ public class ActivityRestController {
 
     private final ProfileRepository profileRepository;
     private final EventRepository eventRepository;
-    private final EventItemRepository eventItemRepository;
-    private final SettingRepository settingRepository;
     private final EventService eventService;
     private final PromotionRepository promotionRepository;
     private final GroupRepository groupRepository;
     private final ParamHandlers paramHandlers;
 
     public ActivityRestController(ProfileRepository profileRepository, EventRepository eventRepository,
-            EventItemRepository eventItemRepository,
-            SettingRepository settingRepository, EventService eventService, PromotionRepository promotionRepository,
+            EventService eventService, PromotionRepository promotionRepository,
             GroupRepository groupRepository, ParamHandlers paramHandlers) {
         this.profileRepository = profileRepository;
         this.eventRepository = eventRepository;
-        this.eventItemRepository = eventItemRepository;
-        this.settingRepository = settingRepository;
         this.eventService = eventService;
         this.promotionRepository = promotionRepository;
         this.groupRepository = groupRepository;
@@ -161,7 +154,8 @@ public class ActivityRestController {
     }
 
     @GetMapping(value = { "events/{id}/items", "invitations/{id}/items", "promotions/{id}/items" })
-    public ResponseEntity<PageDTO<EventItemDTO>> items(@PathVariable String id, PageParam pageParam, Authentication auth) {
+    public ResponseEntity<PageDTO<EventItemDTO>> items(@PathVariable String id, PageParam pageParam,
+            Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
 
@@ -221,6 +215,7 @@ public class ActivityRestController {
         }
     }
 
+    // TODO cleanup
     @GetMapping("promotions")
     @Transactional
     public ResponseEntity<?> getPromotions(@RequestParam(value = "step", required = false) Integer step,
