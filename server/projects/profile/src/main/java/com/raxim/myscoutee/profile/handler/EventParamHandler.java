@@ -41,9 +41,9 @@ public class EventParamHandler implements IParamHandler {
         LocalDate until = LocalDate.now();
 
         if (pageParam.getOffset() != null && pageParam.getOffset().length == 2) {
-            from = LocalDate.parse(CommonUtil.decode(pageParam.getOffset()[0]), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-            createdDateFrom = LocalDate.parse(CommonUtil.decode(pageParam.getOffset()[1]),
-                    DateTimeFormatter.ISO_OFFSET_DATE);
+            from = LocalDate.parse(CommonUtil.decode((String)pageParam.getOffset()[0]), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            createdDateFrom = LocalDate.parse(CommonUtil.decode((String)pageParam.getOffset()[1]),
+                    DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         }
 
         String groupKey = null;

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
-import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
+import com.raxim.myscoutee.profile.handler.LikeParamHandler;
+import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
@@ -39,42 +40,30 @@ public class GameRestController {
     private final LikeRepository likeRepository;
     private final ProfileService profileService;
     private final ObjectMapper objectMapper;
+    private final ParamHandlers paramHandlers;
 
     public GameRestController(ProfileRepository profileRepository,
             EventRepository eventRepository,
             LikeRepository likeRepository,
             ProfileService profileService,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper, ParamHandlers paramHandlers) {
         this.profileRepository = profileRepository;
         this.eventRepository = eventRepository;
         this.likeRepository = likeRepository;
         this.profileService = profileService;
         this.objectMapper = objectMapper;
+        this.paramHandlers = paramHandlers;
     }
 
     @GetMapping("/rate_none")
-    public ResponseEntity<Object> nonRated(
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset,
+    public ResponseEntity<Object> nonRated(PageParam pageParam,
             Authentication auth) {
         // parameter ? man : woman, filter out type = double, filter out from, to field
         // is the session user and type = single
         // (add field for history rated by)
-
-        Object[] tOffset;
-        if (offset != null && offset.length == 4) {
-            tOffset = new Object[] {
-                    Double.valueOf(CommonUtil.decode(offset[0])),
-                    Double.valueOf(CommonUtil.decode(offset[1])),
-                    Double.valueOf(CommonUtil.decode(offset[2])),
-                    CommonUtil.decode(offset[3])
-            };
-        } else {
-            tOffset = new Object[] { 0.0, 0.0, 0.0, "1900-01-01" };
-        }
-
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-        String gender = profile.getGender().equals("m") ? "w" : "m";
+
+        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -84,13 +73,12 @@ public class GameRestController {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.invisible"));
         }
 
+        String gender = profile.getGender().equals("m") ? "w" : "m";
+
         if (profile.getPosition() != null) {
             List<ProfileDTO> profiles = profileRepository.findProfile(
+                    pageParam,
                     CommonUtil.point(profile.getPosition()),
-                    tOffset,
-                    20,
-                    step != null ? step : 5,
-                    profile.getId(),
                     gender,
                     profile.getGroup(),
                     0.0,
@@ -98,12 +86,7 @@ public class GameRestController {
 
             // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
 
-            List<Object> lOffset;
-            if (!profiles.isEmpty()) {
-                lOffset = profiles.get(profiles.size() - 1).getOffset();
-            } else {
-                lOffset = Arrays.asList(tOffset);
-            }
+            List<Object> lOffset = CommonUtil.offset(profiles, pageParam.getOffset());
 
             return ResponseEntity.ok(new PageDTO<>(profiles, lOffset));
         } else {
@@ -112,28 +95,14 @@ public class GameRestController {
     }
 
     @GetMapping("/rate_give")
-    public ResponseEntity<Object> rateGive(
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset,
+    public ResponseEntity<Object> rateGive(PageParam pageParam,
             Authentication auth) {
         // parameter ? man : woman, filter out type = double, filter out from, to field
         // is the session user and type = single
         // (add field for history rated by)
-
-        Object[] tOffset;
-        if (offset != null && offset.length == 4) {
-            tOffset = new Object[] {
-                    Double.valueOf(CommonUtil.decode(offset[0])),
-                    Double.valueOf(CommonUtil.decode(offset[1])),
-                    Double.valueOf(CommonUtil.decode(offset[2])),
-                    CommonUtil.decode(offset[3])
-            };
-        } else {
-            tOffset = new Object[] { 0.0, 0.0, 0.0, "1900-01-01" };
-        }
-
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-        String gender = profile.getGender().equals("m") ? "w" : "m";
+
+        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -144,24 +113,18 @@ public class GameRestController {
         }
 
         if (profile.getPosition() != null) {
+            String gender = profile.getGender().equals("m") ? "w" : "m";
+
             List<ProfileDTO> profiles = profileRepository.findProfile(
+                    pageParam,
                     CommonUtil.point(profile.getPosition()),
-                    tOffset,
-                    20,
-                    step != null ? step : 5,
-                    profile.getId(),
                     gender,
                     profile.getGroup(),
                     1.0, 0);
 
             // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
 
-            List<Object> lOffset;
-            if (!profiles.isEmpty()) {
-                lOffset = profiles.get(profiles.size() - 1).getOffset();
-            } else {
-                lOffset = Arrays.asList(tOffset);
-            }
+            List<Object> lOffset = CommonUtil.offset(profiles, pageParam.getOffset());
 
             return ResponseEntity.ok(new PageDTO<>(profiles, lOffset));
         } else {
@@ -170,28 +133,15 @@ public class GameRestController {
     }
 
     @GetMapping("/rate_receive")
-    public ResponseEntity<Object> rateGet(
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset,
+    public ResponseEntity<Object> rateGet(PageParam pageParam,
             Authentication auth) {
         // parameter ? man : woman, filter out type = double, filter out from, to field
         // is the session user and type = single
         // (add field for history rated by)
 
-        Object[] tOffset;
-        if (offset != null && offset.length == 4) {
-            tOffset = new Object[] {
-                    Double.valueOf(CommonUtil.decode(offset[0])),
-                    Double.valueOf(CommonUtil.decode(offset[1])),
-                    Double.valueOf(CommonUtil.decode(offset[2])),
-                    CommonUtil.decode(offset[3])
-            };
-        } else {
-            tOffset = new Object[] { 0.0, 0.0, 0.0, "1900-01-01" };
-        }
-
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-        String gender = profile.getGender().equals("m") ? "w" : "m";
+
+        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -202,32 +152,17 @@ public class GameRestController {
         }
 
         if (profile.getPosition() != null) {
-            List<ProfileDTO> fProfiles = profileRepository.findProfile(
+            String gender = profile.getGender().equals("m") ? "w" : "m";
+            List<ProfileDTO> profiles = profileRepository.findProfile(
+                    pageParam,
                     CommonUtil.point(profile.getPosition()),
-                    tOffset,
-                    20,
-                    step != null ? step : 5,
-                    profile.getId(),
                     gender,
                     profile.getGroup(),
                     2.0, 0);
 
-            // nullify rate received
-            List<ProfileDTO> profiles = fProfiles.stream().map(fProfile -> {
-                ProfileDTO clonedProfile = JsonUtil.clone(fProfile, objectMapper);
-                clonedProfile.setRate(0d);
-                return clonedProfile;
-            })
-                    .collect(Collectors.toList());
-
             // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
 
-            List<Object> lOffset;
-            if (!profiles.isEmpty()) {
-                lOffset = profiles.get(profiles.size() - 1).getOffset();
-            } else {
-                lOffset = Arrays.asList(tOffset);
-            }
+            List<Object> lOffset = CommonUtil.offset(profiles, pageParam.getOffset());
 
             return ResponseEntity.ok(new PageDTO<>(profiles, lOffset));
         } else {
@@ -347,28 +282,14 @@ public class GameRestController {
     }
 
     @GetMapping("/rate_both")
-    public ResponseEntity<?> rateBoth(
-            @RequestParam(value = "step", required = false) Integer step,
-            @RequestParam(value = "offset", required = false) String[] offset,
+    public ResponseEntity<?> rateBoth(PageParam pageParam,
             Authentication auth) {
         // parameter ? man : woman, filter out type = double, filter out from, to field
         // is the session user and type = single
         // (add field for history rated by)
-
-        Object[] tOffset;
-        if (offset != null && offset.length == 4) {
-            tOffset = new Object[] {
-                    Double.valueOf(CommonUtil.decode(offset[0])),
-                    Double.valueOf(CommonUtil.decode(offset[1])),
-                    Double.valueOf(CommonUtil.decode(offset[2])),
-                    CommonUtil.decode(offset[3])
-            };
-        } else {
-            tOffset = new Object[] { 0, 0, 0, "1900-01-01" };
-        }
-
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-        String gender = profile.getGender().equals("m") ? "w" : "m";
+
+        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -379,24 +300,18 @@ public class GameRestController {
         }
 
         if (profile.getPosition() != null) {
+            String gender = profile.getGender().equals("m") ? "w" : "m";
+
             List<ProfileDTO> profiles = profileRepository.findProfile(
+                    pageParam,
                     CommonUtil.point(profile.getPosition()),
-                    tOffset,
-                    20,
-                    step != null ? step : 5,
-                    profile.getId(),
                     gender,
                     profile.getGroup(),
                     1.5, 0);
 
             // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
 
-            List<Object> lOffset;
-            if (!profiles.isEmpty()) {
-                lOffset = profiles.get(profiles.size() - 1).getOffset();
-            } else {
-                lOffset = Arrays.asList(tOffset);
-            }
+            List<Object> lOffset = CommonUtil.offset(profiles, pageParam.getOffset());
 
             return ResponseEntity.ok(new PageDTO<>(profiles, lOffset));
         } else {

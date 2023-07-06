@@ -15,6 +15,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.School;
 import com.raxim.myscoutee.profile.data.dto.rest.CarDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
 
@@ -25,15 +26,12 @@ public interface ProfileRepository extends MongoRepository<Profile, UUID> {
 
         @Aggregation(pipeline = "findProfile")
         List<ProfileDTO> findProfile(
+                        @Param("param") PageParam param,
                         @Param("loc") Point loc,
-                        @Param("offset") Object[] offset, // minDistance
-                        @Param("limit") int limit,
-                        @Param("step") int step,
-                        @Param("currentId") UUID currentId,
                         @Param("gender") String gender,
                         @Param("groupId") UUID groupId,
                         @Param("direction") double direction,
-                        @Param("score") Integer score);
+                        @Param("score") int score);
 
         @Aggregation(pipeline = "findProfileNoType")
         List<ProfileDTO> findProfileNoType(

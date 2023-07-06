@@ -140,7 +140,7 @@ public class CommonUtil {
                 .distinct().toList()).toList();
     }
 
-    public static <T extends PageItemDTO> List<Object> offset(List<T> list) {
+    public static <T extends PageItemDTO> List<Object> offset(List<T> list, Object[] offset) {
         return !list.isEmpty() ? list.get(list.size() - 1).getOffset() : List.of();
     }
 }

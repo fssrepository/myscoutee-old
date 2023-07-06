@@ -3,7 +3,7 @@ package com.raxim.myscoutee.profile.data.dto.rest;
 import java.util.UUID;
 
 public class PageParam {
-    private String[] offset;
+    private Object[] offset;
     private String type;
     private int direction;
 
@@ -31,11 +31,11 @@ public class PageParam {
         this.type = type;
     }
 
-    public String[] getOffset() {
+    public Object[] getOffset() {
         return offset;
     }
 
-    public void setOffset(String[] offset) {
+    public void setOffset(Object[] offset) {
         this.offset = offset;
     }
 

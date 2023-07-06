@@ -77,7 +77,7 @@ public class ActivityRestController {
             List<EventDTO> events = eventService.getEvents(pageParam,
                     new String[] { "A", "P", "C" });
 
-            List<Object> lOffset = CommonUtil.offset(events);
+            List<Object> lOffset = CommonUtil.offset(events, pageParam.getOffset());
 
             return ResponseEntity.ok(
                     new PageDTO<>(events, lOffset, 0, pageParam.getType()));
@@ -164,7 +164,7 @@ public class ActivityRestController {
 
         List<EventItemDTO> eventItems = eventService.getEventItems(pageParam, UUID.fromString(id));
 
-        List<Object> lOffset = CommonUtil.offset(eventItems);
+        List<Object> lOffset = CommonUtil.offset(eventItems, pageParam.getOffset());
 
         return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }

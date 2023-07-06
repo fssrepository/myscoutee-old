@@ -23,11 +23,12 @@ import com.mongodb.client.model.geojson.Position;
 import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
-import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
-import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
@@ -56,7 +57,7 @@ public class ProfileRepositoryTest {
         private ProfileRepository profileRepository;
 
         @Autowired
-        private EventItemRepository eventItemRepository;
+        private EventRepository eventRepository;
 
         @Test
         public void testShouldFindProfilesNotRatedForOliver() {
@@ -64,9 +65,15 @@ public class ProfileRepositoryTest {
                 int step = 1000;
                 int limit = 2;
 
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_OLIVER);
+
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_OLIVER, AppConstants.WOMAN,
+                                pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -85,24 +92,31 @@ public class ProfileRepositoryTest {
                 Profile profileOliver = this.profileRepository.findById(UUID_PROFILE_OLIVER).get();
                 Profile profileAmelia = this.profileRepository.findById(UUID_PROFILE_AMELIA).get();
 
-                EventItem eventItem = new EventItem();
-                eventItem.setId(UUID.randomUUID());
+                Event event = new Event();
+                event.setId(UUID.randomUUID());
+                event.setStatus("A");
                 Set<Member> members = new HashSet<>();
                 Member memberOliver = new Member(profileOliver);
                 members.add(memberOliver);
                 Member memberAmelia = new Member(profileAmelia);
                 members.add(memberAmelia);
-                eventItem.setMembers(members);
+                event.setMembers(members);
 
-                this.eventItemRepository.save(eventItem);
+                this.eventRepository.save(event);
 
                 double direction = 0.0;
                 int step = 1000;
                 int limit = 2;
 
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_OLIVER);
+
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_OLIVER, AppConstants.WOMAN,
+                                pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -115,9 +129,15 @@ public class ProfileRepositoryTest {
                 int step = 1000;
                 int limit = 2;
 
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_LIAM);
+
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_LIAM, AppConstants.WOMAN,
+                                pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -131,15 +151,16 @@ public class ProfileRepositoryTest {
 
                 ProfileDTO profile2 = profiles.get(1);
                 assertEquals(2000.0, profile2.getGroupKey());
-                assertEquals(UUID_PROFILE_AMELIA, profile2.getProfile().getId());
+                assertEquals(UUID_PROFILE_CHARLOTTE, profile2.getProfile().getId());
                 assertEquals(0d, profile2.getRate());
                 assertFalse(profile2.getMet());
 
                 Object[] nextOffset = profile2.getOffset().toArray();
 
-                profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, nextOffset, limit,
-                                step, UUID_PROFILE_LIAM, AppConstants.WOMAN,
+                pageParam.setOffset(nextOffset);
+
+                profiles = this.profileRepository.findProfile(pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -147,7 +168,7 @@ public class ProfileRepositoryTest {
 
                 profile1 = profiles.get(0);
                 assertEquals(2000.0, profile1.getGroupKey());
-                assertEquals(UUID_PROFILE_CHARLOTTE, profile1.getProfile().getId());
+                assertEquals(UUID_PROFILE_AMELIA, profile1.getProfile().getId());
                 assertEquals(0d, profile1.getRate());
                 assertFalse(profile1.getMet());
         }
@@ -158,9 +179,15 @@ public class ProfileRepositoryTest {
                 int step = 1000;
                 int limit = 2;
 
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_OLIVER);
+
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_OLIVER, AppConstants.WOMAN,
+                                pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -179,9 +206,15 @@ public class ProfileRepositoryTest {
                 int step = 1000;
                 int limit = 3;
 
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_OLIVER);
+
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_OLIVER, AppConstants.WOMAN,
+                                pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -190,13 +223,13 @@ public class ProfileRepositoryTest {
                 ProfileDTO profile1 = profiles.get(0);
                 assertEquals(1000.0, profile1.getGroupKey());
                 assertEquals(UUID_PROFILE_LILY, profile1.getProfile().getId());
-                assertEquals(6d, profile1.getRate());
+                assertEquals(0d, profile1.getRate()); // does not show the rate of received (avoid bias)
                 assertFalse(profile1.getMet());
 
                 ProfileDTO profile2 = profiles.get(1);
                 assertEquals(1000.0, profile2.getGroupKey());
                 assertEquals(UUID_PROFILE_EVELYIN, profile2.getProfile().getId());
-                assertEquals(2d, profile2.getRate());
+                assertEquals(0d, profile2.getRate()); // does not show the rate of received (avoid bias)
                 assertFalse(profile2.getMet());
         }
 
@@ -207,9 +240,15 @@ public class ProfileRepositoryTest {
                 int step = 1000;
                 int limit = 3;
 
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_OLIVER);
+
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_OLIVER, AppConstants.WOMAN,
+                                pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 
@@ -228,24 +267,30 @@ public class ProfileRepositoryTest {
                 Profile profileOliver = this.profileRepository.findById(UUID_PROFILE_OLIVER).get();
                 Profile profileMia = this.profileRepository.findById(UUID_PROFILE_MIA).get();
 
-                EventItem eventItem = new EventItem();
-                eventItem.setId(UUID.randomUUID());
+                Event event = new Event();
+                event.setId(UUID.randomUUID());
+                event.setStatus("A");
                 Set<Member> members = new HashSet<>();
                 Member memberOliver = new Member(profileOliver);
                 members.add(memberOliver);
                 Member memberAmelia = new Member(profileMia);
                 members.add(memberAmelia);
-                eventItem.setMembers(members);
+                event.setMembers(members);
 
-                this.eventItemRepository.save(eventItem);
+                this.eventRepository.save(event);
 
                 double direction = 1.5;
                 int step = 1000;
                 int limit = 3;
 
-                List<ProfileDTO> profiles = this.profileRepository.findProfile(
-                                LOCATION_DEFAULT, OFFSET_START_DEFAULT, limit,
-                                step, UUID_PROFILE_OLIVER, AppConstants.WOMAN,
+                PageParam pageParam = new PageParam();
+                pageParam.setOffset(OFFSET_START_DEFAULT);
+                pageParam.setLimit(limit);
+                pageParam.setStep(step);
+                pageParam.setId(UUID_PROFILE_OLIVER);
+
+                List<ProfileDTO> profiles = this.profileRepository.findProfile(pageParam,
+                                LOCATION_DEFAULT, AppConstants.WOMAN,
                                 UUID_GROUP_DATING,
                                 direction, 0);
 

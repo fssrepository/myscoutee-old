@@ -1,18 +1,18 @@
 [
     {
         "$geoNear": {
-            "near": "?0",
+            "near": ":#{#loc}",
             "spherical": true,
-            "minDistance": ":#{#offset[0]}",
+            "minDistance": "?#{#param.offset[0]}",
             "distanceField": "distance",
             "query": {
                 "_id": {
                     "$nin": [
-                        "?4"
+                        "?#{#param.id}"
                     ]
                 },
-                "gender": "?5",
-                "group": "?6",
+                "gender": ":#{#gender}",
+                "group": ":#{#groupId}",
                 "status": "A"
             }
         }
@@ -21,7 +21,8 @@
         "$lookup": {
             "from": "likes",
             "let": {
-                "p_id": "$_id"
+                "p_id": "$_id",
+                "p_score": "$score"
             },
             "pipeline": [
                 {
@@ -39,7 +40,7 @@
                                         {
                                             "$eq": [
                                                 "$to.$id",
-                                                "?4"
+                                                "?#{#param.id}"
                                             ]
                                         },
                                         {
@@ -61,7 +62,7 @@
                                         {
                                             "$eq": [
                                                 "$from.$id",
-                                                "?4"
+                                                "?#{#param.id}"
                                             ]
                                         },
                                         {
@@ -100,7 +101,7 @@
                                                     {
                                                         "$eq": [
                                                             "$to.$id",
-                                                            "?4"
+                                                            "?#{#param.id}"
                                                         ]
                                                     },
                                                     {
@@ -121,7 +122,7 @@
                                                     {
                                                         "$eq": [
                                                             "$from.$id",
-                                                            "?4"
+                                                            "?#{#param.id}"
                                                         ]
                                                     },
                                                     {
@@ -316,59 +317,132 @@
         }
     },
     {
+        "$set": {
+            "likes.direction": {
+                "$ifNull": [
+                    "$likes.direction",
+                    0
+                ]
+            },
+            "likes.rate": {
+                "$ifNull": [
+                    "$likes.rate",
+                    0
+                ]
+            },
+            "likes.distance": {
+                "$ifNull": [
+                    "$likes.distance",
+                    {
+                        "$abs": {
+                            "$subtract": [
+                                "$score",
+                                "?#{#param.offset[1]}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "createdDate": {
+                "$ifNull": [
+                    "$createdDate",
+                    "ISODate()"
+                ]
+            }
+        }
+    },
+    {
+        "$addFields": {
+            "groupKey": {
+                "$multiply": [
+                    {
+                        "$floor": {
+                            "$divide": [
+                                "$distance",
+                                "?#{#param.step}"
+                            ]
+                        }
+                    },
+                    "?#{#param.step}"
+                ]
+            }
+        }
+    },
+    {
         "$match": {
             "$expr": {
                 "$and": [
                     {
                         "$eq": [
-                            {
-                                "$ifNull": [
-                                    "$likes.direction",
-                                    0
-                                ]
-                            },
+                            "$likes.direction",
                             ":#{#direction}"
                         ]
                     },
                     {
-                        "$gte": [
+                        "$or": [
                             {
-                                "$ifNull": [
-                                    "$likes.rate",
-                                    0
+                                "$gt": [
+                                    "$groupKey",
+                                    "?#{#param.offset[0]}"
                                 ]
                             },
-                            ":#{#offset[1]}"
-                        ]
-                    },
-                    {
-                        "$gte": [
                             {
-                                "$ifNull": [
-                                    "$likes.distance",
+                                "$and": [
                                     {
-                                        "$abs": {
-                                            "$subtract": [
-                                                "$score",
-                                                "?8"
-                                            ]
-                                        }
+                                        "$eq": [
+                                            "$groupKey",
+                                            "?#{#param.offset[0]}"
+                                        ]
+                                    },
+                                    {
+                                        "$or": [
+                                            {
+                                                "$lt": [
+                                                    "$likes.rate",
+                                                    "?#{#param.offset[1]}"
+                                                ]
+                                            },
+                                            {
+                                                "$and": [
+                                                    {
+                                                        "$eq": [
+                                                            "$likes.rate",
+                                                            "?#{#param.offset[1]}"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$or": [
+                                                            {
+                                                                "$gt": [
+                                                                    "$likes.distance",
+                                                                    "?#{#param.offset[2]}"
+                                                                ]
+                                                            },
+                                                            {
+                                                                "$and": [
+                                                                    {
+                                                                        "$eq": [
+                                                                            "$likes.distance",
+                                                                            "?#{#param.offset[2]}"
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "$lt": [
+                                                                            "$createdDate",
+                                                                            {
+                                                                                "$toDate": "?#{#param.offset[3]}"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
-                            },
-                            ":#{#offset[2]}"
-                        ]
-                    },
-                    {
-                        "$gt": [
-                            {
-                                "$ifNull": [
-                                    "$createdDate",
-                                    "ISODate()"
-                                ]
-                            },
-                            {
-                                "$toDate": ":#{#offset[3]}"
                             }
                         ]
                     }
@@ -378,25 +452,62 @@
     },
     {
         "$lookup": {
-            "from": "items",
+            "from": "events",
             "let": {
                 "p_id": "$_id"
             },
             "pipeline": [
                 {
                     "$match": {
+                        "status": "A",
                         "$expr": {
                             "$and": [
                                 {
-                                    "$in": [
-                                        "$$p_id",
-                                        "$members.profile.$id"
-                                    ]
-                                },
-                                {
-                                    "$in": [
-                                        "?4",
-                                        "$members.profile.$id"
+                                    "$eq": [
+                                        {
+                                            "$size": {
+                                                "$filter": {
+                                                    "input": "$members",
+                                                    "cond": {
+                                                        "$or": [
+                                                            {
+                                                                "$and": [
+                                                                    {
+                                                                        "$eq": [
+                                                                            "$$this.status",
+                                                                            "A"
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "$eq": [
+                                                                            "$$this.profile.$id",
+                                                                            "$$p_id"
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "$and": [
+                                                                    {
+                                                                        "$eq": [
+                                                                            "$$this.status",
+                                                                            "A"
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "$eq": [
+                                                                            "$$this.profile.$id",
+                                                                            "?#{#param.id}"
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        2
                                     ]
                                 }
                             ]
@@ -405,19 +516,19 @@
                 },
                 {
                     "$sort": {
-                        "createdDate": -1
+                        "range.start": 1
                     }
                 },
                 {
                     "$limit": 1
                 }
             ],
-            "as": "items"
+            "as": "events"
         }
     },
     {
         "$unwind": {
-            "path": "$items",
+            "path": "$events",
             "preserveNullAndEmptyArrays": true
         }
     },
@@ -430,7 +541,7 @@
                             "$in": [
                                 {
                                     "$ifNull": [
-                                        "$items",
+                                        "$events",
                                         null
                                     ]
                                 },
@@ -478,24 +589,15 @@
         }
     },
     {
-        "$limit": "?2"
+        "$sort": {
+            "groupKey": 1,
+            "likes.rate": -1,
+            "likes.distance": 1,
+            "createdDate": -1
+        }
     },
     {
-        "$addFields": {
-            "groupKey": {
-                "$multiply": [
-                    {
-                        "$floor": {
-                            "$divide": [
-                                "$distance",
-                                ":#{#step}"
-                            ]
-                        }
-                    },
-                    ":#{#step}"
-                ]
-            }
-        }
+        "$limit": "?#{#param.limit}"
     },
     {
         "$addFields": {
@@ -508,14 +610,6 @@
         }
     },
     {
-        "$sort": {
-            "groupKey": 1,
-            "likes.rate": -1,
-            "likes.distance": 1,
-            "createdDate": -1
-        }
-    },
-    {
         "$replaceRoot": {
             "newRoot": {
                 "$mergeObjects": [
@@ -523,18 +617,24 @@
                         "profile": "$$ROOT"
                     },
                     {
-                        "rate": "$likes.rate",
+                        "rate": {
+                            "$cond": {
+                                "if": {
+                                    "$ne": [
+                                        2.0,
+                                        ":#{#direction}"
+                                    ]
+                                },
+                                "then": "$likes.rate",
+                                "else": 0
+                            }
+                        },
                         "groupKey": "$groupKey",
                         "met": "$met",
                         "offset": [
-                            "$distance",
+                            "$groupKey",
                             "$likes.rate",
-                            {
-                                "$ifNull": [
-                                    "$likes.distance",
-                                    0
-                                ]
-                            },
+                            "$likes.distance",
                             "$createdDate"
                         ]
                     }
