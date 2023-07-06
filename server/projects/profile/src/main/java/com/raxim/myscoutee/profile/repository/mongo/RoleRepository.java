@@ -1,13 +1,13 @@
 package com.raxim.myscoutee.profile.repository.mongo;
 
-import com.raxim.myscoutee.profile.data.document.mongo.Role;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+
+import com.raxim.myscoutee.profile.data.document.mongo.Role;
+
 public interface RoleRepository extends MongoRepository<Role, UUID> {
 
     @Query("{'profileId': ?0}")

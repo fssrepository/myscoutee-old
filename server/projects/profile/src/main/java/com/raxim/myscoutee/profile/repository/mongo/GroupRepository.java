@@ -7,13 +7,11 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.model.geojson.Point;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 
-@Repository
 public interface GroupRepository extends MongoRepository<Group, UUID> {
 
     @Query("{system: true}")

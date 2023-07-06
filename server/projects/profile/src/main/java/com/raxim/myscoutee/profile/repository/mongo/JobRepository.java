@@ -6,12 +6,10 @@ import java.util.UUID;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import com.raxim.myscoutee.profile.data.document.mongo.Job;
 import com.raxim.myscoutee.profile.data.dto.rest.JobDTO;
 
-@Repository
 public interface JobRepository extends MongoRepository<Job, UUID> {
 
     @Aggregation(pipeline = "findJobsByProfile")

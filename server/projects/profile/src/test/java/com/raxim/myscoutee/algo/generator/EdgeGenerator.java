@@ -14,8 +14,6 @@ import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
 public class EdgeGenerator implements IGenerator<Edge> {
-
-    private RandomPair randomPair = new RandomPair();
     private Random random = new Random();
 
     private final Map<String, List<Node>> nodesByType = new HashMap<>();

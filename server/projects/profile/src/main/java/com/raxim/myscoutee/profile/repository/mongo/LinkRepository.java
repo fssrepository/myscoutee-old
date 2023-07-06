@@ -6,12 +6,10 @@ import java.util.UUID;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import com.raxim.myscoutee.profile.data.document.mongo.Link;
 import com.raxim.myscoutee.profile.data.dto.rest.RewardDTO;
 
-@Repository
 public interface LinkRepository extends MongoRepository<Link, UUID> {
 
     @Query("{key: ?0}")
