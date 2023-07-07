@@ -185,22 +185,6 @@ public class ActivityMemberRestController {
         return ResponseEntity.ok(new PageDTO<>(members, lOffset, 1, null, lRole));
     }
 
-    @GetMapping(value = { "events/{eventId}/members/{id}/schools" })
-    public ResponseEntity<PageDTO<SchoolDTO>> getSchools(@PathVariable String id, Authentication auth,
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset) {
-        String[] tOffset = (offset != null && offset.length == 3)
-                ? new String[] { CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]),
-                        CommonUtil.decode(offset[2]) }
-                : new String[] { "a", "1900-01-01", "1900-01-01" };
-
-        List<SchoolDTO> schools = profileService.getSchools(UUID.fromString(id), step, tOffset);
-
-        List<Object> lOffset = schools.isEmpty() ? Arrays.asList(tOffset) : schools.get(schools.size() - 1).getOffset();
-
-        return ResponseEntity.ok(new PageDTO<>(schools, lOffset));
-    }
-
     @GetMapping("events/{id}/code")
     public ResponseEntity<CodeDTO> code(@PathVariable String id, Authentication auth) {
         UUID eventUUId = UUID.fromString(id);
@@ -229,6 +213,22 @@ public class ActivityMemberRestController {
         return ControllerUtil.handle((i, s, p) -> eventService.inviteMembersForEvent(i, s, p),
                 eventId, profileids, profile.getId(),
                 HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = { "events/{eventId}/members/{id}/schools" })
+    public ResponseEntity<PageDTO<SchoolDTO>> getSchools(@PathVariable String id, Authentication auth,
+            @RequestParam("step") Integer step,
+            @RequestParam("offset") String[] offset) {
+        String[] tOffset = (offset != null && offset.length == 3)
+                ? new String[] { CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]),
+                        CommonUtil.decode(offset[2]) }
+                : new String[] { "a", "1900-01-01", "1900-01-01" };
+
+        List<SchoolDTO> schools = profileService.getSchools(UUID.fromString(id), step, tOffset);
+
+        List<Object> lOffset = schools.isEmpty() ? Arrays.asList(tOffset) : schools.get(schools.size() - 1).getOffset();
+
+        return ResponseEntity.ok(new PageDTO<>(schools, lOffset));
     }
 
 }
