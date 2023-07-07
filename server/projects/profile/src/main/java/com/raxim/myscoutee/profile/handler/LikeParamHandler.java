@@ -27,7 +27,7 @@ public class LikeParamHandler implements IParamHandler {
         double minDistance = 0d;
         double rate = 0d;
         double distance = 0d;
-        LocalDate createdDateFrom = DATE_MIN;
+        LocalDate createdDateFrom = LocalDate.now();
 
         if (pageParam.getOffset() != null && pageParam.getOffset().length == 4) {
             minDistance = Double.valueOf(CommonUtil.decode((String) pageParam.getOffset()[0]));

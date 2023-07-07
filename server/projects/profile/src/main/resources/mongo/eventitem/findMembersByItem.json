@@ -1,76 +1,116 @@
 [
-        {
-            "$match": {
-                "_id": "?0"
-            }
-        },
-        {
-            "$unwind": "$members"
-        },
-        {
-            "$lookup": {
-                "from": "profiles",
-                "let": { "p_id": "$members.profile.$id", "p_members" : "$members" },
-                "pipeline": [
-                    {
-                        "$match": {
-                            "$expr": {
-                                "$eq": ["$$p_id", "$_id"]
-                            }
-                        }
-                    },
-                    {
-                        "$project": {
-                            "_id": "$$p_members._id",
-                            "profile": "$$ROOT",
-                            "createdDate": "$$p_members.createdDate",
-                            "status": "$$p_members.status"
+    {
+        "$match": {
+            "_id": ":#{#itemId}"
+        }
+    },
+    {
+        "$addFields": {
+            "user": {
+                "$first": {
+                    "$filter": {
+                        "input": "$members",
+                        "as": "member",
+                        "cond": {
+                            "$and": [
+                                {
+                                    "$eq": [
+                                        "$$member.profile.$id",
+                                        "?#{#param.id}"
+                                    ]
+                                }
+                            ]
                         }
                     }
-                ],
-                "as": "profiles"
-            }
-        },
-        {
-            "$unwind": "$profiles"
-        },
-        {
-            "$group": {
-                "_id": "$profiles._id",
-                "data": {
-                    "$first": "$profiles"
-                }
-            }
-        },
-        {
-            "$match": {
-                "$expr": {
-                    "$and": [
-                        { "$gt": [{ "$ifNull": ["$data.createdDate", "ISODate()"] }, { "$toDate": ":#{#offset[1]}" }] },
-                        { "$in": ["$data.status", ":#{#status}"] },
-                        { "$gte": ["$data.status", ":#{#offset[0]}"] }
-                    ]
-                }
-            }
-        },
-        {
-            "$sort": {
-                "data.status": 1,
-                "data.createdDate": -1
-            }
-        },
-        {
-            "$limit": "?1"
-        },
-        {
-            "$replaceRoot": {
-                "newRoot": {
-                    "$mergeObjects": [
-                        { "member": "$data" },
-                        { "offset": ["$data.status", "$data.createdDate"] }
-                    ]
                 }
             }
         }
-    ]
-    
+    },
+    {
+        "$unwind": {
+            "path": "$members"
+        }
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$and": [
+                    {
+                        "$in": [
+                            "$members.status",
+                            ":#{#status}"
+                        ]
+                    },
+                    {
+                        "$or": [
+                            {
+                                "$gt": [
+                                    "$members.status",
+                                    "?#{#param.offset[0]}"
+                                ]
+                            },
+                            {
+                                "$and": [
+                                    {
+                                        "$eq": [
+                                            "$members.status",
+                                            "?#{#param.offset[0]}"
+                                        ]
+                                    },
+                                    {
+                                        "$gt": [
+                                            "$members.createdDate",
+                                            {
+                                                "$toDate": "?#{#param.offset[1]}"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$sort": {
+            "members.status": 1,
+            "members.createdDate": 1
+        }
+    },
+    {
+        "$limit": "?#{#param.limit}"
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$mergeObjects": [
+                    {
+                        "member": "$members"
+                    },
+                    {
+                        "role": {
+                            "$cond": [
+                                {
+                                    "$ifNull": [
+                                        "$user",
+                                        null
+                                    ]
+                                },
+                                "$user.role",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "offset": [
+                            "$members.status",
+                            "$members.createdDate"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]

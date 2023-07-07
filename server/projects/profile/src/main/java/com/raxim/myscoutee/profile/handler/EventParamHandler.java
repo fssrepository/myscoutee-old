@@ -37,7 +37,7 @@ public class EventParamHandler implements IParamHandler {
         viewType = viewType != null ? viewType : DAY; // day is the default grouping
 
         LocalDate from = LocalDate.now();
-        LocalDate createdDateFrom = DATE_MIN;
+        LocalDate createdDateFrom = LocalDate.now();
         LocalDate until = LocalDate.now();
 
         if (pageParam.getOffset() != null && pageParam.getOffset().length == 2) {

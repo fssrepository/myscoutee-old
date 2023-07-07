@@ -22,7 +22,7 @@ public class EventItemParamHandler implements IParamHandler {
     public PageParam handle(Profile profile, PageParam pageParam) {
 
         LocalDate from = LocalDate.now();
-        LocalDate createdDateFrom = DATE_MIN;
+        LocalDate createdDateFrom = LocalDate.now();
 
         if (pageParam.getOffset() != null && pageParam.getOffset().length == 2) {
             from = LocalDate.parse(CommonUtil.decode((String)pageParam.getOffset()[0]), DateTimeFormatter.ISO_OFFSET_DATE_TIME);

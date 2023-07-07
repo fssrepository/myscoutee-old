@@ -63,7 +63,7 @@ public class GameRestController {
         // (add field for history rated by)
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
-        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
+        pageParam = paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -102,7 +102,7 @@ public class GameRestController {
         // (add field for history rated by)
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
-        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
+        pageParam = paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -141,7 +141,7 @@ public class GameRestController {
 
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
-        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
+        pageParam = paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
@@ -289,7 +289,7 @@ public class GameRestController {
         // (add field for history rated by)
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
-        paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
+        pageParam = paramHandlers.handle(profile, pageParam, LikeParamHandler.TYPE);
 
         if (profile.getStatus().equals("F")) {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.friends_only"));
