@@ -42,6 +42,21 @@ import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 
+enum Action {
+    lock("A"),
+    unlock("P"); // based on gracePeriod it can be A, if mincapacity is ok
+
+    private final String type;
+
+    Action(final String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+}
+
 @RepositoryRestController
 @RequestMapping("activity")
 public class ActivityRestController {
@@ -95,11 +110,13 @@ public class ActivityRestController {
         Profile profile = principal.getUser().getProfile();
 
         event.setStatus("P");
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile, event,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile,
+                event,
                 HttpStatus.CREATED);
         return response;
     }
 
+    // can lock event
     @PatchMapping("events/{id}")
     @Transactional
     public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody Event event,
@@ -107,7 +124,8 @@ public class ActivityRestController {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
 
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile, event,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile,
+                event,
                 HttpStatus.OK);
         return response;
     }

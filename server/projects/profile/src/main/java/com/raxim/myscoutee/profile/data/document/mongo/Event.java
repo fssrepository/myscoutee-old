@@ -47,13 +47,21 @@ public class Event extends EventBase implements Convertable {
     private String category;
 
     // status
-    // Accepted (A) (by Organizer), Published/Promotion/Pending (P),
-    // Inactive (I), Template (T), Under Review (U), Reviewed/Recommended (R),
-    // Rejected/Deleted (D)
+    // Accepted (A) (by Organizer), Published/Promotion/Pending (P) ?? -> not sure published/promotion is needed, it's only pending,
+    // Inactive (I), Template (T), Under Review (U) ??, Reviewed/Recommended (R),
+    // Rejected/Deleted (D),
     // Cancelled (C)
     // auto publish when general has been added
     // inactive means, just edited locally, before being published
     // when accepted by organizer, create chat room
+
+    // lock event (status A) -> no new members can be added or removed (event can be unlocked (status P, based on graceTime, it can be A)
+    // also, priority algorithm also filtering it out)
+    // it's important for promotional event, when you need to notify the promoter
+    // activity/promotion/{id} -> promotional event list can be filtered for events
+    // with status A (locked)
+    // any event which is locked, any late invitation accept also does not work,
+    // will go to "W" (wait list) immadiately
 
     // ref counter
     @JsonIgnore
