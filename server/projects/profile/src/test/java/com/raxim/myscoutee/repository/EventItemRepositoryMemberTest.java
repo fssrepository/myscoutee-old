@@ -38,7 +38,7 @@ public class EventItemRepositoryMemberTest {
 
         @Test
         public void shouldGetMembersForItem() {
-                String[] memberStatuses = new String[] { "A", "I", "J" };
+                String[] memberStatuses = new String[] { "A", "I", "J", "W" };
                 String status = "A";
                 LocalDate createdDate = LocalDate.of(1901, 1, 1);
                 String createdDateF = createdDate.atStartOfDay(ZoneId.systemDefault())

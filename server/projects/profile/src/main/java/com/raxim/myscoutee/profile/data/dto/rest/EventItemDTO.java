@@ -2,10 +2,11 @@ package com.raxim.myscoutee.profile.data.dto.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.raxim.myscoutee.profile.converter.Convertable;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
 
 @JsonRootName("eventItem")
-public class EventItemDTO extends PageItemDTO {
+public class EventItemDTO extends PageItemDTO implements Convertable {
 
     @JsonProperty(value = "item")
     private EventItem item;

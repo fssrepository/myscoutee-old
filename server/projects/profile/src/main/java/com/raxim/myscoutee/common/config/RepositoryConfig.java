@@ -9,7 +9,8 @@ import com.raxim.myscoutee.profile.repository.mongo.CarEventHandler;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileEventHandler;
 
 @Configuration
-@EnableMongoRepositories(repositoryFactoryBeanClass = MongoRepositoryFactoryBean.class, basePackages = "com.raxim.myscoutee.profile.repository.mongo")
+@EnableMongoRepositories(repositoryFactoryBeanClass = MongoRepositoryFactoryBean.class, basePackages = {
+        "com.raxim.myscoutee.profile.repository.mongo" })
 public class RepositoryConfig {
 
     @Bean

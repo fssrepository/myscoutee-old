@@ -9,6 +9,7 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,11 +61,8 @@ enum Action {
 @RequestMapping("activity")
 public class ActivityMemberRestController {
     private final EventRepository eventRepository;
-    private final EventItemRepository eventItemRepository;
     private final ProfileService profileService;
-    private final ProfileRepository profileRepository;
     private final StatusService statusService;
-    private final ObjectMapper objectMapper;
     private final ParamHandlers paramHandlers;
     private final EventService eventService;
 
@@ -77,17 +75,14 @@ public class ActivityMemberRestController {
             ParamHandlers paramHandlers,
             EventService eventService) {
         this.eventRepository = eventRepository;
-        this.eventItemRepository = eventItemRepository;
         this.profileService = profileService;
-        this.profileRepository = profileRepository;
         this.statusService = statusService;
-        this.objectMapper = objectMapper;
         this.paramHandlers = paramHandlers;
         this.eventService = eventService;
     }
 
     @PostMapping("events/{id}/items/{itemId}/{type}")
-    public ResponseEntity<?> changeMemberStatusForItem(@PathVariable String id, @PathVariable String itemId,
+    public ResponseEntity<?> changeStatusForItem(@PathVariable String itemId,
             @PathVariable String type,
             @RequestBody EventItem eventItem, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
@@ -96,26 +91,16 @@ public class ActivityMemberRestController {
         String actionType = Action.valueOf(type).getType();
 
         return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForItem(i, s, p),
-                id, profile.getId(), actionType,
+                itemId, profile.getId(), actionType,
                 HttpStatus.OK);
     }
 
-    @PostMapping("events/{id}/{type}")
-    public ResponseEntity<EventDTO> changeMemberStatusForEvent(@PathVariable String id,
+    // wait is when we have invited more members than what capacity we have set, if
+    // it's filled, we can accept with wait
+    @PostMapping({ "events/{id}/{type}", "invitations/{id}/{type}" })
+    public ResponseEntity<EventDTO> changeStatusForEvent(@PathVariable String id,
             @PathVariable String type,
             Authentication auth) {
-        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = firebasePrincipal.getUser().getProfile();
-
-        String actionType = Action.valueOf(type).getType();
-
-        return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForEvent(i, s, p),
-                id, profile.getId(), actionType,
-                HttpStatus.OK);
-    }
-
-    @PostMapping(value = { "invitations/{id}/{type}" })
-    public ResponseEntity<?> reject(@PathVariable String id, @PathVariable String type, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
@@ -141,17 +126,29 @@ public class ActivityMemberRestController {
                 HttpStatus.OK);
     }
 
+    @PostMapping("events/{eventId}/members/{memberId}/{type}")
+    public ResponseEntity<?> manageStatusForEvent(@PathVariable String eventId, @PathVariable String itemId,
+            @PathVariable String memberId, @PathVariable String type, Authentication auth) {
+        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = firebasePrincipal.getUser().getProfile();
+
+        String actionType = Action.valueOf(type).getType();
+
+        return ControllerUtil.handle((i, m, s, p) -> statusService.manageMemberStatusForEvent(i, m, s, p),
+                eventId, memberId, profile.getId(), actionType,
+                HttpStatus.OK);
+    }
+
     @PostMapping("events/{eventId}/items/{id}/members/{memberId}/{type}")
-    public ResponseEntity<?> leaveItem(@PathVariable String id, @PathVariable String itemId,
-            @PathVariable String memberId, @PathVariable String type,
-            @RequestBody EventItem eventItem, Authentication auth) {
+    public ResponseEntity<?> manageStatusForItem(@PathVariable String itemId,
+            @PathVariable String memberId, @PathVariable String type, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
         String actionType = Action.valueOf(type).getType();
 
         return ControllerUtil.handle((i, m, s, p) -> statusService.manageMemberStatusForItem(i, m, s, p),
-                id, memberId, profile.getId(), actionType,
+                itemId, memberId, profile.getId(), actionType,
                 HttpStatus.OK);
     }
 
@@ -217,71 +214,17 @@ public class ActivityMemberRestController {
         return member.map(m -> ResponseEntity.ok(m)).orElse(ResponseEntity.notFound().build());
     }
 
-    // TODO: to be fixed
-    /*
-     * @PostMapping("events/{id}/members")
-     * 
-     * @Transactional
-     * public ResponseEntity<List<MemberDTO>> addMember(
-     * 
-     * @PathVariable String id,
-     * 
-     * @RequestBody List<String> profiles) {
-     * return eventRepository.findById(UUID.fromString(id)).map(event -> {
-     * List<UUID> uProfiles = profiles.stream()
-     * .map(UUID::fromString)
-     * .collect(Collectors.toList());
-     * 
-     * List<com.raxim.myscoutee.profile.data.document.mongo.Profile> pProfiles =
-     * profileRepository
-     * .findAllById(uProfiles);
-     * 
-     * Set<com.raxim.myscoutee.profile.data.document.mongo.Member> tMembers =
-     * pProfiles.stream()
-     * .map(profile -> {
-     * com.raxim.myscoutee.profile.data.document.mongo.Member member =
-     * event.getInfo().getMembers()
-     * .stream()
-     * .filter(m -> m.getId().equals(profile.getId()))
-     * .findFirst()
-     * .orElse(null);
-     * 
-     * if (member == null) {
-     * String code = null;
-     * if (event.getInfo().getTicket()) {
-     * code = UUID.randomUUID().toString();
-     * }
-     * 
-     * Member newMember = new Member();
-     * newMember.setId(profile.getId());
-     * newMember.setProfile(profile);
-     * newMember.setStatus("I");
-     * newMember.setCreatedDate(new Date());
-     * newMember.setCode(code);
-     * newMember.setRole("U");
-     * return newMember;
-     * } else {
-     * Member clonedMember = JsonUtil.clone(member, objectMapper);
-     * clonedMember.setStatus("I");
-     * return clonedMember;
-     * }
-     * })
-     * .collect(Collectors.toSet());
-     * 
-     * tMembers.addAll(event.getInfo().getMembers());
-     * event.getInfo().setMembers(tMembers);
-     * 
-     * eventRepository.save(event);
-     * 
-     * List<MemberDTO> membersDto = tMembers.stream()
-     * .map(member -> new MemberDTO(
-     * member,
-     * List.of(new Date(), member.getStatus())))
-     * .collect(Collectors.toList());
-     * 
-     * return ResponseEntity.status(HttpStatus.CREATED).body(membersDto);
-     * }).orElse(ResponseEntity.notFound().build());
-     * }
-     */
+    @PostMapping("events/{eventId}/members")
+
+    @Transactional
+    public ResponseEntity<EventDTO> addMembers(
+            @PathVariable String eventId, @RequestBody List<String> profileids, Authentication auth) {
+        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = firebasePrincipal.getUser().getProfile();
+
+        return ControllerUtil.handle((i, s, p) -> eventService.inviteMembersForEvent(i, s, p),
+                eventId, profileids, profile.getId(),
+                HttpStatus.CREATED);
+    }
 
 }

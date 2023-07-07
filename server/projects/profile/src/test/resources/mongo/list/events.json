@@ -275,6 +275,10 @@
             "$date": "2020-01-30T04:17:08.000Z"
         },
         "num": 4,
+        "capacity": {
+            "min": 2,
+            "max": 5
+        },
         "members": [
             {
                 "profile": {
@@ -287,6 +291,9 @@
                 "status": "A",
                 "role": "A",
                 "createdDate": {
+                    "$date": "2019-01-02T04:17:08.000Z"
+                },
+                "updatedDate": {
                     "$date": "2019-01-02T04:17:08.000Z"
                 }
             },
@@ -302,6 +309,9 @@
                 "role": "U",
                 "createdDate": {
                     "$date": "2020-01-30T04:17:08.000Z"
+                },
+                "updatedDate": {
+                    "$date": "2019-01-02T04:17:08.000Z"
                 }
             },
             {
@@ -316,6 +326,9 @@
                 "role": "U",
                 "createdDate": {
                     "$date": "2019-02-25T04:17:08.000Z"
+                },
+                "updatedDate": {
+                    "$date": "2019-01-02T04:17:08.000Z"
                 }
             },
             {
@@ -330,6 +343,9 @@
                 "role": "U",
                 "createdDate": {
                     "$date": "2019-01-25T04:17:08.000Z"
+                },
+                "updatedDate": {
+                    "$date": "2019-01-02T04:17:08.000Z"
                 }
             }
         ],

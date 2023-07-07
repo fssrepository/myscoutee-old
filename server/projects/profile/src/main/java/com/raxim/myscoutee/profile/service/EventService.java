@@ -1,46 +1,50 @@
 package com.raxim.myscoutee.profile.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.profile.converter.Converters;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.EventItem;
+import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventItemDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
+import com.raxim.myscoutee.profile.exception.IllegalAccessException;
+import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.handler.EventParamHandler;
 import com.raxim.myscoutee.profile.repository.mongo.EventItemRepository;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
-import com.raxim.myscoutee.profile.repository.mongo.MemberRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 
 @Service
 public class EventService {
     private final EventRepository eventRepository;
     private final EventItemRepository eventItemRepository;
-    private final MemberRepository memberRepository;
-    private final ObjectMapper objectMapper;
+    private final ProfileRepository profileRepository;
     private final Converters converters;
 
     public EventService(EventRepository eventRepository,
             EventItemRepository eventItemRepository,
             PromotionRepository promotionRepository,
-            MemberRepository memberRepository,
-            ObjectMapper objectMapper, Converters converters) {
+            ProfileRepository profileRepository,
+            Converters converters) {
         this.eventRepository = eventRepository;
         this.eventItemRepository = eventItemRepository;
-        this.memberRepository = memberRepository;
-        this.objectMapper = objectMapper;
+        this.profileRepository = profileRepository;
         this.converters = converters;
     }
 
@@ -58,12 +62,12 @@ public class EventService {
 
     public List<MemberDTO> getMembersByItem(PageParam pageParam, String itemId) {
         return eventItemRepository.findMembersByItem(pageParam, UUID.fromString(itemId),
-                new String[] { "A", "I", "J" });
+                new String[] { "A", "I", "J", "W" });
     }
 
     public List<MemberDTO> getMembersByEvent(PageParam pageParam, String eventId) {
         return eventRepository.findMembersByEvent(pageParam, UUID.fromString(eventId),
-                new String[] { "A", "I", "J" });
+                new String[] { "A", "I", "J", "W" });
     }
 
     /*
@@ -176,7 +180,7 @@ public class EventService {
      * }
      */
 
-    public Optional<EventDTO> save(Profile profile, Event pEvent) throws CloneNotSupportedException {
+    public Optional<EventDTO> saveEvent(Profile profile, Event pEvent) throws CloneNotSupportedException {
         Optional<Event> eventRes = pEvent.getId() != null ? this.eventRepository.findById(pEvent.getId())
                 : Optional.empty();
 
@@ -205,7 +209,7 @@ public class EventService {
 
         if (eventRes.isPresent()) {
             Event lEvent = this.eventRepository.save(eventRes.get());
-            Optional.of((EventDTO) converters.convert(lEvent));
+            return converters.convert(lEvent).map(obj -> (EventDTO) obj);
         }
         return Optional.empty();
     }
@@ -261,7 +265,7 @@ public class EventService {
 
             if (dbEventItem.isPresent()) {
                 EventItem tEventItem = dbEventItem.get();
-                return Optional.of((EventItemDTO) converters.convert(tEventItem));
+                return converters.convert(tEventItem).map(obj -> (EventItemDTO) obj);
             }
         }
 
@@ -270,5 +274,66 @@ public class EventService {
 
     public List<EventItemDTO> getEventItems(PageParam pageParam, UUID eventId) {
         return eventRepository.findItemsByEvent(eventId, pageParam);
+    }
+
+    public Optional<EventDTO> inviteMembersForEvent(String eventId, List<String> pProfileUuids, UUID byUuid)
+            throws MessageException {
+        Optional<Event> eventRes = eventId != null ? this.eventRepository.findById(UUID.fromString(eventId))
+                : Optional.empty();
+
+        if (eventRes.isPresent()) {
+            Event dbEvent = eventRes.get();
+
+            Optional<Member> optAdmin = dbEvent.getMembers().stream()
+                    .filter(member -> byUuid.equals(member.getProfile().getId())
+                            && "A".equals(member.getRole()))
+                    .findFirst();
+
+            if (!optAdmin.isPresent()) {
+                throw new IllegalAccessException();
+            }
+
+            List<UUID> profileUUids = pProfileUuids.stream()
+                    .map(UUID::fromString)
+                    .filter(uuid -> dbEvent.getMembers().stream()
+                            .noneMatch(member -> uuid.equals(member.getProfile().getId())))
+                    .collect(Collectors.toList());
+
+            List<Profile> profiles = this.profileRepository
+                    .findAllById(profileUUids);
+
+            // invited order does matter on member list screen
+            Collections.sort(profiles, Comparator.comparing(Profile::getCreatedDate));
+
+            AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
+
+            profiles.stream().forEach(profile -> {
+                // mongodb precision is in millis
+                LocalDateTime lNow = now.getAndSet(now.get().plus(1, ChronoUnit.MILLIS));
+
+                String code = null;
+                if (dbEvent.getTicket() != null
+                        && dbEvent.getTicket().booleanValue()) {
+                    code = UUID.randomUUID().toString();
+                }
+
+                Member newMember = new Member();
+                newMember.setProfile(profile);
+                newMember.setStatus("I");
+                newMember.setUpdatedDate(lNow);
+                newMember.setCreatedDate(lNow);
+                newMember.setCode(code);
+                newMember.setRole("U");
+                dbEvent.getMembers().add(newMember);
+            });
+
+            eventRes = Optional.of(dbEvent);
+        }
+
+        if (eventRes.isPresent()) {
+            Event lEvent = this.eventRepository.save(eventRes.get());
+            return converters.convert(lEvent).map(obj -> (EventDTO) obj);
+        }
+        return Optional.empty();
     }
 }

@@ -13,9 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
+import com.raxim.myscoutee.profile.converter.Convertable;
 
 @Document(collection = "items")
-public class EventItem extends EventBase {
+public class EventItem extends EventBase implements Convertable {
     @Id
     @JsonProperty(value = "key")
     private UUID id;

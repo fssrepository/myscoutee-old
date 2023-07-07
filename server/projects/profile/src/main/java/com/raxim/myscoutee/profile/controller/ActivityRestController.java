@@ -95,7 +95,7 @@ public class ActivityRestController {
         Profile profile = principal.getUser().getProfile();
 
         event.setStatus("P");
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.save(p, e), profile, event,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile, event,
                 HttpStatus.CREATED);
         return response;
     }
@@ -107,7 +107,7 @@ public class ActivityRestController {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
 
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.save(p, e), profile, event,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile, event,
                 HttpStatus.OK);
         return response;
     }

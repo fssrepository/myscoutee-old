@@ -25,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.algo.dto.Range;
+import com.raxim.myscoutee.common.AppTestConstants;
 import com.raxim.myscoutee.common.config.JsonConfig;
 import com.raxim.myscoutee.common.data.TestEvent;
 import com.raxim.myscoutee.common.data.TestLike;
@@ -46,17 +47,6 @@ import com.raxim.myscoutee.profile.service.EventGeneratorService;
 public class EventGeneratorServiceTest extends AbstractAlgoTest {
 
         private static final Range FLAGS_DEFAULT = new Range(2, 3);
-
-        private static final UUID UUID_PROFILE_LIAM = UUID.fromString("8f4bd3a8-1195-01b0-172a-a04f052f5982");
-        private static final UUID UUID_PROFILE_EMMA = UUID.fromString("fc4c72f8-a905-e1d1-05f8-c0d9914e158c");
-
-        private static final UUID UUID_PROFILE_OLIVER = UUID.fromString("534ccc6b-2547-4bf0-ad91-dca739943ea4");
-        private static final UUID UUID_PROFILE_AVA = UUID.fromString("eb494fba-6c56-752f-5123-c414c8c86599");
-
-        private static final UUID UUID_PROFILE_ETHAN = UUID.fromString("2f7e01ce-1336-37d4-e69e-efc88d2ee81a");
-        private static final UUID UUID_PROFILE_SOPHIA = UUID.fromString("39402632-a452-57be-2518-53cc117b1abc");
-
-        private static final UUID UUID_PROFILE_LUCAS = UUID.fromString("694ef9b8-e486-bdf2-6510-7d05f19db486");
 
         @InjectMocks
         private EventGeneratorService eventGeneratorService;
@@ -111,14 +101,16 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 Set<Member> group1 = generatedEvents.get(0).getMembers();
                 assertEquals(2, group1.size());
 
-                List<UUID> expectedUuidsForGroup1 = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
+                List<UUID> expectedUuidsForGroup1 = List.of(AppTestConstants.UUID_PROFILE_LUCAS,
+                                AppTestConstants.UUID_PROFILE_SOPHIA);
                 boolean allProfilesMatched = matchAll(group1, expectedUuidsForGroup1);
                 assertTrue(allProfilesMatched);
 
                 Set<Member> group2 = generatedEvents.get(1).getMembers();
                 assertEquals(2, group2.size());
 
-                List<UUID> expectedUuidsForGroup2 = List.of(UUID_PROFILE_AVA, UUID_PROFILE_OLIVER);
+                List<UUID> expectedUuidsForGroup2 = List.of(AppTestConstants.UUID_PROFILE_AVA,
+                                AppTestConstants.UUID_PROFILE_OLIVER);
                 allProfilesMatched = matchAll(group2, expectedUuidsForGroup2);
                 assertTrue(allProfilesMatched);
 
@@ -126,7 +118,8 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 Set<Member> group3 = generatedEvents.get(2).getMembers();
                 assertEquals(2, group3.size());
 
-                List<UUID> expectedUuidsForGroup3 = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
+                List<UUID> expectedUuidsForGroup3 = List.of(AppTestConstants.UUID_PROFILE_LIAM,
+                                AppTestConstants.UUID_PROFILE_EMMA);
                 allProfilesMatched = matchAll(group3, expectedUuidsForGroup3);
                 assertTrue(allProfilesMatched);
 
@@ -147,14 +140,16 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 Set<Member> group1F = generatedEvents.get(0).getMembers();
                 assertEquals(2, group1F.size());
 
-                List<UUID> expectedUuidsForGroup1F = List.of(UUID_PROFILE_LUCAS, UUID_PROFILE_SOPHIA);
+                List<UUID> expectedUuidsForGroup1F = List.of(AppTestConstants.UUID_PROFILE_LUCAS,
+                                AppTestConstants.UUID_PROFILE_SOPHIA);
                 allProfilesMatched = matchAll(group1F, expectedUuidsForGroup1F);
                 assertTrue(allProfilesMatched);
 
                 Set<Member> group2F = generatedEvents.get(1).getMembers();
                 assertEquals(2, group2F.size());
 
-                List<UUID> expectedUuidsForGroup2F = List.of(UUID_PROFILE_LIAM, UUID_PROFILE_EMMA);
+                List<UUID> expectedUuidsForGroup2F = List.of(AppTestConstants.UUID_PROFILE_LIAM,
+                                AppTestConstants.UUID_PROFILE_EMMA);
                 allProfilesMatched = matchAll(group2F, expectedUuidsForGroup2F);
                 assertTrue(allProfilesMatched);
 

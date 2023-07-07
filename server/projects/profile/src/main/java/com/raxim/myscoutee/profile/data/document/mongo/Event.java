@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
@@ -14,9 +15,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raxim.myscoutee.profile.converter.Convertable;
 
 @Document(collection = "events")
-public class Event extends EventBase {
+public class Event extends EventBase implements Convertable {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -243,6 +245,22 @@ public class Event extends EventBase {
             }
 
             if (getCapacity() != null) {
+
+                // if invitation has been accepted, but the screen was not uptodate -> accept
+                // should have been wait
+                int diffWithJ = cnt - getCapacity().getMax();
+
+                if (diffWithJ > 0) {
+                    getMembers().stream()
+                            .filter(member -> "A".equals(member.getStatus()))
+                            .sorted((m1, m2) -> m2.getUpdatedDate().compareTo(m1.getUpdatedDate()))
+                            .limit(diffWithJ).map(member -> {
+                                member.setStatus("W");
+                                return member;
+                            })
+                            .collect(Collectors.toList());
+                }
+
                 if (getNum() >= getCapacity().getMin()) {
                     if (LocalDateTime.now().isAfter(graceTime) && getNum() >= getCapacity().getMin()) {
                         setStatus("A");
