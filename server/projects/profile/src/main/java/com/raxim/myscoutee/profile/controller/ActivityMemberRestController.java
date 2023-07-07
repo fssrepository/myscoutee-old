@@ -111,10 +111,12 @@ public class ActivityMemberRestController {
                 HttpStatus.OK);
     }
 
-    //when the promoter accepts, can see the members, before that not!
-    //instead of "clone" use name "pick or select"
+    // when the promoter accepts, can see the members, before that not!
+    // instead of "clone" use name "pick or select"
     // TODO: promotion fix -> statusService.changeStatusForEvent not prepared to
     // handle
+    // when event locked, promoter will be invited to the event,
+    // hence the events will appear in the invitations tab, not the promotion tab
     @PostMapping(value = { "promotions/{id}/{type}" })
     public ResponseEntity<EventDTO> changeEventForPromotion(@PathVariable String id, @PathVariable String type,
             Authentication auth) {
