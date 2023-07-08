@@ -42,13 +42,13 @@ import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 
-enum Action {
+enum EventAction {
     lock("A"),
     unlock("P"); // based on gracePeriod it can be A, if mincapacity is ok
 
     private final String type;
 
-    Action(final String type) {
+    EventAction(final String type) {
         this.type = type;
     }
 

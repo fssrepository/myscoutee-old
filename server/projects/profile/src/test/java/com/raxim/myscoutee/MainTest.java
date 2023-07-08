@@ -1,3 +1,4 @@
+package com.raxim.myscoutee;
 /*package com.raxim.myscoutee.profile
 
 import org.junit.jupiter.api.Test

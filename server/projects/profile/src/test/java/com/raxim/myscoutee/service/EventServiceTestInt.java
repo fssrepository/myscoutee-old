@@ -53,6 +53,7 @@ public class EventServiceTestInt extends AbstractAlgoTest {
         private EventItemRepository eventItemRepository;
 
         @Autowired
+        //@Spy is not woring for repositories
         private PromotionRepository promotionRepository;
 
         private Converters converters = new Converters();

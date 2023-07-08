@@ -1,4 +1,4 @@
-package com.raxim.myscoutee;
+package com.raxim.myscoutee.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

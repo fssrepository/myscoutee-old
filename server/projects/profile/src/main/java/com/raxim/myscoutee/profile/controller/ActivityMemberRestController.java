@@ -38,7 +38,7 @@ import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.service.ProfileService;
 import com.raxim.myscoutee.profile.service.StatusService;
 
-enum Action {
+enum MemberAction {
     join("J"),
     wait("W"),
     leave("L"),
@@ -48,7 +48,7 @@ enum Action {
 
     private final String type;
 
-    Action(final String type) {
+    MemberAction(final String type) {
         this.type = type;
     }
 
@@ -88,7 +88,7 @@ public class ActivityMemberRestController {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
-        String actionType = Action.valueOf(type).getType();
+        String actionType = MemberAction.valueOf(type).getType();
 
         return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForItem(i, s, p),
                 itemId, profile.getId(), actionType,
@@ -104,7 +104,7 @@ public class ActivityMemberRestController {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
-        String actionType = Action.valueOf(type).getType();
+        String actionType = MemberAction.valueOf(type).getType();
 
         return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForEvent(i, s, p),
                 id, profile.getId(), actionType,
@@ -117,13 +117,24 @@ public class ActivityMemberRestController {
     // handle
     // when event locked, promoter will be invited to the event,
     // hence the events will appear in the invitations tab, not the promotion tab
+    // the promoter does not receive the chat messages, separate chat tab with admin?
+    // a normal event can cloned to a template and can be used for promotion later on
+    // promotion can be time based or just recommend something
+    // (what you can show on recommendation tab -> like approximate time)
+    // can't rerecommend already promotion event - recommended event hasn't any promoter member also, it's just an empty event
+    // group event is also on recommendation tab -> different colouring
+    // job/idea, is a promotion category, what you can filter on recommendation tab
+    // job is a group event of business, not dating -> advertise an event you need to have "A" = advertiser role
+    // dropdown box on profile editor, whether only advertiser for a group or participants also
+    // there is no separate job group
+    // promotion editor is on event tab
     @PostMapping(value = { "promotions/{id}/{type}" })
     public ResponseEntity<EventDTO> changeEventForPromotion(@PathVariable String id, @PathVariable String type,
             Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
-        String actionType = Action.valueOf(type).getType();
+        String actionType = MemberAction.valueOf(type).getType();
 
         return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForEvent(i, s, p),
                 id, profile.getId(), actionType,
@@ -136,7 +147,7 @@ public class ActivityMemberRestController {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
-        String actionType = Action.valueOf(type).getType();
+        String actionType = MemberAction.valueOf(type).getType();
 
         return ControllerUtil.handle((i, m, s, p) -> statusService.manageMemberStatusForEvent(i, m, s, p),
                 eventId, memberId, profile.getId(), actionType,
@@ -149,7 +160,7 @@ public class ActivityMemberRestController {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
-        String actionType = Action.valueOf(type).getType();
+        String actionType = MemberAction.valueOf(type).getType();
 
         return ControllerUtil.handle((i, m, s, p) -> statusService.manageMemberStatusForItem(i, m, s, p),
                 itemId, memberId, profile.getId(), actionType,
