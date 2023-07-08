@@ -128,6 +128,13 @@ public class ActivityMemberRestController {
     // dropdown box on profile editor, whether only advertiser for a group or participants also
     // there is no separate job group
     // promotion editor is on event tab
+    // group event will be shown at invitations tab
+    // (however members are not added to the event as invited members to simiplify)
+    // to join to a group is on profile screen (separate button etc.) -> remove from recommendations screen
+    // recommendation tab will be removed (when click on +, you can select -> it shows recommended 
+    //and promotional event in the same screen, no separate tab)
+    // recommmended, promotion event needs geo position (longitude, lattitude
+    //built in map willbe later on -> the user coordinates to set for the time being)
     @PostMapping(value = { "promotions/{id}/{type}" })
     public ResponseEntity<EventDTO> changeEventForPromotion(@PathVariable String id, @PathVariable String type,
             Authentication auth) {
