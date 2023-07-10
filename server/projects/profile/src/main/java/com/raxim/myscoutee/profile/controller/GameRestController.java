@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
@@ -39,19 +38,16 @@ public class GameRestController {
     private final EventRepository eventRepository;
     private final LikeRepository likeRepository;
     private final ProfileService profileService;
-    private final ObjectMapper objectMapper;
     private final ParamHandlers paramHandlers;
 
     public GameRestController(ProfileRepository profileRepository,
             EventRepository eventRepository,
             LikeRepository likeRepository,
-            ProfileService profileService,
-            ObjectMapper objectMapper, ParamHandlers paramHandlers) {
+            ProfileService profileService, ParamHandlers paramHandlers) {
         this.profileRepository = profileRepository;
         this.eventRepository = eventRepository;
         this.likeRepository = likeRepository;
         this.profileService = profileService;
-        this.objectMapper = objectMapper;
         this.paramHandlers = paramHandlers;
     }
 

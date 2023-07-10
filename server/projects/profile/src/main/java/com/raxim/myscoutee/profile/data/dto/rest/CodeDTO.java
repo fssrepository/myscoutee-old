@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("code")
-public class CodeDTO {
+public class CodeDTO extends PageItemDTO {
 
     @JsonProperty(value = "code")
     private String code;

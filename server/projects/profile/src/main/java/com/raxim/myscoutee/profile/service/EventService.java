@@ -17,6 +17,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
+import com.raxim.myscoutee.profile.data.dto.rest.CodeDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
@@ -57,6 +58,19 @@ public class EventService {
     public List<MemberDTO> getMembersByEvent(PageParam pageParam, String eventId) {
         return eventRepository.findMembersByEvent(pageParam, UUID.fromString(eventId),
                 new String[] { "A", "I", "J", "W" });
+    }
+
+    public Optional<CodeDTO> getCodeByEvent(String eventId, UUID profileUuid) {
+        UUID eventUUId = UUID.fromString(eventId);
+        Optional<CodeDTO> code = this.eventRepository.findCodeByEvent(eventUUId, profileUuid);
+        return code;
+    }
+
+    public Optional<MemberDTO> getMemberByCode(String eventId, String code) {
+        UUID eventUUId = UUID.fromString(eventId);
+
+        Optional<MemberDTO> member = this.eventRepository.findMemberByCode(eventUUId, code);
+        return member;
     }
 
     /*
@@ -190,6 +204,8 @@ public class EventService {
             lEvent.setCreatedBy(dbEvent.getCreatedBy());
             lEvent.setStatus(dbEvent.getStatus());
 
+            // it should be hierarchical, if the event has "List<Event> items", promotion is
+            // two level deep
             lEvent.shift();
             lEvent.sync(); // if dbEvent.range.end < dbEvent.items.range.end -> revert back
                            // dbEvent.range.end change to dbEvent.items.range.end
@@ -237,7 +253,8 @@ public class EventService {
                     lEventItem.setStatus("D");
                 }
 
-                // event
+                // it should be hierarchical, if the event has "List<Event> items", promotion is
+                // two level deep
                 dbEvent.sync();
 
             }

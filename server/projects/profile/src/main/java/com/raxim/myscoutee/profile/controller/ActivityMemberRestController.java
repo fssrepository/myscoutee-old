@@ -2,7 +2,6 @@ package com.raxim.myscoutee.profile.controller;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.rest.webmvc.RepositoryRestController;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.ControllerUtil;
@@ -30,8 +28,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
 import com.raxim.myscoutee.profile.handler.MemberParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
-import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
-import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.service.ProfileService;
 import com.raxim.myscoutee.profile.service.StatusService;
@@ -58,20 +54,16 @@ enum MemberAction {
 @RepositoryRestController
 @RequestMapping("activity")
 public class ActivityMemberRestController {
-    private final EventRepository eventRepository;
     private final ProfileService profileService;
     private final StatusService statusService;
     private final ParamHandlers paramHandlers;
     private final EventService eventService;
 
-    public ActivityMemberRestController(EventRepository eventRepository,
+    public ActivityMemberRestController(
             ProfileService profileService,
-            ProfileRepository profileRepository,
             StatusService statusService,
-            ObjectMapper objectMapper,
             ParamHandlers paramHandlers,
             EventService eventService) {
-        this.eventRepository = eventRepository;
         this.profileService = profileService;
         this.statusService = statusService;
         this.paramHandlers = paramHandlers;
@@ -187,21 +179,20 @@ public class ActivityMemberRestController {
 
     @GetMapping("events/{id}/code")
     public ResponseEntity<CodeDTO> code(@PathVariable String id, Authentication auth) {
-        UUID eventUUId = UUID.fromString(id);
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
-        Optional<CodeDTO> code = eventRepository.findCodeByEvent(eventUUId, profile.getId());
-
-        return code.map(c -> ResponseEntity.ok(c)).orElse(ResponseEntity.notFound().build());
+        return ControllerUtil.handle((i, p) -> eventService.getCodeByEvent(i, p),
+                id, profile.getId(), HttpStatus.OK);
     }
 
     @PostMapping("events/{id}/verify")
     public ResponseEntity<MemberDTO> verify(@PathVariable String id, @RequestBody String code) {
-        Optional<MemberDTO> member = eventRepository.findMemberByCode(UUID.fromString(id), code);
-        return member.map(m -> ResponseEntity.ok(m)).orElse(ResponseEntity.notFound().build());
+        return ControllerUtil.handle((i, p) -> eventService.getMemberByCode(i, p),
+                id, code, HttpStatus.OK);
     }
 
+    //TODO: fix ParamHandlers
     @GetMapping(value = { "events/{eventId}/members/{id}/schools" })
     public ResponseEntity<PageDTO<SchoolDTO>> getSchools(@PathVariable String id, Authentication auth,
             @RequestParam("step") Integer step,
