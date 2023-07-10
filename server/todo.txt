@@ -69,7 +69,7 @@ New TODO:
     you can invite someone from outside and priority rate in the same way (filter bar, whether it has been invited from outside)
 
     Team{
-      members,
+      profiles,
       profileId (profileId is by group)
     }
 
