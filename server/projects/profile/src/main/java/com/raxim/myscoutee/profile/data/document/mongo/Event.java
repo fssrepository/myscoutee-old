@@ -230,119 +230,155 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
 
     // eventItem range should be within event
     public void sync() {
-        if (getItems() != null) {
-            // max capacity can be changed only from the event
-            List<Event> items = getItems().stream().map(item -> {
-                if (getCapacity() != null && item.getCapacity() != null) {
-
-                    if (item.getCapacity().getMax() > getCapacity().getMax()) {
-                        item.getCapacity().setMax(getCapacity().getMax());
-                    }
-
-                    if (item.getCapacity().getMin() > getCapacity().getMax()) {
-                        item.getCapacity().setMin(getCapacity().getMax());
-                    }
-                }
-                return item;
-            }).toList();
-            setItems(items);
-
-            Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
-                    .map(item -> item.getRange().getStart())
-                    .min((cap1, cap2) -> cap1.isBefore(cap2) ? -1 : 1);
-
-            if (optStart.isPresent()) {
-                LocalDateTime start = optStart.get();
-                if (getRange() != null
-                        && start.isBefore(getRange().getStart())) {
-                    getRange().setStart(start);
-                }
-            }
-
-            Optional<LocalDateTime> optEnd = getItems().stream().filter(item -> item.getRange() != null)
-                    .map(item -> item.getRange().getEnd())
-                    .max((cap1, cap2) -> cap1.isAfter(cap2) ? -1 : 1);
-
-            if (optEnd.isPresent()) {
-                LocalDateTime end = optEnd.get();
-                if (getRange() != null
-                        && end.isAfter(getRange().getEnd())) {
-                    getRange().setEnd(end);
-                }
-            }
-        }
-
-        LocalDateTime graceTime = getRule() != null ? getRange().getStart()
-                .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
-                : getRange().getStart();
-
-        if (getMembers() != null) {
+        if ("I".equals(getType())) {
             int cnt = (int) getMembers().stream().filter(member -> "A".equals(member.getStatus())).count();
             setNumOfMembers(cnt);
 
-            getMembers().stream().map(member -> {
-                if ("L".equals(member.getStatus())
-                        && member.getUpdatedDate().isAfter(graceTime)) {
-                    member.setStatus("LL");
+            if (getMembers() != null && getCapacity() != null) {
+                int diff = getCapacity().getMax() - cnt;
+
+                if (diff > 0) {
+                    getMembers().stream()
+                            .filter(member -> "W".equals(member.getStatus()))
+                            .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate()))
+                            .limit(diff).map(member -> {
+                                member.setStatus("J");
+                                return member;
+                            })
+                            .collect(Collectors.toList());
                 }
-                return member;
-            });
 
-            // admin or promoter
-            if (getRef() != null) {
-                int promoterCnt = (int) getMembers().stream()
-                        .filter(member -> "P".equals(member.getRole()) && "A".equals(member.getStatus())).count();
-
-                if (promoterCnt == 0) {
-                    setStatus("C");
-                }
-            } else {
-                int adminCnt = (int) getMembers().stream()
-                        .filter(member -> "A".equals(member.getRole()) && "A".equals(member.getStatus())).count();
-
-                if (adminCnt == 0) {
-                    Optional<Member> optMemberMin = getMembers().stream().filter(member -> "U".equals(member.getRole()))
-                            .min((cap1, cap2) -> cap1.getCreatedDate().isBefore(cap2.getCreatedDate()) ? -1 : 1);
-
-                    if (optMemberMin.isPresent()) {
-                        Member memberMin = optMemberMin.get();
-                        memberMin.setRole("A");
-                        getMembers().add(memberMin);
-                    }
-                }
-            }
-
-            if (getCapacity() != null) {
-
-                // if invitation has been accepted, but the screen was not uptodate -> accept
-                // should have been wait
-                int diffWithJ = cnt - getCapacity().getMax();
+                int cntWithJ = (int) getMembers().stream()
+                        .filter(member -> "J".equals(member.getStatus())).count();
+                int diffWithJ = cntWithJ - getCapacity().getMax();
 
                 if (diffWithJ > 0) {
                     getMembers().stream()
-                            .filter(member -> "A".equals(member.getStatus()))
-                            .sorted((m1, m2) -> m2.getUpdatedDate().compareTo(m1.getUpdatedDate()))
+                            .filter(member -> "J".equals(member.getStatus()))
+                            .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate()))
                             .limit(diffWithJ).map(member -> {
                                 member.setStatus("W");
                                 return member;
                             })
                             .collect(Collectors.toList());
                 }
+            }
+        } else {
+            if (getItems() != null) {
+                // max capacity can be changed only from the event
+                List<Event> items = getItems().stream().map(item -> {
+                    if (getCapacity() != null && item.getCapacity() != null) {
 
-                if (getNumOfMembers() >= getCapacity().getMin()) {
-                    if (LocalDateTime.now().isAfter(graceTime) && getNumOfMembers() >= getCapacity().getMin()) {
-                        setStatus("A");
-                    } else {
+                        if (item.getCapacity().getMax() > getCapacity().getMax()) {
+                            item.getCapacity().setMax(getCapacity().getMax());
+                        }
+
+                        if (item.getCapacity().getMin() > getCapacity().getMax()) {
+                            item.getCapacity().setMin(getCapacity().getMax());
+                        }
+                    }
+                    return item;
+                }).toList();
+                setItems(items);
+
+                Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
+                        .map(item -> item.getRange().getStart())
+                        .min((cap1, cap2) -> cap1.isBefore(cap2) ? -1 : 1);
+
+                if (optStart.isPresent()) {
+                    LocalDateTime start = optStart.get();
+                    if (getRange() != null
+                            && start.isBefore(getRange().getStart())) {
+                        getRange().setStart(start);
+                    }
+                }
+
+                Optional<LocalDateTime> optEnd = getItems().stream().filter(item -> item.getRange() != null)
+                        .map(item -> item.getRange().getEnd())
+                        .max((cap1, cap2) -> cap1.isAfter(cap2) ? -1 : 1);
+
+                if (optEnd.isPresent()) {
+                    LocalDateTime end = optEnd.get();
+                    if (getRange() != null
+                            && end.isAfter(getRange().getEnd())) {
+                        getRange().setEnd(end);
+                    }
+                }
+            }
+
+            LocalDateTime graceTime = getRule() != null ? getRange().getStart()
+                    .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
+                    : getRange().getStart();
+
+            if (getMembers() != null) {
+                int cnt = (int) getMembers().stream().filter(member -> "A".equals(member.getStatus())).count();
+                setNumOfMembers(cnt);
+
+                getMembers().stream().map(member -> {
+                    if ("L".equals(member.getStatus())
+                            && member.getUpdatedDate().isAfter(graceTime)) {
+                        member.setStatus("LL");
+                    }
+                    return member;
+                });
+
+                // admin or promoter
+                if (getRef() != null) {
+                    int promoterCnt = (int) getMembers().stream()
+                            .filter(member -> "P".equals(member.getRole()) && "A".equals(member.getStatus())).count();
+
+                    if (promoterCnt == 0) {
                         setStatus("C");
                     }
                 } else {
-                    setStatus("P");
+                    int adminCnt = (int) getMembers().stream()
+                            .filter(member -> "A".equals(member.getRole()) && "A".equals(member.getStatus())).count();
+
+                    if (adminCnt == 0) {
+                        Optional<Member> optMemberMin = getMembers().stream()
+                                .filter(member -> "U".equals(member.getRole()))
+                                .min((cap1, cap2) -> cap1.getCreatedDate().isBefore(cap2.getCreatedDate()) ? -1 : 1);
+
+                        if (optMemberMin.isPresent()) {
+                            Member memberMin = optMemberMin.get();
+                            memberMin.setRole("A");
+                            getMembers().add(memberMin);
+                        }
+                    }
+                }
+
+                if (getCapacity() != null) {
+
+                    // if invitation has been accepted, but the screen was not uptodate -> accept
+                    // should have been wait
+                    int diffWithJ = cnt - getCapacity().getMax();
+
+                    if (diffWithJ > 0) {
+                        getMembers().stream()
+                                .filter(member -> "A".equals(member.getStatus()))
+                                .sorted((m1, m2) -> m2.getUpdatedDate().compareTo(m1.getUpdatedDate()))
+                                .limit(diffWithJ).map(member -> {
+                                    member.setStatus("W");
+                                    return member;
+                                })
+                                .collect(Collectors.toList());
+                    }
+
+                    if (getNumOfMembers() >= getCapacity().getMin()) {
+                        if (LocalDateTime.now().isAfter(graceTime) && getNumOfMembers() >= getCapacity().getMin()) {
+                            setStatus("A");
+                        } else {
+                            setStatus("C");
+                        }
+                    } else {
+                        setStatus("P");
+                    }
                 }
             }
-        }
 
-        if (getNumOfMembers() == 0) {
-            setStatus("C");
+            if (getNumOfMembers() == 0) {
+                setStatus("C");
+            }
         }
     }
 

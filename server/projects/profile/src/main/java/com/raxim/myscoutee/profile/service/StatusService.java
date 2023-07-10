@@ -34,41 +34,6 @@ public class StatusService {
     }
 
     // approve, kick etc.
-    public Optional<EventDTO> manageMemberStatusForItem(String id, String profileUid, UUID byUuid, String status)
-            throws MessageException {
-        Optional<Event> eventItemRes = id != null ? this.eventRepository.findById(UUID.fromString(id))
-                : Optional.empty();
-
-        UUID memberId = UUID.fromString(profileUid);
-
-        if (eventItemRes.isPresent()) {
-            Event eventItem = eventItemRes.get();
-
-            Optional<Member> optCurrentMember = eventItem.getMembers().stream()
-                    .filter(member -> memberId.equals(member.getProfile().getId())).findFirst();
-
-            Optional<Member> optAdmin = eventItem.getMembers().stream()
-                    .filter(member -> byUuid.equals(member.getProfile().getId())
-                            && "A".equals(member.getRole()))
-                    .findFirst();
-
-            if (!optAdmin.isPresent() || !optCurrentMember.isPresent()) {
-                throw new IllegalAccessException();
-            }
-
-            Member currentMember = optCurrentMember.get();
-            currentMember.setStatus(status);
-            currentMember.setUpdatedDate(LocalDateTime.now());
-
-            eventItem.sync();
-
-            Event dbEventItem = this.eventRepository.save(eventItem);
-            return Optional.of(new EventDTO(dbEventItem));
-        }
-        return Optional.empty();
-    }
-
-    // approve, kick etc.
     public Optional<EventDTO> manageMemberStatusForEvent(String id, String profileUid, UUID byUuid, String status)
             throws MessageException {
         Optional<Event> eventRes = id != null ? this.eventRepository.findById(UUID.fromString(id))
@@ -103,46 +68,6 @@ public class StatusService {
         return Optional.empty();
     }
 
-    // optional eventItem
-    public Optional<EventDTO> changeStatusForItem(String id, UUID profileUid, String status) {
-        Optional<Event> eventItemRes = id != null ? this.eventRepository.findById(UUID.fromString(id))
-                : Optional.empty();
-
-        if (eventItemRes.isPresent()) {
-            Event eventItem = eventItemRes.get();
-
-            Optional<Member> optCurrentMember = eventItem.getMembers().stream()
-                    .filter(member -> profileUid.equals(member.getProfile().getId())).findFirst();
-
-            if (optCurrentMember.isPresent()) {
-                Member currentMember = optCurrentMember.get();
-                currentMember.setStatus(status);
-                currentMember.setUpdatedDate(LocalDateTime.now());
-            } else {
-                Optional<Profile> optProfile = profileRepository
-                        .findById(profileUid);
-                if (optProfile.isPresent()) {
-                    Member newMember = new Member();
-                    Profile profile = optProfile.get();
-                    newMember.setProfile(profile);
-                    newMember.setUpdatedDate(LocalDateTime.now());
-                    newMember.setCreatedDate(LocalDateTime.now());
-                    newMember.setRole("U");
-                    newMember.setStatus(status);
-
-                    eventItem.getMembers().add(newMember);
-                }
-            }
-
-            eventItem.sync();
-
-            Event dbEventItem = this.eventRepository.save(eventItem);
-            return Optional.of(new EventDTO(dbEventItem));
-
-        }
-        return Optional.empty();
-    }
-
     // promotion accept event -> message to participant, or cancel event
     public Optional<EventDTO> changeStatusForEvent(String id, UUID profileUid, String status)
             throws MessageException {
@@ -152,7 +77,8 @@ public class StatusService {
         if (eventRes.isPresent()) {
             Event event = eventRes.get();
 
-            if (event.getRef() != null) {
+            if (event.getRef() != null
+                    && ("A".equals(event.getAccess()) && Boolean.FALSE.equals(event.getAutoInvite()))) {
                 Optional<Promotion> optPromotion = this.promotionRepository
                         .findPromotionByEvent(event.getRef().getId());
                 if (!optPromotion.isPresent()) {
@@ -174,13 +100,31 @@ public class StatusService {
             Optional<Member> optCurrentMember = event.getMembers().stream()
                     .filter(member -> profileUid.equals(member.getProfile().getId())).findFirst();
 
-            if (!optCurrentMember.isPresent()) {
-                throw new IllegalAccessException();
+            if (!"I".equals(event.getType())) {
+                if (!optCurrentMember.isPresent()) {
+                    throw new IllegalAccessException();
+                }
             }
 
-            Member currentMember = optCurrentMember.get();
-            currentMember.setStatus(status);
-            currentMember.setUpdatedDate(LocalDateTime.now());
+            if (optCurrentMember.isPresent()) {
+                Member currentMember = optCurrentMember.get();
+                currentMember.setStatus(status);
+                currentMember.setUpdatedDate(LocalDateTime.now());
+            } else {
+                Optional<Profile> optProfile = profileRepository
+                        .findById(profileUid);
+                if (optProfile.isPresent()) {
+                    Member newMember = new Member();
+                    Profile profile = optProfile.get();
+                    newMember.setProfile(profile);
+                    newMember.setUpdatedDate(LocalDateTime.now());
+                    newMember.setCreatedDate(LocalDateTime.now());
+                    newMember.setRole("U");
+                    newMember.setStatus(status);
+
+                    event.getMembers().add(newMember);
+                }
+            }
 
             event.sync();
             Event dbEvent = eventRepository.save(event);

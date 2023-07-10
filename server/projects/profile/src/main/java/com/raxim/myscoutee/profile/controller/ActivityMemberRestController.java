@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.ControllerUtil;
-import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.CodeDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
@@ -79,36 +78,6 @@ public class ActivityMemberRestController {
         this.eventService = eventService;
     }
 
-    @PostMapping("events/{id}/items/{itemId}/{type}")
-    public ResponseEntity<?> changeStatusForItem(@PathVariable String itemId,
-            @PathVariable String type,
-            @RequestBody Event eventItem, Authentication auth) {
-        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = firebasePrincipal.getUser().getProfile();
-
-        String actionType = MemberAction.valueOf(type).getType();
-
-        return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForItem(i, s, p),
-                itemId, profile.getId(), actionType,
-                HttpStatus.OK);
-    }
-
-    // wait is when we have invited more members than what capacity we have set, if
-    // it's filled, we can accept with wait
-    @PostMapping({ "events/{id}/{type}", "invitations/{id}/{type}" })
-    public ResponseEntity<EventDTO> changeStatusForEvent(@PathVariable String id,
-            @PathVariable String type,
-            Authentication auth) {
-        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = firebasePrincipal.getUser().getProfile();
-
-        String actionType = MemberAction.valueOf(type).getType();
-
-        return ControllerUtil.handle((i, s, p) -> statusService.changeStatusForEvent(i, s, p),
-                id, profile.getId(), actionType,
-                HttpStatus.OK);
-    }
-
     // when the promoter accepts, can see the members, before that not!
     // instead of "clone" use name "pick or select"
     // TODO: promotion fix -> statusService.changeStatusForEvent not prepared to
@@ -141,8 +110,14 @@ public class ActivityMemberRestController {
     // recommmended, promotion event needs geo position (longitude, lattitude
     // built in map willbe later on -> the user coordinates to set for the time
     // being)
-    @PostMapping(value = { "promotions/{id}/{type}" })
-    public ResponseEntity<EventDTO> changeEventForPromotion(@PathVariable String id, @PathVariable String type,
+
+    // wait is when we have invited more members than what capacity we have set, if
+    // it's filled, we can accept with wait
+    // no separate promotions tab!!!
+    @PostMapping({ "events/{id}/{type}", "invitations/{id}/{type}",
+            "events/{eventId}/items/{id}/{type}" })
+    public ResponseEntity<EventDTO> changeStatusForEvent(@PathVariable String id,
+            @PathVariable String type,
             Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
@@ -154,7 +129,8 @@ public class ActivityMemberRestController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("events/{eventId}/members/{memberId}/{type}")
+    @PostMapping({ "events/{eventId}/members/{memberId}/{type}",
+            "events/{eventId}/items/{id}/members/{memberId}/{type}" })
     public ResponseEntity<?> manageStatusForEvent(@PathVariable String eventId, @PathVariable String itemId,
             @PathVariable String memberId, @PathVariable String type, Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
@@ -164,19 +140,6 @@ public class ActivityMemberRestController {
 
         return ControllerUtil.handle((i, m, s, p) -> statusService.manageMemberStatusForEvent(i, m, s, p),
                 eventId, memberId, profile.getId(), actionType,
-                HttpStatus.OK);
-    }
-
-    @PostMapping("events/{eventId}/items/{id}/members/{memberId}/{type}")
-    public ResponseEntity<?> manageStatusForItem(@PathVariable String itemId,
-            @PathVariable String memberId, @PathVariable String type, Authentication auth) {
-        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = firebasePrincipal.getUser().getProfile();
-
-        String actionType = MemberAction.valueOf(type).getType();
-
-        return ControllerUtil.handle((i, m, s, p) -> statusService.manageMemberStatusForItem(i, m, s, p),
-                itemId, memberId, profile.getId(), actionType,
                 HttpStatus.OK);
     }
 
@@ -194,19 +157,32 @@ public class ActivityMemberRestController {
         return ResponseEntity.ok(new PageDTO<>(members, lOffset));
     }
 
-    @GetMapping(value = { "events/{eventId}/members", "invitations/{eventId}/members" })
-    public ResponseEntity<PageDTO<MemberDTO>> getMembersForEvent(@PathVariable String eventId,
+    @GetMapping(value = { "events/{id}/members", "invitations/{id}/members",
+            "events/{eventId}/items/{id}/members" })
+    public ResponseEntity<PageDTO<MemberDTO>> getMembersForEvent(@PathVariable String id,
             PageParam pageParam, Authentication auth) {
 
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();
 
         pageParam = paramHandlers.handle(profile, pageParam, MemberParamHandler.TYPE);
-        List<MemberDTO> members = eventService.getMembersByEvent(pageParam, eventId);
+        List<MemberDTO> members = eventService.getMembersByEvent(pageParam, id);
         List<Object> lOffset = CommonUtil.offset(members, pageParam.getOffset());
         Object lRole = !members.isEmpty() ? members.get(members.size() - 1).getRole() : null;
 
         return ResponseEntity.ok(new PageDTO<>(members, lOffset, 1, null, lRole));
+    }
+
+    @PostMapping("events/{eventId}/members")
+    @Transactional
+    public ResponseEntity<EventDTO> addMembers(
+            @PathVariable String eventId, @RequestBody List<String> profileids, Authentication auth) {
+        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = firebasePrincipal.getUser().getProfile();
+
+        return ControllerUtil.handle((i, s, p) -> eventService.inviteMembersForEvent(i, s, p),
+                eventId, profileids, profile.getId(),
+                HttpStatus.CREATED);
     }
 
     @GetMapping("events/{id}/code")
@@ -224,19 +200,6 @@ public class ActivityMemberRestController {
     public ResponseEntity<MemberDTO> verify(@PathVariable String id, @RequestBody String code) {
         Optional<MemberDTO> member = eventRepository.findMemberByCode(UUID.fromString(id), code);
         return member.map(m -> ResponseEntity.ok(m)).orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("events/{eventId}/members")
-
-    @Transactional
-    public ResponseEntity<EventDTO> addMembers(
-            @PathVariable String eventId, @RequestBody List<String> profileids, Authentication auth) {
-        FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = firebasePrincipal.getUser().getProfile();
-
-        return ControllerUtil.handle((i, s, p) -> eventService.inviteMembersForEvent(i, s, p),
-                eventId, profileids, profile.getId(),
-                HttpStatus.CREATED);
     }
 
     @GetMapping(value = { "events/{eventId}/members/{id}/schools" })
