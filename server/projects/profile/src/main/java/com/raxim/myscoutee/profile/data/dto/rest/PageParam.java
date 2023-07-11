@@ -17,15 +17,15 @@ public class PageParam {
     public PageParam() {
     }
 
-    public PageParam(String[] offset) {
+    public PageParam(Object[] offset) {
         this(offset, null);
     }
 
-    public PageParam(String[] offset, String type) {
+    public PageParam(Object[] offset, String type) {
         this(offset, type, 0);
     }
 
-    public PageParam(String[] offset, String type, int direction) {
+    public PageParam(Object[] offset, String type, int direction) {
         this.offset = offset;
         this.direction = direction;
         this.type = type;

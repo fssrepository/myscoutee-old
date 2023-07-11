@@ -7,8 +7,49 @@
     {
         "$lookup": {
             "from": "events",
-            "localField": "items.$id",
-            "foreignField": "_id",
+            "let": {
+                "items": "$items"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$in": [
+                                "$_id",
+                                "$$items.$id"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$replaceWith": {
+                        "$setField": {
+                            "field": "name",
+                            "input": "$$ROOT",
+                            "value": {
+                                "$cond": {
+                                    "if": {
+                                        "$gt": [
+                                            "$slotCnt",
+                                            0
+                                        ]
+                                    },
+                                    "then": {
+                                        "$concat": [
+                                            {
+                                                "$toString": "$slotCnt"
+                                            },
+                                            ". ",
+                                            "$name"
+                                        ]
+                                    },
+                                    "else": "$name"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
             "as": "items"
         }
     },
@@ -16,12 +57,21 @@
         "$unwind": "$items"
     },
     {
+        "$addFields": {
+            "child": {
+                "stage": "$items.stage",
+                "range": "$items.range",
+                "createdDate": "$items.createdDate"
+            }
+        }
+    },
+    {
         "$match": {
             "$expr": {
                 "$and": [
                     {
                         "$in": [
-                            "$status",
+                            "$items.status",
                             [
                                 "A",
                                 "P"
@@ -32,27 +82,47 @@
                         "$or": [
                             {
                                 "$gt": [
-                                    "$range.start",
-                                    {
-                                        "$toDate": "?#{#param.offset[0]}"
-                                    }
+                                    "$items.stage",
+                                    "?#{#param.offset[2]}"
                                 ]
                             },
                             {
                                 "$and": [
                                     {
                                         "$eq": [
-                                            "$range.start",
-                                            {
-                                                "$toDate": "?#{#param.offset[0]}"
-                                            }
+                                            "$items.stage",
+                                            "?#{#param.offset[2]}"
                                         ]
                                     },
                                     {
-                                        "$gt": [
-                                            "$createdDate",
+                                        "$or": [
                                             {
-                                                "$toDate": "?#{#param.offset[1]}"
+                                                "$gt": [
+                                                    "$items.range.start",
+                                                    {
+                                                        "$toDate": "?#{#param.offset[0]}"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "$and": [
+                                                    {
+                                                        "$eq": [
+                                                            "$items.range.start",
+                                                            {
+                                                                "$toDate": "?#{#param.offset[0]}"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$gt": [
+                                                            "$items.createdDate",
+                                                            {
+                                                                "$toDate": "?#{#param.offset[1]}"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
@@ -66,8 +136,9 @@
     },
     {
         "$sort": {
-            "range.start": 1,
-            "createdDate": 1
+            "child.stage": 1,
+            "child.range.start": 1,
+            "child.createdDate": 1
         }
     },
     {
@@ -76,19 +147,69 @@
     {
         "$addFields": {
             "groupKey": {
-                "$dateToString": {
-                    "format": "?#{#param.groupKey}",
-                    "date": "$range.start"
-                }
+                "$concat": [
+                    {
+                        "$cond": {
+                            "if": {
+                                "$gt": [
+                                    "$items.stage",
+                                    0
+                                ]
+                            },
+                            "then": {
+                                "$concat": [
+                                    {
+                                        "$toString": "$items.stage"
+                                    },
+                                    ". "
+                                ]
+                            },
+                            "else": ""
+                        }
+                    },
+                    {
+                        "$dateToString": {
+                            "format": "?#{#param.groupKey}",
+                            "date": "$items.range.start"
+                        }
+                    },
+                    {
+                        "$cond": {
+                            "if": {
+                                "$eq": [
+                                    "$multislot",
+                                    true
+                                ]
+                            },
+                            "then": {
+                                "$concat": [
+                                    " - ",
+                                    {
+                                        "$dateToString": {
+                                            "format": "?#{#param.groupKey}",
+                                            "date": "$items.range.end"
+                                        }
+                                    }
+                                ]
+                            },
+                            "else": ""
+                        }
+                    }
+                ]
             }
         }
     },
     {
         "$addFields": {
             "user": {
-                "$first": {
+                "$last": {
                     "$filter": {
-                        "input": "$members",
+                        "input": {
+                            "$concatArrays": [
+                                "$members",
+                                "$items.members"
+                            ]
+                        },
                         "as": "member",
                         "cond": {
                             "$and": [
@@ -133,13 +254,14 @@
                             ]
                         },
                         "sortKey": {
-                            "$toLong": "$createdDate"
+                            "$toLong": "$items.createdDate"
                         },
                         "offset": [
-                            "$range.start",
+                            "$items.range.start",
                             {
-                                "$toDate": "$createdDate"
-                            }
+                                "$toDate": "$items.createdDate"
+                            },
+                            "$items.stage"
                         ]
                     }
                 ]

@@ -76,9 +76,14 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
     @JsonProperty(value = "multislot")
     private Boolean multislot;
 
-    // counter of stage
+    // based on created date make a slotIdx (sync method)
+    //leave it 0, if there is only one item in the slot
+    @JsonIgnore
+    private int slotCnt;
+
+    // counter of stage - stage should be greater than 0, if it's multistage
     @JsonProperty(value = "stage")
-    private Integer stage;
+    private int stage;
 
     // ref counter
     @JsonIgnore
@@ -449,11 +454,11 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
         this.autoInvite = autoInvite;
     }
 
-    public Integer getStage() {
+    public int getStage() {
         return stage;
     }
 
-    public void setStage(Integer stage) {
+    public void setStage(int stage) {
         this.stage = stage;
     }
 
@@ -495,5 +500,13 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
 
     public void setMatches(List<Match> matches) {
         this.matches = matches;
+    }
+
+    public int getSlotCnt() {
+        return slotCnt;
+    }
+
+    public void setSlotCnt(int slotIdx) {
+        this.slotCnt = slotIdx;
     }
 }

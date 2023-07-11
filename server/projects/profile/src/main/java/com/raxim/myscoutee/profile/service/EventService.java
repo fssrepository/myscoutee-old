@@ -278,8 +278,9 @@ public class EventService {
         return Optional.empty();
     }
 
-    public List<EventDTO> getEventItems(PageParam pageParam, UUID eventId) {
-        return eventRepository.findItemsByEvent(eventId, pageParam);
+    public List<EventDTO> getEventItems(PageParam pageParam, String eventId) {
+        UUID eventUid = UUID.fromString(eventId);
+        return eventRepository.findItemsByEvent(eventUid, pageParam);
     }
 
     public Optional<EventDTO> inviteMembersForEvent(String eventId, List<String> pProfileUuids, UUID byUuid)

@@ -14,6 +14,7 @@ public class PageDTO<T> {
     @JsonIgnore
     private List<Object> offset;
 
+    //1 is scrollable for up and down
     @JsonProperty(value = "scroll")
     private Integer scroll;
 

@@ -128,6 +128,23 @@ public class ActivityRestController {
         return response;
     }
 
+    // promotions is the new recommendation tab
+    @GetMapping(value = { "events/{eventId}/items", "events/{id}/items/{eventId}/items",
+            "invitations/{eventId}/items", "promotions/{id}/items" })
+    public ResponseEntity<PageDTO<EventDTO>> items(@PathVariable String eventId,
+            PageParam pageParam, Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
+
+        // override page param
+        pageParam = paramHandlers.handle(profile, pageParam, EventItemParamHandler.TYPE);
+
+        List<EventDTO> eventItems = eventService.getEventItems(pageParam, eventId);
+        List<Object> lOffset = CommonUtil.offset(eventItems, pageParam.getOffset());
+
+        return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
+    }
+
     @PostMapping("events/{id}/items")
     public ResponseEntity<EventDTO> addItem(@PathVariable String id, @RequestBody Event eventItem,
             Authentication auth) {
@@ -167,22 +184,6 @@ public class ActivityRestController {
                 profile, id, eventItem,
                 HttpStatus.NO_CONTENT);
         return response;
-    }
-
-    @GetMapping(value = { "events/{id}/items", "invitations/{id}/items", "promotions/{id}/items" })
-    public ResponseEntity<PageDTO<EventDTO>> items(@PathVariable String id, PageParam pageParam,
-            Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-
-        // override page param
-        pageParam = paramHandlers.handle(profile, pageParam, EventItemParamHandler.TYPE);
-
-        List<EventDTO> eventItems = eventService.getEventItems(pageParam, UUID.fromString(id));
-
-        List<Object> lOffset = CommonUtil.offset(eventItems, pageParam.getOffset());
-
-        return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }
 
     // TODO: promotion fix
