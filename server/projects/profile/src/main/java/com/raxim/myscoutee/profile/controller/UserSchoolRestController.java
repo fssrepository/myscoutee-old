@@ -110,6 +110,7 @@ public class UserSchoolRestController {
         if (profileId == null) {
             return ResponseEntity.notFound().build();
         } else {
+            //TODO: school fix why we need new method findById is fine for schoolRepository
             Optional<School> school = profileService
                     .getSchoolByProfile(profileId, UUID.fromString(id));
             if (school.isPresent()) {

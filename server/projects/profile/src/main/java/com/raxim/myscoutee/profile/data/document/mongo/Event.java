@@ -306,7 +306,8 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
                     setItems(items);
                 }
 
-                //TODO: multislot fix hierarchy -> if item is added, than event and promotion needs to be updated until upper level
+                // TODO: multislot fix hierarchy -> if item is added, than event and promotion
+                // needs to be updated until upper level
                 Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
                         .map(item -> item.getRange().getStart())
                         .min((cap1, cap2) -> cap1.isBefore(cap2) ? -1 : 1);
@@ -348,14 +349,20 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
                     return member;
                 });
 
-                //TODO: multislot fix
                 // admin or promoter
                 if (getRef() != null) {
+
+                    // promotion needs to cancel all the subEvents
                     int promoterCnt = (int) getMembers().stream()
                             .filter(member -> "P".equals(member.getRole()) && "A".equals(member.getStatus()))
                             .count();
 
                     if (promoterCnt == 0) {
+                        List<Event> events = getItems().stream().map(item -> {
+                            item.setStatus("C");
+                            return item;
+                        }).toList();
+                        setItems(events);
                         setStatus("C");
                     }
                 } else {
@@ -377,32 +384,34 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
                     }
                 }
 
-                //TODO: multislot fix
-                if (getCapacity() != null) {
+                //algorithm will calculate whether new member needs to be added, when someone leaves
+                if (!Boolean.TRUE.equals(getMultislot())) {
+                    if (getCapacity() != null) {
 
-                    // if invitation has been accepted, but the screen was not uptodate -> accept
-                    // should have been wait
-                    int diffWithJ = cnt - getCapacity().getMax();
+                        // if invitation has been accepted, but the screen was not uptodate -> accept
+                        // should have been wait
+                        int diffWithJ = cnt - getCapacity().getMax();
 
-                    if (diffWithJ > 0) {
-                        getMembers().stream()
-                                .filter(member -> "A".equals(member.getStatus()))
-                                .sorted((m1, m2) -> m2.getUpdatedDate().compareTo(m1.getUpdatedDate()))
-                                .limit(diffWithJ).map(member -> {
-                                    member.setStatus("W");
-                                    return member;
-                                })
-                                .collect(Collectors.toList());
-                    }
-
-                    if (getNumOfMembers() >= getCapacity().getMin()) {
-                        if (LocalDateTime.now().isAfter(graceTime) && getNumOfMembers() >= getCapacity().getMin()) {
-                            setStatus("A");
-                        } else {
-                            setStatus("C");
+                        if (diffWithJ > 0) {
+                            getMembers().stream()
+                                    .filter(member -> "A".equals(member.getStatus()))
+                                    .sorted((m1, m2) -> m2.getUpdatedDate().compareTo(m1.getUpdatedDate()))
+                                    .limit(diffWithJ).map(member -> {
+                                        member.setStatus("W");
+                                        return member;
+                                    })
+                                    .collect(Collectors.toList());
                         }
-                    } else {
-                        setStatus("P");
+
+                        if (getNumOfMembers() >= getCapacity().getMin()) {
+                            if (LocalDateTime.now().isAfter(graceTime) && getNumOfMembers() >= getCapacity().getMin()) {
+                                setStatus("A");
+                            } else {
+                                setStatus("C");
+                            }
+                        } else {
+                            setStatus("P");
+                        }
                     }
                 }
             }

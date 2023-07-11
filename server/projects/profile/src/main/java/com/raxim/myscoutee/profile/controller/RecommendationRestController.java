@@ -1,7 +1,5 @@
 package com.raxim.myscoutee.profile.controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,25 +25,18 @@ import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Role;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
 import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
-import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
-import com.raxim.myscoutee.profile.data.dto.rest.FeedbackDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
-import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
-import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.RoleRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
-import com.raxim.myscoutee.profile.service.EventService;
 
 @RepositoryRestController
 @RequestMapping("recommendations")
 public class RecommendationRestController {
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
-    private final EventService eventService;
-    private final EventRepository eventRepository;
     private final GroupRepository groupRepository;
     private final RoleRepository roleRepository;
     private final ObjectMapper objectMapper;
@@ -53,15 +44,11 @@ public class RecommendationRestController {
     public RecommendationRestController(
             ProfileRepository profileRepository,
             UserRepository userRepository,
-            EventService eventService,
-            EventRepository eventRepository,
             GroupRepository groupRepository,
             RoleRepository roleRepository,
             ObjectMapper objectMapper) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
-        this.eventService = eventService;
-        this.eventRepository = eventRepository;
         this.groupRepository = groupRepository;
         this.roleRepository = roleRepository;
         this.objectMapper = objectMapper;
@@ -156,49 +143,6 @@ public class RecommendationRestController {
         return group.map(value -> ResponseEntity.ok(value)).orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    @GetMapping("events")
-    @Transactional
-    public ResponseEntity<Object> events(
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset,
-            Authentication auth) {
-        Object[] tOffset;
-        if (offset != null && offset.length == 2) {
-            tOffset = new Double[] {
-                    Double.parseDouble(offset[0]),
-                    Double.parseDouble(offset[1])
-            };
-        } else {
-            tOffset = new Object[] { 0.0, "1900-01-01" };
-        }
-
-        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-
-        if (profile.getPosition() != null) {
-            List<EventDTO> events = eventRepository.findEventsByProfile(
-                    profile.getId(),
-                    CommonUtil.point(profile.getPosition()),
-                    20,
-                    step != null ? step : 5,
-                    profile.getGroup(),
-                    tOffset);
-
-            // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
-
-            List<Object> lOffset;
-            if (!events.isEmpty()) {
-                lOffset = events.get(events.size() - 1).getOffset();
-            } else {
-                lOffset = Arrays.asList(tOffset);
-            }
-
-            return ResponseEntity.ok(
-                    new PageDTO<>(events, lOffset, 0));
-        } else {
-            return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
-        }
-    }
-
     // TODO: promotion fix
     /*
      * @PostMapping("events/{id}/clone")
@@ -224,128 +168,101 @@ public class RecommendationRestController {
      * }
      */
 
-    // People who you haven't met, but your surroundings are ordered by rate
-    @Deprecated
-    @GetMapping("profiles")
-    @Transactional
-    public ResponseEntity<Object> getInvitations(
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset,
-            Authentication auth) {
-        Object[] tOffset;
-        if (offset != null && offset.length == 5) {
-            tOffset = new Object[] {
-                    Double.parseDouble(offset[0]),
-                    Double.parseDouble(offset[1]),
-                    Double.parseDouble(offset[2]),
-                    Double.parseDouble(offset[3]),
-                    offset[4]
-            };
-        } else {
-            tOffset = new Object[] { 0.0, 0.0, 0.0, 0.0,
-                    LocalDate.now().atStartOfDay().format(DateTimeFormatter.ISO_DATE_TIME) };
-        }
-
-        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-
-        if (profile.getPosition() != null) {
-            List<ProfileDTO> profiles = profileRepository.findPeopleByProfile(
-                    profile.getId(),
-                    CommonUtil.point(profile.getPosition()),
-                    20,
-                    step != null ? step : 5,
-                    profile.getGender(),
-                    profile.getGroup(),
-                    tOffset,
-                    1.5);
-
-            // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
-
-            List<Object> lOffset;
-            if (!profiles.isEmpty()) {
-                lOffset = profiles.get(profiles.size() - 1).getOffset();
-            } else {
-                lOffset = Arrays.asList(tOffset);
-            }
-
-            return ResponseEntity.ok(
-                    new PageDTO<>(profiles, lOffset, 0));
-        } else {
-            return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
-        }
-    }
-
-    // promotion fix
+    // TODO: promotion fix
     /*
-     * @GetMapping(value = { "events/{id}/items", "invitations/{id}/items" })
-     * public ResponseEntity<PageDTO<EventItemDTO>> items(
+     * @GetMapping("/promotions")
      * 
-     * @PathVariable String id,
+     * @Transactional
+     * public ResponseEntity<Object> getPromotions(
      * 
-     * @RequestParam("step") Integer step,
+     * @RequestParam(value = "step", required = false) Integer step,
      * 
-     * @RequestParam("offset") String[] offset,
+     * @RequestParam(value = "offset", required = false) String[] offset,
      * Authentication auth) {
-     * Profile profile = ((FirebasePrincipal)
-     * auth.getPrincipal()).getUser().getProfile();
-     * 
-     * String[] tOffset;
-     * if (offset != null && offset.length == 2) {
-     * tOffset = new String[] { offset[0], offset[1] };
+     * // Convert offset array to List<Object>
+     * List<Object> lOffset;
+     * if (offset != null && offset.length == 5) {
+     * lOffset = Arrays.asList(
+     * Double.parseDouble(offset[0]),
+     * Double.parseDouble(offset[1]),
+     * Double.parseDouble(offset[2]),
+     * Double.parseDouble(offset[3]),
+     * CommonUtil.decode(offset[4]));
      * } else {
-     * tOffset = new String[] { "1900-01-01", "1900-01-01" };
+     * lOffset = Arrays.asList(
+     * 0.0,
+     * 0.0,
+     * 0.0,
+     * 0.0,
+     * LocalDate.now().atStartOfDay().format(DateTimeFormatter.ISO_DATE_TIME));
      * }
      * 
-     * List<EventItemDTO> eventItems = eventRepository.findItemsByEvent(
-     * UUID.fromString(id),
+     * FirebasePrincipal firebasePrincipal = (FirebasePrincipal)
+     * auth.getPrincipal();
+     * Profile profile = firebasePrincipal.getUser().getProfile();
+     * 
+     * if (profile.getPosition() != null) {
+     * List<PromotionDTO> promotions = promotionRepository.findPromotionsByRec(
+     * profile.getId(),
+     * CommonUtil.point(profile.getPosition()),
      * 20,
      * step != null ? step : 5,
-     * "%Y-%m-%d",
-     * profile.getId(),
-     * tOffset);
+     * "j",
+     * profile.getGroup(),
+     * lOffset.toArray());
      * 
-     * // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
-     * 
-     * List<Object> lOffset;
-     * if (!eventItems.isEmpty()) {
-     * lOffset = eventItems.get(eventItems.size() - 1).getOffset();
+     * List<Object> lastOffset;
+     * if (!promotions.isEmpty()) {
+     * lastOffset = promotions.get(promotions.size() - 1).getOffset();
      * } else {
-     * lOffset = Arrays.asList(tOffset);
+     * lastOffset = lOffset;
      * }
      * 
-     * return ResponseEntity.ok(
-     * new PageDTO<>(eventItems, lOffset));
+     * return ResponseEntity.ok(new PageDTO<>(promotions, lastOffset, 0));
+     * } else {
+     * return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
+     * }
      * }
      */
 
-    @GetMapping(value = { "events/{id}/feedbacks", "invitations/{id}/feedbacks" })
-    public ResponseEntity<PageDTO<FeedbackDTO>> feedbacks(
-            @PathVariable String id,
-            @RequestParam("step") Integer step,
-            @RequestParam("offset") String[] offset) {
-        String[] tOffset;
-        if (offset != null && offset.length == 1) {
-            tOffset = new String[] { offset[0] };
-        } else {
-            tOffset = new String[] { "1900-01-01" };
-        }
-
-        List<FeedbackDTO> feedbacks = eventRepository.findFeedbacksByEvent(
-                UUID.fromString(id),
-                20,
-                step != null ? step : 5,
-                tOffset);
-
-        // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
-
-        List<Object> lOffset;
-        if (!feedbacks.isEmpty()) {
-            lOffset = feedbacks.get(feedbacks.size() - 1).getOffset();
-        } else {
-            lOffset = Arrays.asList(tOffset);
-        }
-
-        return ResponseEntity.ok(
-                new PageDTO<>(feedbacks, lOffset));
-    }
+    // TODO: promotion fix
+    /*
+     * @PostMapping("/promotions/{promoId}/events/{id}/clone")
+     * public ResponseEntity<?> cloneEvent(
+     * 
+     * @PathVariable String promoId,
+     * 
+     * @PathVariable String id,
+     * 
+     * @RequestParam(value = "step", required = false) Integer step,
+     * 
+     * @RequestParam(value = "offset", required = false) String[] offset,
+     * Authentication auth) {
+     * FirebasePrincipal firebasePrincipal = (FirebasePrincipal)
+     * auth.getPrincipal();
+     * Profile profile = firebasePrincipal.getUser().getProfile();
+     * 
+     * List<Event> events = eventRepository.findPendingEvents(UUID.fromString(id),
+     * profile.getId());
+     * Event promoter = events.stream()
+     * .filter(event -> event.getInfo().getMembers().stream()
+     * .anyMatch(member -> member.getProfile().getId().equals(profile.getId())))
+     * .findFirst()
+     * .orElse(null);
+     * 
+     * if (promoter == null) {
+     * Optional<Event> event = eventService.cloneEvent(UUID.fromString(id),
+     * profile);
+     * if (event.isPresent()) {
+     * EventDTO tEvent = EventUtil.transform(event.get());
+     * return ResponseEntity.ok(tEvent);
+     * } else {
+     * return ResponseEntity.badRequest().build();
+     * }
+     * } else {
+     * return ResponseEntity.badRequest().body(new ErrorDTO(450,
+     * "err.clone_not_allowed"));
+     * }
+     * }
+     */
 }

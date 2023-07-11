@@ -26,7 +26,6 @@ import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.handler.EventParamHandler;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 
 @Service
 public class EventService {
@@ -35,7 +34,6 @@ public class EventService {
     private final Converters converters;
 
     public EventService(EventRepository eventRepository,
-            PromotionRepository promotionRepository,
             ProfileRepository profileRepository,
             Converters converters) {
         this.eventRepository = eventRepository;
@@ -117,6 +115,10 @@ public class EventService {
             events = eventRepository.findEventByMonth(pageParam, status);
         }
         return events;
+    }
+
+    public List<EventDTO> getInvitations(PageParam pageParam) {
+        return this.eventRepository.findInvitationByProfile(null, null, 0, 0, null, null, 0);
     }
 
     // TODO: promotion fix
@@ -212,6 +214,9 @@ public class EventService {
             eventRes = Optional.of(lEvent);
         }
 
+        // find events in hierarchy, and run sync and shift accordingly on each level
+        // and save
+
         if (eventRes.isPresent()) {
             Event lEvent = this.eventRepository.save(eventRes.get());
             return converters.convert(lEvent).map(obj -> (EventDTO) obj);
@@ -283,7 +288,7 @@ public class EventService {
         return eventRepository.findItemsByEvent(eventUid, pageParam);
     }
 
-    public Optional<EventDTO> inviteMembersForEvent(String eventId, List<String> pProfileUuids, UUID byUuid)
+    public Optional<EventDTO> invite(String eventId, List<String> pProfileUuids, UUID byUuid)
             throws MessageException {
         Optional<Event> eventRes = eventId != null ? this.eventRepository.findById(UUID.fromString(eventId))
                 : Optional.empty();

@@ -29,7 +29,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.service.StatusService;
 
@@ -48,10 +47,6 @@ public class EventServiceTestInt extends AbstractAlgoTest {
         @Autowired
         private EventRepository eventRepository;
 
-        @Autowired
-        // @Spy is not woring for repositories
-        private PromotionRepository promotionRepository;
-
         private Converters converters = new Converters();
 
         private EventService eventService;
@@ -59,10 +54,9 @@ public class EventServiceTestInt extends AbstractAlgoTest {
 
         @BeforeEach
         public void init() {
-                eventService = new EventService(eventRepository, promotionRepository,
+                eventService = new EventService(eventRepository,
                                 profileRepository, converters);
-                statusService = new StatusService(profileRepository, eventRepository,
-                                promotionRepository);
+                statusService = new StatusService(profileRepository, eventRepository);
         }
 
         @Test
@@ -90,7 +84,7 @@ public class EventServiceTestInt extends AbstractAlgoTest {
                                 uuid -> uuid.toString())
                                 .toList();
 
-                eventService.inviteMembersForEvent(AppTestConstants.UUID_EVENT_32.toString(), invitedIds,
+                eventService.invite(AppTestConstants.UUID_EVENT_32.toString(), invitedIds,
                                 AppTestConstants.UUID_PROFILE_OLIVER);
 
                 memberDTOs = this.eventRepository.findMembersByEvent(pageParam,

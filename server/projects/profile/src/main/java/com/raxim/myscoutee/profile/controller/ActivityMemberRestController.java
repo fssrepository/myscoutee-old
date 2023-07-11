@@ -106,6 +106,10 @@ public class ActivityMemberRestController {
         // wait is when we have invited more members than what capacity we have set, if
         // it's filled, we can accept with wait
         // no separate promotions tab!!!
+
+        //join or rate on promotion event, and the sub event you can prefer
+
+        //if an event is full, promoter will get the invitation by the system
         @PostMapping({ "events/{id}/{type}", "invitations/{id}/{type}",
                         "events/{eventId}/items/{id}/{type}" })
         public ResponseEntity<EventDTO> changeStatusForEvent(@PathVariable String id,
@@ -162,7 +166,7 @@ public class ActivityMemberRestController {
                 FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
                 Profile profile = firebasePrincipal.getUser().getProfile();
 
-                return ControllerUtil.handle((i, s, p) -> eventService.inviteMembersForEvent(i, s, p),
+                return ControllerUtil.handle((i, s, p) -> eventService.invite(i, s, p),
                                 eventId, profileids, profile.getId(),
                                 HttpStatus.CREATED);
         }

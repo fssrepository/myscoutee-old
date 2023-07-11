@@ -267,6 +267,7 @@
         },
         "type": "A",
         "stage": 0,
+        "multislot": true,
         "name": "Event32",
         "range": {
             "start": {

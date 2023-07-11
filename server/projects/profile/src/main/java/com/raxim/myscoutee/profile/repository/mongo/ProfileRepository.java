@@ -14,7 +14,6 @@ import com.raxim.myscoutee.profile.data.document.mongo.Car;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.School;
 import com.raxim.myscoutee.profile.data.dto.rest.CarDTO;
-import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
@@ -43,28 +42,6 @@ public interface ProfileRepository extends MongoRepository<Profile, UUID> {
                         @Param("gender") String gender,
                         @Param("groupId") UUID groupId,
                         @Param("cProfileId") UUID cProfileId, // curr
-                        @Param("type") double type);
-
-        @Aggregation(pipeline = "findInvitationByProfile")
-        List<EventDTO> findInvitationByProfile(
-                        @Param("currentId") UUID currentId,
-                        @Param("loc") Point loc,
-                        @Param("limit") int limit,
-                        @Param("step") int step,
-                        @Param("groupId") UUID groupId,
-                        @Param("offset") Object[] offset,
-                        @Param("type") double type);
-
-        @Aggregation(pipeline = "findPeopleByProfile")
-        @Deprecated
-        List<ProfileDTO> findPeopleByProfile(
-                        @Param("currentId") UUID currentId,
-                        @Param("loc") Point loc,
-                        @Param("limit") int limit,
-                        @Param("step") int step,
-                        @Param("gender") String gender,
-                        @Param("groupId") UUID groupId,
-                        @Param("offset") Object[] offset,
                         @Param("type") double type);
 
         @Aggregation(pipeline = "findCarsByProfilePage")

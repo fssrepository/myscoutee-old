@@ -51,6 +51,7 @@ public class GameRestController {
         this.paramHandlers = paramHandlers;
     }
 
+    //TODO: event fix maybe the query prioritize first profiles, who you don't met, but has a contact who has met???
     @GetMapping("/rate_none")
     public ResponseEntity<Object> nonRated(PageParam pageParam,
             Authentication auth) {

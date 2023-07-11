@@ -9,28 +9,23 @@ import org.springframework.stereotype.Service;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.document.mongo.Promotion;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.exception.IllegalAccessException;
 import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.exception.PromotionFullException;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 
 @Service
 public class StatusService {
     private final ProfileRepository profileRepository;
     private final EventRepository eventRepository;
-    private final PromotionRepository promotionRepository;
 
     public StatusService(
             ProfileRepository profileRepository,
-            EventRepository eventRepository,
-            PromotionRepository promotionRepository) {
+            EventRepository eventRepository) {
         this.profileRepository = profileRepository;
         this.eventRepository = eventRepository;
-        this.promotionRepository = promotionRepository;
     }
 
     // approve, kick etc.
@@ -79,13 +74,12 @@ public class StatusService {
 
             if (event.getRef() != null
                     && ("A".equals(event.getAccess()) && Boolean.FALSE.equals(event.getAutoInvite()))) {
-                Optional<Promotion> optPromotion = this.promotionRepository
-                        .findPromotionByEvent(event.getRef().getId());
+                Optional<Event> optPromotion = this.eventRepository.findById(event.getRef().getId());
                 if (!optPromotion.isPresent()) {
                     throw new IllegalAccessException();
                 }
 
-                Promotion promotion = optPromotion.get();
+                Event promotion = optPromotion.get();
                 if (promotion.getNumOfEvents() == 0) {
                     throw new PromotionFullException();
                 }

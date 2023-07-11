@@ -2,9 +2,7 @@ package com.raxim.myscoutee.profile.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.rest.webmvc.RepositoryRestController;
@@ -25,7 +23,6 @@ import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.ControllerUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
@@ -34,10 +31,7 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.handler.EventItemParamHandler;
 import com.raxim.myscoutee.profile.handler.EventParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
-import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
-import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 
 enum EventAction {
@@ -60,20 +54,13 @@ enum EventAction {
 public class ActivityRestController {
 
     private final ProfileRepository profileRepository;
-    private final EventRepository eventRepository;
     private final EventService eventService;
-    private final PromotionRepository promotionRepository;
-    private final GroupRepository groupRepository;
     private final ParamHandlers paramHandlers;
 
-    public ActivityRestController(ProfileRepository profileRepository, EventRepository eventRepository,
-            EventService eventService, PromotionRepository promotionRepository,
-            GroupRepository groupRepository, ParamHandlers paramHandlers) {
+    public ActivityRestController(ProfileRepository profileRepository,
+            EventService eventService, ParamHandlers paramHandlers) {
         this.profileRepository = profileRepository;
-        this.eventRepository = eventRepository;
         this.eventService = eventService;
-        this.promotionRepository = promotionRepository;
-        this.groupRepository = groupRepository;
         this.paramHandlers = paramHandlers;
     }
 
@@ -88,7 +75,7 @@ public class ActivityRestController {
 
         if (profile.getPosition() != null) {
             List<EventDTO> events = eventService.getEvents(pageParam,
-                    new String[] { "A", "P", "C" }); //the statuses is coming from the page filter (SettingsRepository)
+                    new String[] { "A", "P", "C" }); // the statuses is coming from the page filter (SettingsRepository)
 
             List<Object> lOffset = CommonUtil.offset(events, pageParam.getOffset());
 
@@ -99,6 +86,7 @@ public class ActivityRestController {
         }
     }
 
+    // TODO: multislot fix - saveEvent and saveItem should be the same method!!!
     // status needs to be filled in the event either T or P
     @PostMapping("events")
     @Transactional
@@ -114,7 +102,7 @@ public class ActivityRestController {
         return response;
     }
 
-    // can lock event
+    // can lock event, filter for own events (organized by me)
     @PatchMapping("events/{id}")
     @Transactional
     public ResponseEntity<?> patchEvent(@PathVariable String id, @RequestBody Event event,
@@ -126,23 +114,6 @@ public class ActivityRestController {
                 event,
                 HttpStatus.OK);
         return response;
-    }
-
-    // promotions is the new recommendation tab
-    @GetMapping(value = { "events/{eventId}/items", "events/{id}/items/{eventId}/items",
-            "invitations/{eventId}/items", "promotions/{id}/items" })
-    public ResponseEntity<PageDTO<EventDTO>> items(@PathVariable String eventId,
-            PageParam pageParam, Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-
-        // override page param
-        pageParam = paramHandlers.handle(profile, pageParam, EventItemParamHandler.TYPE);
-
-        List<EventDTO> eventItems = eventService.getEventItems(pageParam, eventId);
-        List<Object> lOffset = CommonUtil.offset(eventItems, pageParam.getOffset());
-
-        return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }
 
     @PostMapping("events/{id}/items")
@@ -186,6 +157,23 @@ public class ActivityRestController {
         return response;
     }
 
+    //TODO: promotion fix, only events for the current stage can be shown
+    @GetMapping(value = { "events/{eventId}/items", "events/{id}/items/{eventId}/items",
+            "invitations/{eventId}/items", "promotions/{id}/items" })
+    public ResponseEntity<PageDTO<EventDTO>> getItems(@PathVariable String eventId,
+            PageParam pageParam, Authentication auth) {
+        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+        Profile profile = principal.getUser().getProfile();
+
+        // override page param
+        pageParam = paramHandlers.handle(profile, pageParam, EventItemParamHandler.TYPE);
+
+        List<EventDTO> eventItems = eventService.getEventItems(pageParam, eventId);
+        List<Object> lOffset = CommonUtil.offset(eventItems, pageParam.getOffset());
+
+        return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
+    }
+
     // TODO: promotion fix
     /*
      * @PostMapping("events/{id}/recommend")
@@ -200,8 +188,8 @@ public class ActivityRestController {
      * }
      */
 
-    // TODO cleanup
-    @GetMapping("invitations")
+    // TODO invitation fix
+    /*@GetMapping("invitations")
     @Transactional
     public ResponseEntity<?> getInvitations(@RequestParam(value = "step", required = false) Integer step,
             @RequestParam(value = "offset", required = false) String[] offset, Authentication auth) {
@@ -220,7 +208,7 @@ public class ActivityRestController {
         Profile profile = principal.getUser().getProfile();
 
         if (profile.getPosition() != null) {
-            List<EventDTO> events = profileRepository.findInvitationByProfile(profile.getId(),
+            List<EventDTO> events = eventService.getInvitations(profile.getId(),
                     CommonUtil.point(profile.getPosition()), 20,
                     step != null ? step : 5, profile.getGroup(), tOffset, 1.5);
 
@@ -230,49 +218,12 @@ public class ActivityRestController {
         } else {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
         }
-    }
+    }*/
 
-    // TODO cleanup
-    @GetMapping("promotions")
+    // TODO: recommendation fix
+    @GetMapping("recommendations")
     @Transactional
-    public ResponseEntity<?> getPromotions(@RequestParam(value = "step", required = false) Integer step,
-            @RequestParam(value = "direction", required = false) Integer direction,
-            @RequestParam(value = "offset", required = false) String[] offset, Authentication auth) {
-
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-
-        if (profile.getPosition() != null) {
-            String[] tOffset;
-            Optional<Group> group = groupRepository.findById(profile.getGroup());
-            List<EventDTO> events;
-            if (group.isPresent()) {
-                Group tGroup = group.get();
-                if (tGroup.getType().equals("b")) {
-                    tOffset = offset != null && offset.length == 3 ? new String[] {
-                            CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1])
-                    } : new String[] { "1900-01-01", "1900-01-01" };
-
-                    events = promotionRepository.findFullEventsByPromoter(profile.getId(), 20, step != null ? step : 5,
-                            "%Y-%m-%d", tOffset);
-                } else {
-                    tOffset = offset != null && offset.length == 3 ? new String[] {
-                            CommonUtil.decode(offset[0]), CommonUtil.decode(offset[1]), CommonUtil.decode(offset[2])
-                    } : new String[] { "1900-01-01", "10", "1900-01-01" };
-
-                    events = eventRepository.findEventsByRated(profile.getId(), 20, step != null ? step : 5, "%Y-%m-%d",
-                            tOffset);
-                }
-            } else {
-                tOffset = new String[] {};
-                events = Collections.emptyList();
-            }
-
-            List<Object> lOffset = !events.isEmpty() ? events.get(events.size() - 1).getOffset() : List.of();
-
-            return ResponseEntity.ok(new PageDTO<>(events, lOffset, 0, step));
-        } else {
-            return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
-        }
+    public ResponseEntity<?> getRecommendations(PageParam pageParam, Authentication auth) {
+        return null;
     }
 }

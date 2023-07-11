@@ -54,6 +54,8 @@ public class ActivityFeedbackRestController {
             tOffset = new Object[] { "1900-01-01" };
         }
 
+        // http://dolszewski.com/spring/how-to-bind-requestparam-to-object/
+
         List<FeedbackDTO> feedbacks = eventRepository.findFeedbacksByEvent(
                 UUID.fromString(id), 20, step != null ? step : 5,
                 tOffset);

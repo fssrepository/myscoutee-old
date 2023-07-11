@@ -26,7 +26,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.PromotionRepository;
 import com.raxim.myscoutee.profile.service.StatusService;
 
 @DataMongoTest
@@ -34,7 +33,7 @@ import com.raxim.myscoutee.profile.service.StatusService;
 @Import({ RepositoryConfig.class, JsonConfig.class })
 @TestPropertySource(properties = { "de.flapdoodle.mongodb.embedded.version=6.0.6",
                 "logging.level.org.springframework.data.mongodb=DEBUG" })
-@TestData({ "mongo/profiles.json", "mongo/list/events.json" })
+@TestData({ "mongo/profiles.json", "mongo/multislot/events.json" })
 @TestExecutionListeners(value = MongoDataLoaderTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class StatusServiceTestInt extends AbstractAlgoTest {
 
@@ -43,9 +42,6 @@ public class StatusServiceTestInt extends AbstractAlgoTest {
 
         @Autowired
         private EventRepository eventRepository;
-
-        @Autowired
-        private PromotionRepository promotionRepository;
 
         @Test
         public void shouldEventAdminLeave() throws MessageException {
@@ -71,8 +67,7 @@ public class StatusServiceTestInt extends AbstractAlgoTest {
                 assertEquals(AppTestConstants.UUID_PROFILE_EMMA, memberDTOs.get(1).getMember().getProfile().getId());
                 assertEquals("U", memberDTOs.get(1).getMember().getRole());
 
-                StatusService statusService = new StatusService(profileRepository, eventRepository,
-                                promotionRepository);
+                StatusService statusService = new StatusService(profileRepository, eventRepository);
 
                 statusService.change(
                                 AppTestConstants.UUID_EVENT_32.toString(), AppTestConstants.UUID_PROFILE_OLIVER, "L");

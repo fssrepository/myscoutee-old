@@ -35,7 +35,7 @@ import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 @TestPropertySource(properties = { "de.flapdoodle.mongodb.embedded.version=6.0.6",
                 "logging.level.org.springframework.data.mongodb=DEBUG" })
 // @TestData({"profiles" = mongo/profiles.json})
-@TestData({ "mongo/profiles.json", "mongo/list/events.json" })
+@TestData({ "mongo/profiles.json", "mongo/multislot/events.json" })
 @TestExecutionListeners(value = MongoDataLoaderTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class EventRepositoryListTest {
 
