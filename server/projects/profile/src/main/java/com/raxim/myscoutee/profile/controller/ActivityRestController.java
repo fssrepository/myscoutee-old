@@ -1,7 +1,5 @@
 package com.raxim.myscoutee.profile.controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
@@ -31,7 +28,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.handler.EventItemParamHandler;
 import com.raxim.myscoutee.profile.handler.EventParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
-import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 
 enum EventAction {
@@ -53,13 +49,10 @@ enum EventAction {
 @RequestMapping("activity")
 public class ActivityRestController {
 
-    private final ProfileRepository profileRepository;
     private final EventService eventService;
     private final ParamHandlers paramHandlers;
 
-    public ActivityRestController(ProfileRepository profileRepository,
-            EventService eventService, ParamHandlers paramHandlers) {
-        this.profileRepository = profileRepository;
+    public ActivityRestController(EventService eventService, ParamHandlers paramHandlers) {
         this.eventService = eventService;
         this.paramHandlers = paramHandlers;
     }
@@ -157,7 +150,7 @@ public class ActivityRestController {
         return response;
     }
 
-    //TODO: promotion fix, only events for the current stage can be shown
+    // TODO: promotion fix, only events for the current stage can be shown
     @GetMapping(value = { "events/{eventId}/items", "events/{id}/items/{eventId}/items",
             "invitations/{eventId}/items", "promotions/{id}/items" })
     public ResponseEntity<PageDTO<EventDTO>> getItems(@PathVariable String eventId,
@@ -189,36 +182,43 @@ public class ActivityRestController {
      */
 
     // TODO invitation fix
-    /*@GetMapping("invitations")
-    @Transactional
-    public ResponseEntity<?> getInvitations(@RequestParam(value = "step", required = false) Integer step,
-            @RequestParam(value = "offset", required = false) String[] offset, Authentication auth) {
-
-        String[] tOffset = offset != null && offset.length == 5 ? new String[] {
-                CommonUtil.decode(offset[0]),
-                CommonUtil.decode(offset[1]),
-                CommonUtil.decode(offset[2]),
-                CommonUtil.decode(offset[3]),
-                CommonUtil.decode(offset[4])
-        }
-                : new String[] { "0.0", "0.0", "0.0", "0.0",
-                        LocalDate.now().atStartOfDay().format(DateTimeFormatter.ISO_DATE_TIME) };
-
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        Profile profile = principal.getUser().getProfile();
-
-        if (profile.getPosition() != null) {
-            List<EventDTO> events = eventService.getInvitations(profile.getId(),
-                    CommonUtil.point(profile.getPosition()), 20,
-                    step != null ? step : 5, profile.getGroup(), tOffset, 1.5);
-
-            List<Object> lOffset = !events.isEmpty() ? events.get(events.size() - 1).getOffset() : List.of();
-
-            return ResponseEntity.ok(new PageDTO<>(events, lOffset, 0));
-        } else {
-            return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
-        }
-    }*/
+    /*
+     * @GetMapping("invitations")
+     * 
+     * @Transactional
+     * public ResponseEntity<?> getInvitations(@RequestParam(value = "step",
+     * required = false) Integer step,
+     * 
+     * @RequestParam(value = "offset", required = false) String[] offset,
+     * Authentication auth) {
+     * 
+     * String[] tOffset = offset != null && offset.length == 5 ? new String[] {
+     * CommonUtil.decode(offset[0]),
+     * CommonUtil.decode(offset[1]),
+     * CommonUtil.decode(offset[2]),
+     * CommonUtil.decode(offset[3]),
+     * CommonUtil.decode(offset[4])
+     * }
+     * : new String[] { "0.0", "0.0", "0.0", "0.0",
+     * LocalDate.now().atStartOfDay().format(DateTimeFormatter.ISO_DATE_TIME) };
+     * 
+     * FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
+     * Profile profile = principal.getUser().getProfile();
+     * 
+     * if (profile.getPosition() != null) {
+     * List<EventDTO> events = eventService.getInvitations(profile.getId(),
+     * CommonUtil.point(profile.getPosition()), 20,
+     * step != null ? step : 5, profile.getGroup(), tOffset, 1.5);
+     * 
+     * List<Object> lOffset = !events.isEmpty() ? events.get(events.size() -
+     * 1).getOffset() : List.of();
+     * 
+     * return ResponseEntity.ok(new PageDTO<>(events, lOffset, 0));
+     * } else {
+     * return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
+     * }
+     * }
+     */
 
     // TODO: recommendation fix
     @GetMapping("recommendations")

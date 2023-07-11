@@ -147,7 +147,47 @@ New TODO:
      * }
      * 
      */
+38) promoter accept
+            // when the promoter accepts, can see the members, before that not!
+        // instead of "clone" use name "pick or select"
+        // TODO: promotion fix -> statusService.changeStatusForEvent not prepared to
+        // handle
+        // when event locked, promoter will be invited to the event,
+        // hence the events will appear in the invitations tab, not the promotion tab
+        // the promoter does not receive the chat messages, separate chat tab with
+        // admin?
+        // a normal event can cloned to a template and can be used for promotion later
+        // on
+        // promotion can be time based or just recommend something
+        // (what you can show on recommendation tab -> like approximate time)
+        // can't rerecommend already promotion event - recommended event hasn't any
+        // promoter member also, it's just an empty event
+        // group event is also on recommendation tab -> different colouring
+        // job/idea, is a promotion category, what you can filter on recommendation tab
+        // job is a group event of business, not dating -> advertise an event you need
+        // to have "A" = advertiser role
+        // dropdown box on profile editor, whether only advertiser for a group or
+        // participants also
+        // there is no separate job group
+        // promotion editor is on event tab
+        // group event will be shown at invitations tab
+        // (however members are not added to the event as invited members to simiplify)
+        // to join to a group is on profile screen (separate button etc.) -> remove from
+        // recommendations screen
+        // recommendation tab will be removed (when click on +, you can select -> it
+        // shows recommended
+        // and promotional event in the same screen, no separate tab)
+        // recommmended, promotion event needs geo position (longitude, lattitude
+        // built in map willbe later on -> the user coordinates to set for the time
+        // being)
 
+        // wait is when we have invited more members than what capacity we have set, if
+        // it's filled, we can accept with wait
+        // no separate promotions tab!!!
+
+        //join or rate on promotion event, and the sub event you can prefer
+
+        //if an event is full, promoter will get the invitation by the system
 
 
 
