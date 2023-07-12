@@ -4,7 +4,10 @@
             "type": "E",
             "members": {
                 "$elemMatch": {
-                    "profile.$id": "?#{#param.id}"
+                    "profile.$id": "?#{#param.id}",
+                    "status": {
+                        "$ne": "I"
+                    }
                 }
             }
         }
