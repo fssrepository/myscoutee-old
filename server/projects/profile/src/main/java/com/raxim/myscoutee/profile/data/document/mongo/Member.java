@@ -25,6 +25,8 @@ public class Member {
     // than one, L (left) V (Verified)
     // T (Timed-Out), M (manager), P (promoter), LL (late leave), W (on waiting
     // list), LD (left deleted), D (deleted)
+    // Manager, who can add members to the event, or in priority can set up some rules
+    // Admin can change other parts, like add new eventItem
     @JsonProperty(value = "status")
     private String status;
 

@@ -127,24 +127,30 @@ public class EventService {
     public List<EventDTO> cloneBy(String eventId, Profile profile, CloneDTO cloneDTO)
             throws CloneNotSupportedException {
         UUID eventUid = UUID.fromString(eventId);
-        Optional<Event> eventRes = eventRepository.findById(eventUid);
+        List<Event> dbEvents = this.eventRepository.findParents(eventUid, 1);
 
-        if (eventRes.isPresent()) {
-            Event event = eventRes.get();
+        if (!dbEvents.isEmpty()) {
+            Event event = dbEvents.get(0);
 
-            Set<Event> parents = new HashSet<>();
+            Set<Event> childs = new HashSet<>();
             List<Event> events = new ArrayList<>();
 
             events.add(event);
             for (int i = 0; i < cloneDTO.getNumberOfCopies(); i++) {
                 Event clonedEvent = (Event) event.clone(profile);
-                parents.add(clonedEvent);
+                childs.add(clonedEvent);
                 events.addAll(clonedEvent.flatten());
+            }
+
+            if (dbEvents.size() == 2) {
+                Event parent = dbEvents.get(1);
+                parent.getItems().addAll(childs);
+                events.add(parent);
             }
 
             events = this.eventRepository.saveAll(events);
             List<EventDTO> savedParents = events.stream()
-                    .filter(fEvent -> parents.contains(fEvent))
+                    .filter(fEvent -> childs.contains(fEvent))
                     .map(fEvent -> (EventDTO) converters.convert(fEvent).get())
                     .toList();
 
@@ -153,51 +159,6 @@ public class EventService {
             return List.of();
         }
     }
-
-    // TODO: promotion fix
-    /*
-     * public Optional<EventDTO> recommendEvent(UUID eventId) {
-     * Optional<Event> eventRes = eventRepository.findById(eventId);
-     * 
-     * if (eventRes.isPresent()) {
-     * EventDTO eventDto;
-     * 
-     * Event event = eventRes.get();
-     * List<EventItem> items = event.getItems().stream()
-     * .filter(item -> !"pr".equals(item.getType()) &&
-     * !"D".equals(item.getStatus()))
-     * .map(item -> {
-     * EventItem eventItem = JsonUtil.clone(item, objectMapper);
-     * eventItem.setId(UUID.randomUUID());
-     * return eventItem;
-     * })
-     * .collect(Collectors.toList());
-     * event.setItems(eventItemRepository.saveAll(items));
-     * 
-     * event.getInfo().setMembers(new HashSet<>());
-     * 
-     * Event clonedEvent = JsonUtil.clone(event, objectMapper);
-     * clonedEvent.setId(UUID.randomUUID());
-     * clonedEvent.setStatus("U");
-     * clonedEvent.setRef(event);
-     * // clonedEvent.setCreatedDate(LocalDateTime.now());
-     * 
-     * Event savedEvent = eventRepository.save(clonedEvent);
-     * 
-     * LocalDate groupKey =
-     * savedEvent.getInfo().getRange().getStart().toLocalDate();
-     * Long sortKey =
-     * savedEvent.getInfo().getRange().getStart().toInstant(ZoneOffset.UTC).
-     * toEpochMilli();
-     * 
-     * eventDto = new EventDTO(savedEvent, groupKey, sortKey);
-     * 
-     * return Optional.of(eventDto);
-     * } else {
-     * return Optional.empty();
-     * }
-     * }
-     */
 
     // clone -> check whether it's participating in a clone, and if it's the same
     // parent, change all the variable inside, and save both

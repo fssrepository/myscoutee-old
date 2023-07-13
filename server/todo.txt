@@ -193,3 +193,6 @@ New TODO:
 40) recommendation list
     (small rounded profile picture (similar to select member for invitation at top bar) 
     left top corener of each panel, who has created)
+41) if clone an event from recommendations tab, the user will be a member with Role M, status A.
+    M (can invite members, or change the rule to priority etc.)
+42) /recommend has been removed (can't recommend an event, will be confusing, data privacy)
