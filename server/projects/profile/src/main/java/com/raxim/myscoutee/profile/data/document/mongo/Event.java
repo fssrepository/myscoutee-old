@@ -3,6 +3,7 @@ package com.raxim.myscoutee.profile.data.document.mongo;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -23,14 +24,16 @@ import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.converter.Convertable;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.EventBase;
-import com.raxim.myscoutee.profile.data.document.mongo.iface.Shiftable;
-import com.raxim.myscoutee.profile.data.document.mongo.iface.Syncable;
+import com.raxim.myscoutee.profile.data.document.mongo.iface.Tree;
 
 @Document(collection = "events")
-public class Event extends EventBase implements Convertable, Syncable, Shiftable {
+public class Event extends EventBase implements Convertable<Event>, Tree<Event> {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
+
+    @JsonIgnore
+    private UUID parentId;
 
     // type = event (E) vs template??? (T) vs Item (I = item)
 
@@ -54,6 +57,14 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
     // with status A (locked)
     // any event which is locked, any late invitation accept also does not work,
     // will go to "W" (wait list) immadiately
+
+    public UUID getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(UUID parentId) {
+        this.parentId = parentId;
+    }
 
     // friends only (F) vs all members inside the group (A) vs P (private)
     @JsonProperty(value = "access")
@@ -88,7 +99,7 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
     @JsonProperty(value = "stage")
     private int stage;
 
-    // ref counter
+    // ref counter - how many clones are there, hence we can show on the view
     @JsonIgnore
     private int refCnt;
 
@@ -384,7 +395,8 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
                     }
                 }
 
-                //algorithm will calculate whether new member needs to be added, when someone leaves
+                // algorithm will calculate whether new member needs to be added, when someone
+                // leaves
                 if (!Boolean.TRUE.equals(getMultislot())) {
                     if (getCapacity() != null) {
 
@@ -543,5 +555,79 @@ public class Event extends EventBase implements Convertable, Syncable, Shiftable
 
     public void setSlotCnt(int slotIdx) {
         this.slotCnt = slotIdx;
+    }
+
+    @Override
+    public Event clone(Profile profile) throws CloneNotSupportedException {
+        Event clonedEvent = (Event) super.clone();
+        clonedEvent.setId(UUID.randomUUID());
+
+        clonedEvent.setCreatedDate(LocalDateTime.now());
+        clonedEvent.setCreatedBy(profile.getId());
+        clonedEvent.setUpdatedDate(LocalDateTime.now());
+        clonedEvent.setUpdatedBy(profile.getId());
+
+        if (clonedEvent.getItems() != null) {
+            List<Event> items = clonedEvent.getItems().stream().map(item -> {
+                try {
+                    Event sItem = (Event) item.clone(profile);
+                    // nullify ref in childs
+                    item.setRefCnt(item.getRefCnt() - 1);
+                    sItem.setRef(null);
+                    return sItem;
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace(); // logger needs to be added
+                }
+
+                return null;
+            }).filter(item -> item != null).toList();
+            clonedEvent.setItems(items);
+        }
+
+        this.setRefCnt(clonedEvent.getRefCnt() + 1);
+        clonedEvent.setRef(this);
+
+        if ("T".equals(this.getType())) {
+            clonedEvent.setType("E");
+        }
+
+        return clonedEvent;
+    }
+
+    @Override
+    public List<Event> flatten() {
+        List<Event> events = new ArrayList<>();
+        events.add(this);
+        if (getItems() != null) {
+            List<Event> items = getItems()
+                    .stream().flatMap(item -> item.flatten().stream()).toList();
+            events.addAll(items);
+        }
+        return events;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Event other = (Event) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
     }
 }

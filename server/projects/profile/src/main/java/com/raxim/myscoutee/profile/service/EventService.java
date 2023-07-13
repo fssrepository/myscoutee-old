@@ -2,10 +2,13 @@ package com.raxim.myscoutee.profile.service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -13,12 +16,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.model.geojson.Point;
-import com.mongodb.client.model.geojson.Position;
 import com.raxim.myscoutee.profile.converter.Converters;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
+import com.raxim.myscoutee.profile.data.dto.rest.CloneDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.CodeDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
@@ -119,24 +122,37 @@ public class EventService {
         return this.eventRepository.findInvitationDown(pageParam, status);
     }
 
-    // TODO: promotion fix
-    /*
-     * public Optional<Event> cloneEvent(UUID eventId, Profile profile) {
-     * Optional<Event> eventRes = eventRepository.findById(eventId);
-     * 
-     * if (eventRes.isPresent()) {
-     * Event clonedEvent = EventUtil.cloneBy(eventRes.get(), profile, null, false,
-     * objectMapper);
-     * 
-     * memberRepository.saveAll(clonedEvent.getInfo().getMembers());
-     * eventItemRepository.saveAll(clonedEvent.getItems());
-     * Event savedEvent = eventRepository.save(clonedEvent);
-     * return Optional.of(savedEvent);
-     * } else {
-     * return Optional.empty();
-     * }
-     * }
-     */
+    // check whether we clone inside a parent or not, clone event, where you are not
+    // a member
+    public List<EventDTO> cloneBy(String eventId, Profile profile, CloneDTO cloneDTO)
+            throws CloneNotSupportedException {
+        UUID eventUid = UUID.fromString(eventId);
+        Optional<Event> eventRes = eventRepository.findById(eventUid);
+
+        if (eventRes.isPresent()) {
+            Event event = eventRes.get();
+
+            Set<Event> parents = new HashSet<>();
+            List<Event> events = new ArrayList<>();
+
+            events.add(event);
+            for (int i = 0; i < cloneDTO.getNumberOfCopies(); i++) {
+                Event clonedEvent = (Event) event.clone(profile);
+                parents.add(clonedEvent);
+                events.addAll(clonedEvent.flatten());
+            }
+
+            events = this.eventRepository.saveAll(events);
+            List<EventDTO> savedParents = events.stream()
+                    .filter(fEvent -> parents.contains(fEvent))
+                    .map(fEvent -> (EventDTO) converters.convert(fEvent).get())
+                    .toList();
+
+            return savedParents;
+        } else {
+            return List.of();
+        }
+    }
 
     // TODO: promotion fix
     /*
@@ -183,6 +199,9 @@ public class EventService {
      * }
      */
 
+    // clone -> check whether it's participating in a clone, and if it's the same
+    // parent, change all the variable inside, and save both
+    // parentId findParent and iterate
     public Optional<EventDTO> saveEvent(Profile profile, Event pEvent) throws CloneNotSupportedException {
         Optional<Event> eventRes = pEvent.getId() != null ? this.eventRepository.findById(pEvent.getId())
                 : Optional.empty();

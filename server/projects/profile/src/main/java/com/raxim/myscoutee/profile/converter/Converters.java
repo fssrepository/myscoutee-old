@@ -7,21 +7,24 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Converters {
-    private final List<? extends BaseConverter<Convertable, Convertable>> converters;
+public class Converters<T extends Convertable<T>, U extends Convertable<U>> {
+    private final List<BaseConverter<T, U>> converters;
 
     public Converters() {
         this(new ArrayList<>());
     }
 
-    public Converters(List<? extends BaseConverter<Convertable, Convertable>> converters) {
+    public Converters(List<BaseConverter<T, U>> converters) {
         this.converters = converters;
     }
 
-    public Optional<Convertable> convert(Convertable obj) {
-        Optional<Convertable> objConverted = this.converters.stream().filter(converter -> converter.canConvert(obj))
-                .map(converter -> converter.convert(obj)).findFirst();
-        return objConverted;
+    public Optional<U> convert(T obj) {
+        for (BaseConverter<T, U> converter : converters) {
+            if (converter.canConvert(obj)) {
+                return Optional.of(converter.convert(obj));
+            }
+        }
+        return Optional.empty();
     }
 
 }

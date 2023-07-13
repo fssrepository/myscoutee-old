@@ -6,7 +6,7 @@ import com.raxim.myscoutee.profile.converter.Convertable;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 
 @JsonRootName("event")
-public class EventDTO extends PageItemDTO implements Convertable {
+public class EventDTO extends PageItemDTO implements Convertable<EventDTO> {
 
     @JsonProperty(value = "item")
     private Event item;

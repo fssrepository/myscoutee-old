@@ -21,6 +21,7 @@ import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.ControllerUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.dto.rest.CloneDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
@@ -205,6 +206,19 @@ public class ActivityRestController {
      * .orElse(ResponseEntity.badRequest().build());
      * }
      */
+
+    @PostMapping("events/{id}/clone")
+    public ResponseEntity<List<EventDTO>> cloneEvent(
+            @PathVariable String id,
+            Authentication auth, @RequestBody CloneDTO cloneDTO) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+
+        ResponseEntity<List<EventDTO>> response = ControllerUtil.handleList(
+                (i, p, ei) -> eventService.cloneBy(i, p, ei),
+                id, profile, cloneDTO,
+                HttpStatus.CREATED);
+        return response;
+    }
 
     @GetMapping("recommendations")
     @Transactional

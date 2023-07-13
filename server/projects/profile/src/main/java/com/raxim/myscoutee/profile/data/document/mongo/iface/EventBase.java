@@ -13,7 +13,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeInt;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 
-public abstract class EventBase implements Cloneable {
+public abstract class EventBase {
     @JsonProperty(value = "name")
     private String name;
 
@@ -172,11 +172,5 @@ public abstract class EventBase implements Cloneable {
 
     public void setUpdatedBy(UUID updatedBy) {
         this.updatedBy = updatedBy;
-    }
-
-    @Override
-    protected Object clone()
-            throws CloneNotSupportedException {
-        return super.clone();
     }
 }

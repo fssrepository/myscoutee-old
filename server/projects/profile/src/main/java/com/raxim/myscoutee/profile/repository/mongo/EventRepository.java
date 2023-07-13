@@ -98,4 +98,10 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
 
         @Aggregation(pipeline = "findTokensByEvent")
         List<Token> findTokensByEvent(@Param("eventIds") UUID[] eventId);
+
+        @Aggregation(pipeline = "findParents")
+        List<Event> findParents(
+                        @Param("eventId") UUID eventId,
+                        @Param("level") int level);
+
 }

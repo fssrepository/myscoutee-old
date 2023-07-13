@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 
 import org.springframework.core.convert.converter.Converter;
 
-public abstract class BaseConverter<T extends Convertable, U extends Convertable> implements Converter<T, U> {
+public abstract class BaseConverter<T, U> implements Converter<T, U> {
 
     public boolean canConvert(T t) {
         Type[] typeArguments = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments();

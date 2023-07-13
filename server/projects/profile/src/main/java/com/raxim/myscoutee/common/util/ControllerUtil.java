@@ -1,5 +1,6 @@
 package com.raxim.myscoutee.common.util;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -70,6 +71,23 @@ public class ControllerUtil {
             Optional<E> result = function.apply(p1, p2, p3);
             if (result.isPresent()) {
                 return new ResponseEntity<>(result.get(), status);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // use logger
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    public static <T, U, V, E extends PageItemDTO> ResponseEntity<List<E>> handleList(
+            CheckedTriFunction<T, U, V, List<E>> function,
+            T p1,
+            U p2, V p3, HttpStatus status) {
+        try {
+            List<E> result = function.apply(p1, p2, p3);
+            if (result.size() > 0) {
+                return new ResponseEntity<>(result, status);
             } else {
                 return ResponseEntity.notFound().build();
             }

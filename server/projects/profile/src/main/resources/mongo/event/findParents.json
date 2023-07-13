@@ -1,0 +1,43 @@
+[
+    {
+        "$match": {
+            "_id": ":#{#eventId}"
+        }
+    },
+    {
+        "$graphLookup": {
+            "from": "events",
+            "startWith": "$parentId",
+            "connectFromField": "parentId",
+            "connectToField": "_id",
+            "as": "parents",
+            "maxDepth": ":#{#level}",
+            "depthField": "level"
+        }
+    },
+    {
+        "$project": {
+            "documents": {
+                "$concatArrays": [
+                    [
+                        "$$ROOT"
+                    ],
+                    "$parents"
+                ]
+            }
+        }
+    },
+    {
+        "$unwind": "$documents"
+    },
+    {
+        "$sort": {
+            "documents.level" : 1
+        }
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": "$documents"
+        }
+    }
+]

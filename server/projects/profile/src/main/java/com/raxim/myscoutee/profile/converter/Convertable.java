@@ -1,5 +1,5 @@
 package com.raxim.myscoutee.profile.converter;
 
-public interface Convertable {
+public interface Convertable<T> {
     
 }
