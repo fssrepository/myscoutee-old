@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import com.raxim.myscoutee.common.config.firebase.FirebaseService;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.config.properties.ConfigProperties;
 import com.raxim.myscoutee.common.util.CommonUtil;
+import com.raxim.myscoutee.common.util.ControllerUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Badge;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
@@ -70,6 +72,22 @@ public class UserGroupRestController {
         this.objectMapper = objectMapper;
     }
 
+    // Suspend/activate account from a group or all groups managed by a particular
+    // user
+    @PatchMapping("/groups/{groupId}/profiles/{profileId}")
+    @Transactional
+    public ResponseEntity<ProfileDTO> suspendProfile(
+            Authentication auth,
+            @PathVariable String profileId,
+            @RequestBody Profile pProfile) {
+
+        ResponseEntity<ProfileDTO> response = ControllerUtil.handle(
+                (i, a) -> profileService.saveProfile(profileId, pProfile),
+                profileId, pProfile,
+                HttpStatus.OK);
+        return response;
+    }
+
     @PostMapping("/groups/{groupId}/leave")
     public ResponseEntity<UserDTO> join(@PathVariable String groupId, Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
@@ -104,33 +122,6 @@ public class UserGroupRestController {
                 profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
         return ResponseEntity.ok(new UserDTO(userSaved, groups, likes));
-    }
-
-    /*
-     * if ("A".equals(member.getStatus())) {
-     * member.setStatus("LD");
-     * } else if ("I".equals(member.getStatus())) {
-     * member.setStatus("RD");
-     * } else {
-     * member.setStatus("D");
-     * }
-     */
-    // Suspend/activate account from a group or all groups managed by a particular
-    // user
-    @PatchMapping("/groups/{groupId}/profiles/{profileId}")
-    @Transactional
-    public ResponseEntity<Void> suspendProfile(
-            Authentication auth,
-            @PathVariable String groupId,
-            @PathVariable String profileId,
-            @RequestBody Profile pProfile) {
-
-        ProfileDTO profile = profileService.saveProfile(profileId, pProfile);
-        if (profile == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok().build();
-        }
     }
 
     // List groups with system groups if Role_Admin has in admin group

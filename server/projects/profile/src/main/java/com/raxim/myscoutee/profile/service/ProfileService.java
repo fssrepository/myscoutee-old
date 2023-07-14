@@ -65,7 +65,7 @@ public class ProfileService {
         this.objectMapper = objectMapper;
     }
 
-    public ProfileDTO saveProfile(String profileId,
+    public Optional<ProfileDTO> saveProfile(String profileId,
             Profile pProfile) {
         UUID pProfileUuid = UUID.fromString(profileId);
         Optional<Profile> dbProfile = profileRepository.findById(pProfileUuid);
@@ -95,9 +95,9 @@ public class ProfileService {
             this.eventRepository.saveAll(sEvents);
 
             Profile profileSaved = profileRepository.save(profile);
-            return new ProfileDTO(profileSaved);
+            return Optional.of(new ProfileDTO(profileSaved));
         }
-        return null;
+        return Optional.empty();
     }
 
     private List<Event> changeStatus(Profile profile, Stream<Event> sEvents, String toStatus) {
