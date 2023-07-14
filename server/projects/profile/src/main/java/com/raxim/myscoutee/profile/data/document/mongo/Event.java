@@ -248,187 +248,217 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
 
     // eventItem range should be within event
     public void sync() {
-        if ("I".equals(getType())) {
+        if (getItems() != null) {
+
+            if (Boolean.TRUE.equals(getMultislot())) {
+                List<Event> items = getItems().stream()
+                        .collect(Collectors.groupingBy(item -> item.getRange())) // Group items by range
+                        .values().stream()
+                        .flatMap(group -> CommonUtil.mapIndexed(
+                                group.stream().sorted(Comparator.comparing(Event::getCreatedDate)).toList(),
+                                (index, item) -> {
+                                    item.slotCnt = ++index;
+                                    return item;
+                                }))
+                        .toList();
+                setItems(items);
+            }
+
+            if (!Boolean.TRUE.equals(getMultislot())) {
+                // max capacity can be changed only from the event
+                List<Event> items = getItems().stream().map(item -> {
+                    if (getCapacity() != null && item.getCapacity() != null) {
+
+                        if (item.getCapacity().getMax() > getCapacity().getMax()) {
+                            item.getCapacity().setMax(getCapacity().getMax());
+                        }
+
+                        if (item.getCapacity().getMin() > getCapacity().getMax()) {
+                            item.getCapacity().setMin(getCapacity().getMax());
+                        }
+                    }
+                    return item;
+                }).toList();
+                setItems(items);
+            }
+
+            // TODO: multislot fix hierarchy -> if item is added, than event and promotion
+            // needs to be updated until upper level
+            Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
+                    .map(item -> item.getRange().getStart())
+                    .min((cap1, cap2) -> cap1.isBefore(cap2) ? -1 : 1);
+
+            if (optStart.isPresent()) {
+                LocalDateTime start = optStart.get();
+                if (getRange() != null
+                        && start.isBefore(getRange().getStart())) {
+                    getRange().setStart(start);
+                }
+            }
+
+            Optional<LocalDateTime> optEnd = getItems().stream().filter(item -> item.getRange() != null)
+                    .map(item -> item.getRange().getEnd())
+                    .max((cap1, cap2) -> cap1.isAfter(cap2) ? -1 : 1);
+
+            if (optEnd.isPresent()) {
+                LocalDateTime end = optEnd.get();
+                if (getRange() != null
+                        && end.isAfter(getRange().getEnd())) {
+                    getRange().setEnd(end);
+                }
+            }
+        }
+
+        LocalDateTime graceTime = getRule() != null ? getRange().getStart()
+                .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
+                : getRange().getStart();
+
+        if (getMembers() != null) {
             int cnt = (int) getMembers().stream().filter(member -> "A".equals(member.getStatus())).count();
             setNumOfMembers(cnt);
 
-            if (getMembers() != null && getCapacity() != null) {
-                int diff = getCapacity().getMax() - cnt;
-
-                if (diff > 0) {
-                    getMembers().stream()
-                            .filter(member -> "W".equals(member.getStatus()))
-                            .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate()))
-                            .limit(diff).map(member -> {
-                                member.setStatus("J");
-                                return member;
-                            })
-                            .collect(Collectors.toList());
+            getMembers().stream().map(member -> {
+                if ("L".equals(member.getStatus())
+                        && member.getUpdatedDate().isAfter(graceTime)) {
+                    member.setStatus("LL");
                 }
+                return member;
+            });
 
-                int cntWithJ = (int) getMembers().stream()
-                        .filter(member -> "J".equals(member.getStatus())).count();
-                int diffWithJ = cntWithJ - getCapacity().getMax();
+            // admin or promoter
+            if (getRef() != null) {
 
-                if (diffWithJ > 0) {
-                    getMembers().stream()
-                            .filter(member -> "J".equals(member.getStatus()))
-                            .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate()))
-                            .limit(diffWithJ).map(member -> {
-                                member.setStatus("W");
-                                return member;
-                            })
-                            .collect(Collectors.toList());
-                }
-            }
-        } else {
-            if (getItems() != null) {
+                // promotion needs to cancel all the subEvents
+                int promoterCnt = (int) getMembers().stream()
+                        .filter(member -> "P".equals(member.getRole()) && "A".equals(member.getStatus()))
+                        .count();
 
-                if (Boolean.TRUE.equals(getMultislot())) {
-                    List<Event> items = getItems().stream()
-                            .collect(Collectors.groupingBy(item -> item.getRange())) // Group items by range
-                            .values().stream()
-                            .flatMap(group -> CommonUtil.mapIndexed(
-                                    group.stream().sorted(Comparator.comparing(Event::getCreatedDate)).toList(),
-                                    (index, item) -> {
-                                        item.slotCnt = ++index;
-                                        return item;
-                                    }))
-                            .toList();
-                    setItems(items);
-                }
-
-                if (!Boolean.TRUE.equals(getMultislot())) {
-                    // max capacity can be changed only from the event
-                    List<Event> items = getItems().stream().map(item -> {
-                        if (getCapacity() != null && item.getCapacity() != null) {
-
-                            if (item.getCapacity().getMax() > getCapacity().getMax()) {
-                                item.getCapacity().setMax(getCapacity().getMax());
-                            }
-
-                            if (item.getCapacity().getMin() > getCapacity().getMax()) {
-                                item.getCapacity().setMin(getCapacity().getMax());
-                            }
-                        }
+                if (promoterCnt == 0) {
+                    List<Event> events = getItems().stream().map(item -> {
+                        item.setStatus("C");
                         return item;
                     }).toList();
-                    setItems(items);
+                    setItems(events);
+                    setStatus("C");
                 }
+            } else {
+                int adminCnt = (int) getMembers().stream()
+                        .filter(member -> "A".equals(member.getRole()) && "A".equals(member.getStatus()))
+                        .count();
 
-                // TODO: multislot fix hierarchy -> if item is added, than event and promotion
-                // needs to be updated until upper level
-                Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
-                        .map(item -> item.getRange().getStart())
-                        .min((cap1, cap2) -> cap1.isBefore(cap2) ? -1 : 1);
+                if (adminCnt == 0) {
+                    Optional<Member> optMemberMin = getMembers().stream()
+                            .filter(member -> "U".equals(member.getRole()))
+                            .min((cap1, cap2) -> cap1.getCreatedDate().isBefore(cap2.getCreatedDate()) ? -1
+                                    : 1);
 
-                if (optStart.isPresent()) {
-                    LocalDateTime start = optStart.get();
-                    if (getRange() != null
-                            && start.isBefore(getRange().getStart())) {
-                        getRange().setStart(start);
-                    }
-                }
-
-                Optional<LocalDateTime> optEnd = getItems().stream().filter(item -> item.getRange() != null)
-                        .map(item -> item.getRange().getEnd())
-                        .max((cap1, cap2) -> cap1.isAfter(cap2) ? -1 : 1);
-
-                if (optEnd.isPresent()) {
-                    LocalDateTime end = optEnd.get();
-                    if (getRange() != null
-                            && end.isAfter(getRange().getEnd())) {
-                        getRange().setEnd(end);
+                    if (optMemberMin.isPresent()) {
+                        Member memberMin = optMemberMin.get();
+                        memberMin.setRole("A");
+                        getMembers().add(memberMin);
                     }
                 }
             }
 
-            LocalDateTime graceTime = getRule() != null ? getRange().getStart()
-                    .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
-                    : getRange().getStart();
+            // algorithm will calculate whether new member needs to be added, when someone
+            // leaves
+            if (!Boolean.TRUE.equals(getMultislot())) {
+                if (getCapacity() != null) {
 
-            if (getMembers() != null) {
-                int cnt = (int) getMembers().stream().filter(member -> "A".equals(member.getStatus())).count();
-                setNumOfMembers(cnt);
+                    int diff = getCapacity().getMax() - cnt;
 
-                getMembers().stream().map(member -> {
-                    if ("L".equals(member.getStatus())
-                            && member.getUpdatedDate().isAfter(graceTime)) {
-                        member.setStatus("LL");
+                    if (getRule() != null
+                            && Boolean.TRUE.equals(getRule().getBalanced())) {
+                        balanceByGender("W", "J", diff);
+                        balanceByGender("J", "W", null);
+                        balanceByGender("A", "W", null);
+                    } else {
+                        balance("W", "J", diff);
+                        balance("J", "W", null);
+                        balance("A", "W", null);
                     }
-                    return member;
-                });
 
-                // admin or promoter
-                if (getRef() != null) {
-
-                    // promotion needs to cancel all the subEvents
-                    int promoterCnt = (int) getMembers().stream()
-                            .filter(member -> "P".equals(member.getRole()) && "A".equals(member.getStatus()))
-                            .count();
-
-                    if (promoterCnt == 0) {
-                        List<Event> events = getItems().stream().map(item -> {
-                            item.setStatus("C");
-                            return item;
-                        }).toList();
-                        setItems(events);
-                        setStatus("C");
-                    }
-                } else {
-                    int adminCnt = (int) getMembers().stream()
-                            .filter(member -> "A".equals(member.getRole()) && "A".equals(member.getStatus()))
-                            .count();
-
-                    if (adminCnt == 0) {
-                        Optional<Member> optMemberMin = getMembers().stream()
-                                .filter(member -> "U".equals(member.getRole()))
-                                .min((cap1, cap2) -> cap1.getCreatedDate().isBefore(cap2.getCreatedDate()) ? -1
-                                        : 1);
-
-                        if (optMemberMin.isPresent()) {
-                            Member memberMin = optMemberMin.get();
-                            memberMin.setRole("A");
-                            getMembers().add(memberMin);
-                        }
-                    }
-                }
-
-                // algorithm will calculate whether new member needs to be added, when someone
-                // leaves
-                if (!Boolean.TRUE.equals(getMultislot())) {
-                    if (getCapacity() != null) {
-
-                        // if invitation has been accepted, but the screen was not uptodate -> accept
-                        // should have been wait
-                        int diffWithJ = cnt - getCapacity().getMax();
-
-                        if (diffWithJ > 0) {
-                            getMembers().stream()
-                                    .filter(member -> "A".equals(member.getStatus()))
-                                    .sorted((m1, m2) -> m2.getUpdatedDate().compareTo(m1.getUpdatedDate()))
-                                    .limit(diffWithJ).map(member -> {
-                                        member.setStatus("W");
-                                        return member;
-                                    })
-                                    .collect(Collectors.toList());
-                        }
-
-                        if (getNumOfMembers() >= getCapacity().getMin()) {
-                            if (LocalDateTime.now().isAfter(graceTime) && getNumOfMembers() >= getCapacity().getMin()) {
-                                setStatus("A");
-                            } else {
-                                setStatus("C");
-                            }
+                    if (getNumOfMembers() >= getCapacity().getMin()) {
+                        if (LocalDateTime.now().isAfter(graceTime) && getNumOfMembers() >= getCapacity().getMin()) {
+                            setStatus("A");
                         } else {
-                            setStatus("P");
+                            setStatus("C");
                         }
+                    } else {
+                        setStatus("P");
                     }
                 }
             }
+        }
 
-            if (getNumOfMembers() == 0) {
-                setStatus("C");
+        if (getNumOfMembers() == 0) {
+            setStatus("C");
+        }
+    }
+
+    private void balance(String fromStatus, String toStatus, Integer pDiff) {
+        int lDiff = 0;
+        if (pDiff != null) {
+            lDiff = pDiff.intValue();
+        } else {
+            int cntWithJ = (int) getMembers().stream()
+                    .filter(member -> fromStatus.equals(member.getStatus())).count();
+            lDiff = cntWithJ - getCapacity().getMax();
+        }
+
+        if (lDiff > 0) {
+            getMembers().stream()
+                    .filter(member -> fromStatus.equals(member.getStatus()))
+                    .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate()))
+                    .limit(lDiff).map(member -> {
+                        member.setStatus(toStatus);
+                        return member;
+                    }).toList();
+        }
+    }
+
+    private void balanceByGender(String fromStatus, String toStatus, Integer pDiff) {
+        int lDiff = 0;
+        if (pDiff != null) {
+            lDiff = pDiff.intValue();
+        } else {
+            int cntWithJ = (int) getMembers().stream()
+                    .filter(member -> fromStatus.equals(member.getStatus())).count();
+            lDiff = cntWithJ - getCapacity().getMax();
+        }
+
+        int halfDiff = (int) ((float) lDiff / 2);
+
+        if (lDiff > 0) {
+            List<Member> menW = getMembers().stream()
+                    .filter(member -> fromStatus.equals(member.getStatus())
+                            && "m".equals(member.getProfile().getGender()))
+                    .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate())).limit(halfDiff)
+                    .map(member -> {
+                        member.setStatus(toStatus);
+                        return member;
+                    }).toList();
+
+            List<Member> womenW = getMembers().stream()
+                    .filter(member -> fromStatus.equals(member.getStatus())
+                            && "w".equals(member.getProfile().getGender()))
+                    .sorted((m1, m2) -> m1.getUpdatedDate().compareTo(m2.getUpdatedDate())).limit(halfDiff)
+                    .map(member -> {
+                        member.setStatus(toStatus);
+                        return member;
+                    }).toList();
+
+            int diffGW = menW.size() - womenW.size();
+            if (diffGW < 0) {
+                menW.stream().map(man -> {
+                    man.setStatus(toStatus);
+                    return man;
+                }).toList();
+            } else if (diffGW > 0) {
+                womenW.stream().map(woman -> {
+                    woman.setStatus(toStatus);
+                    return woman;
+                }).toList();
             }
         }
     }
