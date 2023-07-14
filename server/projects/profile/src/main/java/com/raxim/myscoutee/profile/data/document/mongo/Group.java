@@ -1,6 +1,6 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 
 @Document(collection = "groups")
-public class Group {
+public class Group implements Cloneable {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -27,9 +28,8 @@ public class Group {
     @JsonProperty(value = "name")
     private String name;
 
-    // values: d
-    @JsonProperty(value = "type")
-    private String type;
+    @JsonProperty(value = "category")
+    private String category;
 
     // public
     @JsonProperty(value = "visibility")
@@ -49,8 +49,9 @@ public class Group {
     @JsonProperty(value = "position")
     private GeoJsonPoint position;
 
-    @JsonIgnore
-    private Date createdDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonProperty(value = "createdDate")
+    private LocalDateTime createdDate = LocalDateTime.now();
 
     // profileId
     @JsonIgnore
@@ -70,14 +71,6 @@ public class Group {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getVisibility() {
@@ -120,19 +113,33 @@ public class Group {
         this.position = position;
     }
 
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public UUID getCreatedBy() {
         return createdBy;
     }
 
     public void setCreatedBy(UUID createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public Object clone()
+            throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 }

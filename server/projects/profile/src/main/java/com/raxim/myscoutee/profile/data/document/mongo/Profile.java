@@ -142,10 +142,10 @@ public class Profile implements Cloneable {
      * I (invisible),
      * A (All),
      * S (suspended),
-     * D (deleted - group leave)
+     * L (group leave)
      */
     @JsonProperty(value = "status")
-    private String status = "I";
+    private String status = "P";
 
     @JsonProperty(value = "role")
     private String role;

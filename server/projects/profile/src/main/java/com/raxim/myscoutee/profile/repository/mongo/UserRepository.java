@@ -29,9 +29,6 @@ public interface UserRepository extends MongoRepository<User, UUID>, UserExtRepo
                         @Param("step") int step,
                         @Param("offset") Object[] offset);
 
-        @Aggregation(pipeline = "findAllGroupsByEmail")
-        List<GroupDTO> findAllGroupsByEmail(String email);
-
         @Aggregation(pipeline = "findDeviceWithProfileStatusAll")
         List<Topic> findDeviceWithProfileStatusAll(
                         @Param("lastTime") String lastTime,

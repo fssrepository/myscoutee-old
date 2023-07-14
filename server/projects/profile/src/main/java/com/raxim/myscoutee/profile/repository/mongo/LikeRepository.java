@@ -20,8 +20,8 @@ public interface LikeRepository extends MongoRepository<Like, UUID> {
     @Aggregation(pipeline = "findByParty")
     List<LikeGroup> findByParty(@Param("currUser") UUID currUser, @Param("likes") List<LikeDTO> likes);
 
-    @Aggregation(pipeline = "newLikesByProfile")
-    List<Badge> newLikesByProfile(UUID profileId, String date);
+    @Aggregation(pipeline = "findBadges")
+    List<Badge> getBadges(UUID profileId, String date);
 
     @Aggregation(pipeline = "findDoubleById")
     List<ProfileDTO> findDoubleById(

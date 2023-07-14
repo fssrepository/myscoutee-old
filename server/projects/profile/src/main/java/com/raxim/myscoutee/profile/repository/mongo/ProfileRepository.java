@@ -21,8 +21,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.SchoolDTO;
 @RepositoryRestResource(collectionResourceRel = "profiles", path = "profiles")
 public interface ProfileRepository extends MongoRepository<Profile, UUID> {
 
-        List<Profile> findProfileByStatus(String status);
-
         @Aggregation(pipeline = "findProfile")
         List<ProfileDTO> findProfile(
                         @Param("param") PageParam param,

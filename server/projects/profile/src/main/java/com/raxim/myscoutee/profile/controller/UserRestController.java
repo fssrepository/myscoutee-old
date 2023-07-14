@@ -88,7 +88,7 @@ public class UserRestController {
                 .filter(g -> g.getRole().equals("ROLE_USER") || (adminUser && g.getGroup().getType().equals("b")))
                 .toList();
 
-        List<Badge> likes = likeRepository.newLikesByProfile(
+        List<Badge> likes = likeRepository.getBadges(
                 profile.getId(), profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
         return ResponseEntity.ok(new UserDTO(userSaved, groups, likes));
@@ -109,7 +109,7 @@ public class UserRestController {
         profile.setLastLogin(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
         profileRepository.save(profile);
 
-        List<Badge> likes = likeRepository.newLikesByProfile(
+        List<Badge> likes = likeRepository.getBadges(
                 profileId, profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
         return ResponseEntity.ok(new UserDTO(user, groups, likes));
