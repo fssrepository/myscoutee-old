@@ -14,6 +14,10 @@ public class MemberDTO extends PageItemDTO {
     @JsonProperty(value = "role")
     private String role;
 
+    //promotion rate member - only show, what the promoter rated
+    @JsonProperty(value = "rate")
+    private Integer rate;
+
     public MemberDTO(Member member, List<Object> offset) {
         setOffset(offset);
         this.member = member;
@@ -33,5 +37,13 @@ public class MemberDTO extends PageItemDTO {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(Integer rate) {
+        this.rate = rate;
     }
 }

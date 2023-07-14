@@ -83,6 +83,43 @@
         "$limit": "?#{#param.limit}"
     },
     {
+        "$lookup": {
+            "from": "likes",
+            "let": {
+                "p_id": "$members.profile.$id",
+                "p_eventId": "$_id"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$eq": [
+                                        "$from.$id",
+                                        "$$p_id"
+                                    ]
+                                },
+                                {
+                                    "$eq": [
+                                        "$ref",
+                                        "$$p_eventId"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$likes",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
         "$replaceRoot": {
             "newRoot": {
                 "$mergeObjects": [
@@ -101,9 +138,19 @@
                                 "$user.role",
                                 null
                             ]
-                        }
-                    },
-                    {
+                        },
+                        "rate": {
+                            "$cond": [
+                                {
+                                    "$ifNull": [
+                                        "$likes",
+                                        null
+                                    ]
+                                },
+                                "$likes.rate",
+                                null
+                            ]
+                        },
                         "offset": [
                             "$members.status",
                             "$members.createdDate"

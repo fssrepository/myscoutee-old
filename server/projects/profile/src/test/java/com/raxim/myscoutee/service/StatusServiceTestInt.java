@@ -70,7 +70,8 @@ public class StatusServiceTestInt extends AbstractAlgoTest {
                 StatusService statusService = new StatusService(profileRepository, eventRepository);
 
                 statusService.change(
-                                AppTestConstants.UUID_EVENT_32.toString(), AppTestConstants.UUID_PROFILE_OLIVER, "L");
+                                AppTestConstants.UUID_EVENT_32.toString(),
+                                AppTestConstants.UUID_PROFILE_OLIVER.toString(), "L");
 
                 pageParam.setId(AppTestConstants.UUID_PROFILE_EMMA);
 

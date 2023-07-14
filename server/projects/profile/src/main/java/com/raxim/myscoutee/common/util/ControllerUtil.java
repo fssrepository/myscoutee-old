@@ -63,6 +63,23 @@ public class ControllerUtil {
         }
     }
 
+    public static <T, U, E extends PageItemDTO> ResponseEntity<List<E>> handleList(
+            CheckedBiFunction<T, U, List<E>> function,
+            T p1,
+            U p2, HttpStatus status) {
+        try {
+            List<E> result = function.apply(p1, p2);
+            if (result.size() > 0) {
+                return new ResponseEntity<>(result, status);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // use logger
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     public static <T, U, V, E extends PageItemDTO> ResponseEntity<E> handle(
             CheckedTriFunction<T, U, V, Optional<E>> function,
             T p1,

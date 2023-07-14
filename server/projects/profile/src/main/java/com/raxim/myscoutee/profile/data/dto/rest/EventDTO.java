@@ -20,9 +20,6 @@ public class EventDTO extends PageItemDTO implements Convertable<EventDTO> {
     @JsonProperty(value = "rate")
     private Integer rate;
 
-    @JsonProperty(value = "isPromotion")
-    private Boolean isPromotion;
-
     @JsonProperty(value = "role")
     private String role;
 
@@ -73,14 +70,6 @@ public class EventDTO extends PageItemDTO implements Convertable<EventDTO> {
 
     public void setRate(Integer rate) {
         this.rate = rate;
-    }
-
-    public Boolean getPromotion() {
-        return isPromotion;
-    }
-
-    public void setPromotion(Boolean promotion) {
-        isPromotion = promotion;
     }
 
     public String getRole() {

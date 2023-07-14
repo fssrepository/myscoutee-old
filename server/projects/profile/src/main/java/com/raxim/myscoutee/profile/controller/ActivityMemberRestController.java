@@ -38,7 +38,8 @@ enum MemberAction {
         leave("L"),
         accept("A"),
         kick("K"),
-        reject("R");
+        reject("R"),
+        prefer("PR");
 
         private final String type;
 
@@ -81,7 +82,7 @@ public class ActivityMemberRestController {
                 String actionType = MemberAction.valueOf(type).getType();
 
                 return ControllerUtil.handle((i, s, p) -> statusService.change(i, s, p),
-                                id, profile.getId(), actionType,
+                                id, profile.getId().toString(), actionType,
                                 HttpStatus.OK);
         }
 
@@ -95,7 +96,7 @@ public class ActivityMemberRestController {
                 String actionType = MemberAction.valueOf(type).getType();
 
                 return ControllerUtil.handle((i, m, s, p) -> statusService.change(i, m, s, p),
-                                eventId, memberId, profile.getId(), actionType,
+                                eventId, memberId, actionType, profile.getId(),
                                 HttpStatus.OK);
         }
 

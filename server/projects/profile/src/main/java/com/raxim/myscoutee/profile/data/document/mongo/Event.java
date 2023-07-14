@@ -105,9 +105,8 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
 
     // cloned from
     // can be from the recommendation screen or inside a multislot event
-    @DBRef
     @JsonIgnore
-    private Event ref;
+    private UUID ref;
 
     @JsonProperty(value = "rule")
     private Rule rule = new Rule();
@@ -223,11 +222,11 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         this.position = position;
     }
 
-    public Event getRef() {
+    public UUID getRef() {
         return ref;
     }
 
-    public void setRef(Event ref) {
+    public void setRef(UUID ref) {
         this.ref = ref;
     }
 
@@ -585,7 +584,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         }
 
         this.setRefCnt(clonedEvent.getRefCnt() + 1);
-        clonedEvent.setRef(this);
+        clonedEvent.setRef(this.getRef());
 
         if ("T".equals(this.getType())) {
             clonedEvent.setType("E");

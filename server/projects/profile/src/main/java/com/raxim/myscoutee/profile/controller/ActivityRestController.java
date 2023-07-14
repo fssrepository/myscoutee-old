@@ -28,7 +28,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.handler.EventParamHandler;
 import com.raxim.myscoutee.profile.handler.InvitationParamHandler;
-import com.raxim.myscoutee.profile.handler.LikeParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.handler.RecommendationParamHandler;
 import com.raxim.myscoutee.profile.service.EventService;
@@ -114,7 +113,7 @@ public class ActivityRestController {
         Profile profile = principal.getUser().getProfile();
 
         event.setStatus("P");
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.save(p, e), profile,
                 event,
                 HttpStatus.CREATED);
         return response;
@@ -128,25 +127,25 @@ public class ActivityRestController {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
 
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.saveEvent(p, e), profile,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, e) -> eventService.save(p, e), profile,
                 event,
                 HttpStatus.OK);
         return response;
     }
 
-    @PostMapping("events/{id}/items")
+    @PostMapping({ "events/{id}/items", "events/{parentId}/items/{id}/items" })
     public ResponseEntity<EventDTO> addItem(@PathVariable String id, @RequestBody Event eventItem,
             Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = principal.getUser().getProfile();
 
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.saveItem(p, i, ei),
-                profile, id, eventItem,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.save(p, i, ei),
+                profile, eventItem, id,
                 HttpStatus.CREATED);
         return response;
     }
 
-    @PatchMapping("events/{id}/items/{itemId}")
+    @PatchMapping({ "events/{id}/items/{itemId}", "events/{parentId}/items/{id}/items/{itemId}" })
     public ResponseEntity<EventDTO> patchItem(@PathVariable String id, @PathVariable String itemId,
             @RequestBody Event eventItem, Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
@@ -154,13 +153,13 @@ public class ActivityRestController {
 
         eventItem.setId(UUID.fromString(itemId));
 
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.saveItem(p, i, ei),
-                profile, id, eventItem,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.save(p, i, ei),
+                profile, eventItem, id,
                 HttpStatus.OK);
         return response;
     }
 
-    @DeleteMapping("events/{id}/items/{itemId}")
+    @DeleteMapping({ "events/{id}/items/{itemId}", "events/{parentId}/items/{id}/items/{itemId}" })
     public ResponseEntity<EventDTO> deleteItem(@PathVariable String id, @PathVariable String itemId,
             Authentication auth) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
@@ -169,8 +168,8 @@ public class ActivityRestController {
         Event eventItem = new Event(UUID.fromString(itemId));
         eventItem.setStatus("D");
 
-        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.saveItem(p, i, ei),
-                profile, id, eventItem,
+        ResponseEntity<EventDTO> response = ControllerUtil.handle((p, i, ei) -> eventService.save(p, i, ei),
+                profile, eventItem, id,
                 HttpStatus.NO_CONTENT);
         return response;
     }
@@ -193,20 +192,6 @@ public class ActivityRestController {
         return ResponseEntity.ok(new PageDTO<>(eventItems, lOffset));
     }
 
-    // TODO: promotion fix
-    /*
-     * @PostMapping("events/{id}/recommend")
-     * public ResponseEntity<EventDTO> recommend(@PathVariable String id,
-     * 
-     * @RequestParam(value = "step", required = false) Integer step) {
-     * Optional<EventDTO> eventDto =
-     * eventService.recommendEvent(UUID.fromString(id));
-     * 
-     * return eventDto.map(event -> ResponseEntity.ok(event))
-     * .orElse(ResponseEntity.badRequest().build());
-     * }
-     */
-
     @PostMapping("events/{id}/clone")
     public ResponseEntity<List<EventDTO>> cloneEvent(
             @PathVariable String id,
@@ -217,6 +202,19 @@ public class ActivityRestController {
                 (i, p, ei) -> eventService.cloneBy(i, p, ei),
                 id, profile, cloneDTO,
                 HttpStatus.CREATED);
+        return response;
+    }
+
+    @PostMapping("events/{id}/{type}")
+    public ResponseEntity<List<EventDTO>> lockEvent(
+            @PathVariable String id, @PathVariable String type,
+            Authentication auth) {
+        String actionType = EventAction.valueOf(type).getType();
+
+        ResponseEntity<List<EventDTO>> response = ControllerUtil.handleList(
+                (i, a) -> eventService.changeStatus(i, a),
+                id, actionType,
+                HttpStatus.OK);
         return response;
     }
 

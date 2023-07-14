@@ -1,5 +1,6 @@
 package com.raxim.myscoutee.profile.service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
+import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Sequence;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.SequenceRepository;
@@ -25,13 +30,16 @@ public class LikeService {
 
     private final ProfileRepository profileRepository;
     private final LikeRepository likeRepository;
+    private final EventRepository eventRepository;
     private final SequenceRepository sequenceRepository;
 
     public LikeService(ProfileRepository profileRepository,
             LikeRepository likeRepository,
+            EventRepository eventRepository,
             SequenceRepository sequenceRepository) {
         this.profileRepository = profileRepository;
         this.likeRepository = likeRepository;
+        this.eventRepository = eventRepository;
         this.sequenceRepository = sequenceRepository;
     }
 
@@ -49,6 +57,28 @@ public class LikeService {
 
         // save likes
         List<Like> likesSaved = likeRepository.saveAll(likesWithCnt);
+
+        List<Pair<UUID, Profile>> membersToAdd = likesSaved.stream().filter(like -> like.getRef() != null)
+                .map(like -> Pair.of(like.getRef(), like.getFrom())).toList();
+
+        List<UUID> evenUuids = membersToAdd.stream().map(member -> member.getFirst()).toList();
+        Map<UUID, Event> events = this.eventRepository.findAllById(evenUuids).stream()
+                .collect(Collectors.toMap(event -> event.getId(), event -> event));
+
+        // if you rate, than you will be added as a member with pending
+        List<Event> eventsToSave = membersToAdd.stream().map(member -> {
+            Member newMember = new Member();
+            newMember.setProfile(profile);
+            newMember.setUpdatedDate(LocalDateTime.now());
+            newMember.setCreatedDate(LocalDateTime.now());
+            newMember.setRole("U");
+            newMember.setStatus("P");
+
+            Event currEvent = events.get(member.getFirst());
+            currEvent.getMembers().add(newMember);
+            return currEvent;
+        }).toList();
+        this.eventRepository.saveAll(eventsToSave);
 
         List<LikeDTO> likesAll = toLikeDTOs(likesSaved);
         return likesAll;
@@ -124,8 +154,10 @@ public class LikeService {
                 mLike.setRate(likeDTO.getRate());
                 mLike.setDistance(LikeUtil.calcDistance(profileFrom, profile));
             }
+
             return Stream.of(mLike);
         }).filter(likeForGroup -> likeForGroup != null).toList();
+
         return likes;
     }
 

@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -123,6 +122,7 @@ public class EventService {
     }
 
     // check whether we clone inside a parent or not, clone event, where you are not
+    // +41
     // a member
     public List<EventDTO> cloneBy(String eventId, Profile profile, CloneDTO cloneDTO)
             throws CloneNotSupportedException {
@@ -132,29 +132,35 @@ public class EventService {
         if (!dbEvents.isEmpty()) {
             Event event = dbEvents.get(0);
 
-            Set<Event> childs = new HashSet<>();
             List<Event> events = new ArrayList<>();
+
+            Member newMember = new Member(profile);
+            newMember.setUpdatedDate(LocalDateTime.now());
+            newMember.setCreatedDate(LocalDateTime.now());
+            newMember.setRole("M"); // Manager
+            newMember.setStatus("A");
 
             events.add(event);
             for (int i = 0; i < cloneDTO.getNumberOfCopies(); i++) {
                 Event clonedEvent = (Event) event.clone(profile);
-                childs.add(clonedEvent);
-                events.addAll(clonedEvent.flatten());
-            }
 
-            //clone event from promotion (for Group promotion)
-            Member pMember = new Member(profile);
-            if (dbEvents.size() == 2) {
-                Event parent = dbEvents.get(1);
-                if (parent.getMembers().contains(pMember)) {
-                    parent.getItems().addAll(childs);
+                // clone event from promotion (for Group promotion)
+                if (dbEvents.size() == 2) {
+                    Event parent = dbEvents.get(1);
+                    if (parent.getMembers().contains(newMember)) {
+                        parent.getItems().add(clonedEvent);
+                    } else {
+                        // add Manager to an event, as he can invite members to it + lock/unlock ->
+                        // status "A"/"P"
+                        clonedEvent.getMembers().add(newMember);
+                    }
+                    events.add(parent);
                 }
-                events.add(parent);
+                events.addAll(clonedEvent.flatten());
             }
 
             events = this.eventRepository.saveAll(events);
             List<EventDTO> savedParents = events.stream()
-                    .filter(fEvent -> childs.contains(fEvent))
                     .map(fEvent -> (EventDTO) converters.convert(fEvent).get())
                     .toList();
 
@@ -164,104 +170,132 @@ public class EventService {
         }
     }
 
-    // clone -> check whether it's participating in a clone, and if it's the same
-    // parent, change all the variable inside, and save both
-    // parentId findParent and iterate
-    public Optional<EventDTO> saveEvent(Profile profile, Event pEvent) throws CloneNotSupportedException {
-        Optional<Event> eventRes = pEvent.getId() != null ? this.eventRepository.findById(pEvent.getId())
-                : Optional.empty();
+    public List<EventDTO> changeStatus(String eventId, String status) throws CloneNotSupportedException {
+        UUID eventUuid = UUID.fromString(eventId);
+        Optional<Event> dbEvent = this.eventRepository.findById(eventUuid);
+        if (dbEvent.isPresent()) {
+            List<Event> events = new ArrayList<>();
 
-        if (!eventRes.isPresent()) {
+            Event event = dbEvent.get();
+
+            if (event.getRef() != null) {
+                List<Event> dbRefEvents = this.eventRepository.findParents(event.getRef(), 1);
+                if (!dbRefEvents.isEmpty()) {
+                    Event refEvent = null;
+                    if ("A".equals(status)) {
+                        refEvent = (Event) event.clone();
+                        refEvent.setId(dbRefEvents.get(0).getId());
+                    } else if ("P".equals(status)) { // unlock event
+                        refEvent = dbRefEvents.get(0);
+                        refEvent.setMembers(new HashSet<>());
+                    }
+                    events.add(refEvent);
+                }
+
+            }
+
+            event.setStatus(status);
+            events.add(event);
+
+            List<EventDTO> savedParents = events.stream()
+                    .map(fEvent -> (EventDTO) converters.convert(fEvent).get())
+                    .toList();
+
+            return savedParents;
+        }
+        return List.of();
+    }
+
+    public Optional<EventDTO> save(Profile profile, Event pEvent) throws CloneNotSupportedException {
+        return save(profile, pEvent, null);
+    }
+
+    public Optional<EventDTO> save(Profile profile, Event pEvent, String parentId)
+            throws CloneNotSupportedException {
+        List<Event> dbEvents = this.eventRepository.findParents(pEvent.getId(), 2);
+
+        List<Event> events = new ArrayList<>();
+
+        if (dbEvents.isEmpty()) {
             Event lEvent = (Event) pEvent.clone();
             lEvent.setId(UUID.randomUUID());
             lEvent.setGroup(profile.getGroup());
             lEvent.setCreatedDate(LocalDateTime.now());
             lEvent.setCreatedBy(profile.getId());
             lEvent.setStatus(pEvent.getStatus());
-            eventRes = Optional.of(lEvent);
+
+            events.add(lEvent);
+
+            dbEvents.add(lEvent);
+            if (parentId != null) {
+                UUID tParentUuid = UUID.fromString(parentId);
+                lEvent.setParentId(tParentUuid);
+
+                List<Event> dbParents = this.eventRepository.findParents(tParentUuid, 2);
+                dbEvents.addAll(dbParents);
+
+                if (dbParents.size() > 1) {
+                    Event dbParent = dbEvents.get(1);
+                    dbParent.getItems().add(lEvent);
+                    dbParent.sync();
+                    events.add(dbParent);
+                }
+            }
         } else {
-            Event dbEvent = eventRes.get();
+            Event dbEvent = dbEvents.get(0);
+
             Event lEvent = (Event) pEvent.clone();
             lEvent.setId(dbEvent.getId());
             lEvent.setGroup(dbEvent.getGroup());
             lEvent.setCreatedDate(dbEvent.getCreatedDate());
             lEvent.setCreatedBy(dbEvent.getCreatedBy());
             lEvent.setStatus(dbEvent.getStatus());
+            lEvent.setParentId(dbEvent.getParentId());
 
-            // it should be hierarchical, if the event has "List<Event> items", promotion is
-            // two level deep
             lEvent.shift();
-            lEvent.sync(); // if dbEvent.range.end < dbEvent.items.range.end -> revert back
-                           // dbEvent.range.end change to dbEvent.items.range.end
-            eventRes = Optional.of(lEvent);
-        }
+            lEvent.sync();
 
-        // find events in hierarchy, and run sync and shift accordingly on each level
-        // and save
+            events.add(lEvent);
 
-        if (eventRes.isPresent()) {
-            Event lEvent = this.eventRepository.save(eventRes.get());
-            return converters.convert(lEvent).map(obj -> (EventDTO) obj);
-        }
-        return Optional.empty();
-    }
+            if (dbEvents.size() > 1) {
+                Event dbParent = dbEvents.get(1);
 
-    public Optional<EventDTO> saveItem(Profile profile, String eventId, Event pEventItem)
-            throws CloneNotSupportedException {
-        Optional<Event> eventRes = eventId != null ? this.eventRepository.findById(UUID.fromString(eventId))
-                : Optional.empty();
-
-        if (eventRes.isPresent()) {
-            Event dbEvent = eventRes.get();
-
-            Optional<Event> eventItemRes = dbEvent.getItems().stream()
-                    .filter(item -> pEventItem.getId().equals(item.getId()))
-                    .findFirst();
-
-            Event lEventItem = (Event) pEventItem.clone();
-            UUID eventItemId;
-            if (!eventItemRes.isPresent()) {
-                eventItemId = UUID.randomUUID();
-                lEventItem.setId(eventItemId);
-                lEventItem.setCreatedDate(LocalDateTime.now());
-                lEventItem.setCreatedBy(profile.getId());
-                lEventItem.setStatus(lEventItem.getNumOfMembers() >= lEventItem.getCapacity().getMin() ? "A" : "P");
-            } else {
-                Event dbEventItem = eventItemRes.get();
-
-                eventItemId = dbEventItem.getId();
-                lEventItem.setId(eventItemId);
-                lEventItem.setCreatedDate(dbEventItem.getCreatedDate());
-                lEventItem.setCreatedBy(dbEventItem.getCreatedBy());
-
-                if (!"D".equals(pEventItem.getStatus())) {
-                    lEventItem.setStatus(dbEventItem.getStatus());
-                } else {
-                    lEventItem.setStatus("D");
-                }
-
-                // it should be hierarchical, if the event has "List<Event> items", promotion is
-                // two level deep
-                dbEvent.sync();
-
-            }
-            dbEvent.getItems().add(lEventItem);
-
-            List<Event> eventItems = eventRepository.saveAll(dbEvent.getItems());
-
-            dbEvent.setItems(eventItems);
-            dbEvent = eventRepository.save(dbEvent);
-
-            Optional<Event> dbEventItem = dbEvent.getItems().stream()
-                    .filter(item -> item.getId().equals(eventItemId))
-                    .findFirst();
-
-            if (dbEventItem.isPresent()) {
-                Event tEventItem = dbEventItem.get();
-                return converters.convert(tEventItem).map(obj -> (EventDTO) obj);
+                // check whether it's participating in a clone, and if it's the same
+                // parent, change all the variable inside, and save both
+                List<Event> items = dbParent.getItems().stream()
+                        .filter(item -> !item.getId().equals(dbEvent.getId())
+                                && (item.getId().equals(dbEvent.getRef())
+                                        || item.getRef().equals(dbEvent.getRef())))
+                        .map(item -> {
+                            Event tEvent;
+                            try {
+                                tEvent = (Event) lEvent.clone();
+                                tEvent.setId(item.getId());
+                                return tEvent;
+                            } catch (CloneNotSupportedException e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }).filter(item -> item != null).toList();
+                dbParent.getItems().addAll(items);
+                events.addAll(dbParent.getItems());
+                dbParent.sync();
+                events.add(dbParent);
             }
         }
 
+        for (int i = 2; i < dbEvents.size(); i++) {
+            Event dbParent = dbEvents.get(i);
+            dbParent.getItems().add(dbEvents.get(i - 1));
+            dbParent.sync();
+            events.add(dbParent);
+        }
+
+        List<Event> savedEvents = this.eventRepository.saveAll(events);
+        if (!savedEvents.isEmpty()) {
+            Event tEvent = savedEvents.get(0);
+            return converters.convert(tEvent).map(obj -> (EventDTO) obj);
+        }
         return Optional.empty();
     }
 
