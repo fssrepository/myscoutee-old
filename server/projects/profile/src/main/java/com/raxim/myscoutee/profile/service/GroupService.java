@@ -13,6 +13,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
+import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
@@ -33,6 +34,10 @@ public class GroupService {
 
     public List<GroupDTO> getAllGroups(PageParam pageParam, Point position, String access) {
         return this.groupRepository.findAllGroups(pageParam, position, access);
+    }
+
+    public List<ProfileDTO> getProfilesByGroup(UUID groupUuid, PageParam pageParam) {
+        return this.groupRepository.findProfilesByGroup(groupUuid, pageParam);
     }
 
     public Optional<GroupDTO> saveGroup(Group pGroup, User user) throws CloneNotSupportedException {

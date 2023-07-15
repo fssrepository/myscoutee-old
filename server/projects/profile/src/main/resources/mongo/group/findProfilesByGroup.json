@@ -1,0 +1,136 @@
+[
+    {
+        "$match": {
+            "_id": ":#{#groupId}"
+        }
+    },
+    {
+        "$lookup": {
+            "from": "profiles",
+            "let": {
+                "p_group": "$$ROOT"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$eq": [
+                                        "$group",
+                                        "$$p_group._id"
+                                    ]
+                                },
+                                {
+                                    "$or": [
+                                        {
+                                            "$and": [
+                                                {
+                                                    "$eq": [
+                                                        "$$p_group.createdBy",
+                                                        "?#{#param.id}"
+                                                    ]
+                                                },
+                                                {
+                                                    "$ne": [
+                                                        "$_id",
+                                                        "?#{#param.id}"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "$and": [
+                                                {
+                                                    "$eq": [
+                                                        "$$p_group.discreet",
+                                                        false
+                                                    ]
+                                                },
+                                                {
+                                                    "$or": [
+                                                        {
+                                                            "$eq": [
+                                                                "$role",
+                                                                "A"
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "as": "profiles"
+        }
+    },
+    {
+        "$unwind": "$profiles"
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$and": [
+                    {
+                        "$or": [
+                            {
+                                "$gt": [
+                                    "$profiles.role",
+                                    "?#{#param.offset[0]}"
+                                ]
+                            },
+                            {
+                                "$and": [
+                                    {
+                                        "$eq": [
+                                            "$profiles.role",
+                                            "?#{#param.offset[0]}"
+                                        ]
+                                    },
+                                    {
+                                        "$lt": [
+                                            "$profiles.updatedDate",
+                                            "?#{#param.offset[1]}"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$sort": {
+            "profiles.role": 1,
+            "profiles.updatedDate": -1
+        }
+    },
+    {
+        "$limit": "?#{#param.limit}"
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$mergeObjects": [
+                    {
+                        "profile": "$profiles"
+                    },
+                    {
+                        "role": "$profiles.role",
+                        "offset": [
+                            "$profiles.role",
+                            "$profiles.updatedDate"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]

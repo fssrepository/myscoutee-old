@@ -8,19 +8,24 @@
         "$lookup": {
             "from": "groups",
             "let": {
-                "g_id": "$group"
+                "g_id": "$group",
+                "p_role": "$role"
             },
             "pipeline": [
                 {
                     "$match": {
                         "$expr": {
-                            "$eq": [
-                                "$$g_id",
-                                "$_id"
-                            ],
-                            "$ne": [
-                                "$system",
-                                false
+                            "$or": [
+                                {
+                                    "$and": [
+                                        {
+                                            "$eq": [
+                                                "$$g_id",
+                                                "$_id"
+                                            ]
+                                        }
+                                    ]
+                                }
                             ]
                         }
                     }

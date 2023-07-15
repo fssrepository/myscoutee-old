@@ -67,10 +67,6 @@ public class ProfileService {
         this.objectMapper = objectMapper;
     }
 
-    public List<ProfileDTO> getProfiles(UUID groupUuid, PageParam pageParam) {
-        return this.profileRepository.findProfilesByGroup(groupUuid, pageParam);
-    }
-
     public List<GroupDTO> getGroupsByProfile(UUID profileId, PageParam pageParam) {
         return this.profileRepository.findGroupsByProfile(profileId, pageParam);
     }

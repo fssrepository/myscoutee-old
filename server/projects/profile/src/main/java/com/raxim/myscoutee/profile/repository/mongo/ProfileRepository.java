@@ -63,11 +63,6 @@ public interface ProfileRepository extends MongoRepository<Profile, UUID> {
                         @Param("step") int step,
                         @Param("offset") Object[] offset);
 
-        @Aggregation(pipeline = "findProfilesByGroup")
-        List<ProfileDTO> findProfilesByGroup(
-                        @Param("groupId") UUID groupId,
-                        @Param("param") PageParam pageParam);
-
         @Aggregation(pipeline = "findGroupsByProfile")
         List<GroupDTO> findGroupsByProfile(
                         @Param("profileId") UUID profileId,

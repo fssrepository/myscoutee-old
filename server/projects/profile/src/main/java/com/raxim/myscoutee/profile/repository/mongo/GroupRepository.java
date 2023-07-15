@@ -12,6 +12,7 @@ import com.mongodb.client.model.geojson.Point;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
+import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 
 public interface GroupRepository extends MongoRepository<Group, UUID> {
 
@@ -25,5 +26,10 @@ public interface GroupRepository extends MongoRepository<Group, UUID> {
     List<GroupDTO> findAllGroups(PageParam pageParam,
             @Param("loc") Point loc,
             @Param("access") String access);
+
+    @Aggregation(pipeline = "findProfilesByGroup")
+    List<ProfileDTO> findProfilesByGroup(
+            @Param("groupId") UUID groupId,
+            @Param("param") PageParam pageParam);
 
 }
