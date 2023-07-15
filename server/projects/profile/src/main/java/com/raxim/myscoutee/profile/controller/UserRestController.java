@@ -27,7 +27,6 @@ import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Setting;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
-import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
 import com.raxim.myscoutee.profile.repository.mongo.FormRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
@@ -62,6 +61,7 @@ public class UserRestController {
         this.objectMapper = objectMapper;
     }
 
+    //user.profiles.name is the dropdownbox content, not the group name
     @PostMapping()
     public ResponseEntity<UserDTO> saveUser(Authentication auth, @RequestPart Group group) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
@@ -83,15 +83,10 @@ public class UserRestController {
         userToSave.setProfile(profile);
         User userSaved = userRepository.save(userToSave);
 
-        boolean adminUser = config.getAdminUser().equals(auth.getName());
-        List<GroupDTO> groups = userRepository.findAllGroupsByEmail(auth.getName()).stream()
-                .filter(g -> g.getRole().equals("ROLE_USER") || (adminUser && g.getGroup().getType().equals("b")))
-                .toList();
-
         List<Badge> likes = likeRepository.getBadges(
                 profile.getId(), profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        return ResponseEntity.ok(new UserDTO(userSaved, groups, likes));
+        return ResponseEntity.ok(new UserDTO(userSaved, likes));
     }
 
     @GetMapping()
@@ -101,18 +96,13 @@ public class UserRestController {
         Profile profile = user.getProfile();
         UUID profileId = profile.getId();
 
-        boolean adminUser = config.getAdminUser().equals(auth.getName());
-        List<GroupDTO> groups = userRepository.findAllGroupsByEmail(auth.getName()).stream()
-                .filter(g -> g.getRole().equals("ROLE_USER") || (adminUser && g.getGroup().getType().equals("b")))
-                .toList();
-
         profile.setLastLogin(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
         profileRepository.save(profile);
 
         List<Badge> likes = likeRepository.getBadges(
                 profileId, profile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        return ResponseEntity.ok(new UserDTO(user, groups, likes));
+        return ResponseEntity.ok(new UserDTO(user, likes));
     }
 
     @GetMapping("/settings")

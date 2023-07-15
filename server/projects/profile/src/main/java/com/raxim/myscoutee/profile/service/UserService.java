@@ -7,11 +7,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Badge;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
-import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
@@ -52,11 +50,6 @@ public class UserService {
             List<Profile> activeProfiles = dbUser.getProfiles().stream()
                     .filter(p -> !"S".equals(p.getStatus()) || !"L".equals(p.getStatus())).toList();
 
-            List<UUID> groupUuids = activeProfiles.stream().map(activeProfile -> activeProfile.getGroup()).toList();
-            List<GroupDTO> groupDTOs = this.groupRepository.findAllById(groupUuids).stream()
-                    .map(group -> new GroupDTO(group))
-                    .toList();
-
             Profile currProfile = profile;
             if ("S".equals(status) || "L".equals(status)) {
                 if (!activeProfiles.isEmpty()) {
@@ -74,7 +67,7 @@ public class UserService {
                 List<Badge> likes = this.likeRepository.getBadges(currProfile.getId(),
                         currProfile.getLastLogin().format(DateTimeFormatter.ISO_DATE_TIME));
 
-                return Optional.of(new UserDTO(userSaved, groupDTOs, likes));
+                return Optional.of(new UserDTO(userSaved, likes));
             }
         } else {
             if ("J".equals(status)) {

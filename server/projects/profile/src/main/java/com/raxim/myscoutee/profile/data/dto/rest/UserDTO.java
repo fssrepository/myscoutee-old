@@ -12,15 +12,11 @@ public class UserDTO extends PageItemDTO {
     @JsonProperty(value = "user")
     private User user;
 
-    @JsonProperty(value = "groups")
-    private List<GroupDTO> groups;
-
     @JsonProperty(value = "likes")
     private List<Badge> likes;
 
-    public UserDTO(User user, List<GroupDTO> groups, List<Badge> likes) {
+    public UserDTO(User user, List<Badge> likes) {
         this.user = user;
-        this.groups = groups;
         this.likes = likes;
     }
 
@@ -34,14 +30,6 @@ public class UserDTO extends PageItemDTO {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public List<GroupDTO> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<GroupDTO> groups) {
-        this.groups = groups;
     }
 
     public List<Badge> getLikes() {
