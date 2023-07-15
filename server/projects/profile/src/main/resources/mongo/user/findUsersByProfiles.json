@@ -1,0 +1,13 @@
+[
+    {
+        "$match": {
+            "$elemMatch": {
+                "profiles.$id": {
+                    "$in": [
+                        ":#{#profileIds}"
+                    ]
+                }
+            }
+        }
+    }
+]

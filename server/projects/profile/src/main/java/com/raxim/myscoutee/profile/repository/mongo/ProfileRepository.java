@@ -64,9 +64,6 @@ public interface ProfileRepository extends MongoRepository<Profile, UUID> {
 
         @Aggregation(pipeline = "findProfilesByGroup")
         List<ProfileDTO> findProfilesByGroup(
-                        @Param("profileId") UUID profileId,
                         @Param("groupId") UUID groupId,
-                        @Param("limit") int limit,
-                        @Param("step") int step,
-                        @Param("offset") Object[] offset);
+                        @Param("param") PageParam pageParam);
 }

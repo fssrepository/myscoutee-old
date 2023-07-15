@@ -147,12 +147,21 @@ public class Profile implements Cloneable {
     @JsonProperty(value = "status")
     private String status = "P";
 
-    //group's role
+    // group's role
     @JsonProperty(value = "role")
     private String role;
 
     @JsonIgnore
-    private Date createdDate;
+    private LocalDateTime createdDate;
+
+    @JsonIgnore
+    private UUID createdBy;
+
+    @JsonIgnore
+    private LocalDateTime updatedDate;
+
+    @JsonIgnore
+    private UUID updatedBy;
 
     @JsonIgnore
     private UUID group;
@@ -174,7 +183,7 @@ public class Profile implements Cloneable {
     public Profile clone() {
         try {
             Profile clonedProfile = (Profile) super.clone();
-            clonedProfile.createdDate = new Date();
+            clonedProfile.createdDate = LocalDateTime.now();
             clonedProfile.lastLogin = LocalDateTime.now();
             return clonedProfile;
         } catch (CloneNotSupportedException e) {
@@ -343,11 +352,11 @@ public class Profile implements Cloneable {
         this.status = status;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -381,6 +390,30 @@ public class Profile implements Cloneable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public UUID getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(UUID updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     @Override

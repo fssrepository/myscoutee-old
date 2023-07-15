@@ -20,6 +20,10 @@ public interface UserRepository extends MongoRepository<User, UUID>, UserExtRepo
         @Query("{email: ?0}")
         User findUserByEmail(String email);
 
+        @Aggregation(pipeline = "findUsersByProfiles")
+        List<User> findUsersByProfiles(
+                        @Param("profileIds") List<UUID> profileIds);
+
         @Aggregation(pipeline = "findGroupsByUser")
         List<GroupDTO> findGroupsByUser(
                         @Param("userId") UUID userId,

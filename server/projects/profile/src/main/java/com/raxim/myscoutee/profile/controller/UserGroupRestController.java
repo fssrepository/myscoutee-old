@@ -27,12 +27,13 @@ import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.LinkDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
-import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.handler.UserParamHandler;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.service.GroupService;
 import com.raxim.myscoutee.profile.service.LinkService;
+import com.raxim.myscoutee.profile.service.ProfileService;
 import com.raxim.myscoutee.profile.service.UserService;
 
 enum GroupAction {
@@ -61,12 +62,15 @@ public class UserGroupRestController {
     private final GroupService groupService;
     private final UserService userService;
     private final LinkService linkService;
+    private final ProfileService profileService;
     private final GroupRepository groupRepository;
     private final ParamHandlers paramHandlers;
 
     public UserGroupRestController(GroupService groupService, UserService userService, LinkService linkService,
+            ProfileService profileService,
             GroupRepository groupRepository, ParamHandlers paramHandlers) {
         this.groupService = groupService;
+        this.profileService = profileService;
         this.userService = userService;
         this.linkService = linkService;
         this.groupRepository = groupRepository;
@@ -86,7 +90,7 @@ public class UserGroupRestController {
         List<Object> lOffset = CommonUtil.offset(groupDTOs, pageParam.getOffset());
 
         return ResponseEntity.ok(
-                new PageDTO<>(groupDTOs, lOffset, 0, pageParam.getType()));
+                new PageDTO<>(groupDTOs, lOffset, 0));
     }
 
     // add button on the group list screen
@@ -121,17 +125,59 @@ public class UserGroupRestController {
         return response;
     }
 
+    // consider discreet group also
+    // clicking on + button, show the "met" tab, hence you can choose members
+    // already met to invite
+    @GetMapping("/groups/{groupId}/profiles")
+    public ResponseEntity<PageDTO<ProfileDTO>> getProfilesByGroup(@PathVariable String groupId, PageParam pageParam,
+            Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+
+        pageParam = paramHandlers.handle(profile, pageParam, UserParamHandler.TYPE);
+
+        List<ProfileDTO> profileDTOs = this.profileService.getProfiles(UUID.fromString(groupId), pageParam);
+
+        List<Object> lOffset = CommonUtil.offset(profileDTOs, pageParam.getOffset());
+
+        return ResponseEntity.ok(
+                new PageDTO<>(profileDTOs, lOffset, 0));
+    }
+
+    @PostMapping("/groups/{groupId}/profiles/{profileId}/{type}")
+    public ResponseEntity<ProfileDTO> manage(@PathVariable String groupId, @PathVariable String profileId,
+            @PathVariable String type,
+            Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+
+        String actionType = MemberAction.valueOf(type).getType();
+
+        return ControllerUtil.handle((u, g, s, i) -> this.userService.changeStatus(u, g, s, i),
+                UUID.fromString(profileId), groupId, actionType, profile.getId(),
+                HttpStatus.OK);
+    }
+
+    @PostMapping("/groups/{groupId}/profiles")
+    public ResponseEntity<List<ProfileDTO>> invite(@PathVariable String groupId, @RequestBody List<String> profileids,
+            Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+
+        ResponseEntity<List<ProfileDTO>> response = ControllerUtil.handleList(
+                (g, p, i) -> userService.invite(g, p, i),
+                groupId, profileids, profile.getId(),
+                HttpStatus.CREATED);
+        return response;
+    }
+
     // leave group/delete group etc. -> notify other users
     @PostMapping("/groups/{groupId}/{type}")
-    public ResponseEntity<UserDTO> change(@PathVariable String groupId, @PathVariable String type,
+    public ResponseEntity<ProfileDTO> change(@PathVariable String groupId, @PathVariable String type,
             Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        User user = principal.getUser();
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
         String actionType = MemberAction.valueOf(type).getType();
 
         return ControllerUtil.handle((u, g, s) -> this.userService.changeStatus(u, g, s),
-                user, groupId, actionType,
+                profile.getId(), groupId, actionType,
                 HttpStatus.OK);
     }
 

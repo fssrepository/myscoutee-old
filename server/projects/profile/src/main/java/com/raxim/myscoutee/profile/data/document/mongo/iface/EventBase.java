@@ -27,12 +27,10 @@ public abstract class EventBase {
     @JsonProperty(value = "status")
     private String status = "P";
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @JsonProperty(value = "createdDate")
+    @JsonIgnore
     private LocalDateTime createdDate = LocalDateTime.now();
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @JsonProperty(value = "updatedDate")
+    @JsonIgnore
     private LocalDateTime updatedDate = LocalDateTime.now();
 
     @JsonIgnore

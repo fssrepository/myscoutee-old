@@ -21,6 +21,7 @@ import com.raxim.myscoutee.profile.data.dto.rest.ErrorDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
+import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.handler.TemplateParamHandler;
@@ -69,15 +70,14 @@ public class GroupRestController {
 
     // join group
     @PostMapping("/{groupId}/{type}")
-    public ResponseEntity<UserDTO> change(@PathVariable String groupId, @PathVariable String type,
+    public ResponseEntity<ProfileDTO> change(@PathVariable String groupId, @PathVariable String type,
             Authentication auth) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        User user = principal.getUser();
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
         String actionType = MemberAction.valueOf(type).getType();
 
-        return ControllerUtil.handle((u, g, s) -> userService.changeStatus(u, g, s),
-                user, groupId, actionType,
+        return ControllerUtil.handle((i, g, s) -> userService.changeStatus(i, g, s),
+                profile.getId(), groupId, actionType,
                 HttpStatus.OK);
     }
 

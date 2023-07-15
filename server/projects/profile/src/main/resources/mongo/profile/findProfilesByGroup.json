@@ -1,57 +1,120 @@
 [
-        {
-            "$match": {
-                "$expr": {
-                    "$and": [
-                        { "$eq": ["$group", "?1"] },
-                        { "$ne": ["$_id", "?0"] },
-                        {
-                            "$or": [
-                                { "$eq": ["$status", "A"] },
-                                { "$eq": ["$status", "F"] },
-                                { "$eq": ["$status", "P"] }
-                            ]
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "$lookup": {
-                "from": "roles",
-                "let": { "p_id": "$_id" },
-                "pipeline": [
+    {
+        "$match": {
+            "$expr": {
+                "$and": [
                     {
-                        "$match": {
-                            "$expr": { "$eq": ["$$p_id", "$profileId"] }
-                        }
+                        "$eq": [
+                            "$group",
+                            ":#{#groupId}"
+                        ]
+                    },
+                    {
+                        "$ne": [
+                            "$_id",
+                            "?#{#param.id}"
+                        ]
                     }
-                ],
-                "as": "role"
-            }
-        },
-        {
-            "$unwind": "$role"
-        },
-        {
-            "$match": {
-                "$expr": {
-                    "$gt": [{ "$ifNull": ["$createdDate", "ISODate()"] }, { "$toDate": ":#{#offset[0]}" }]
-                }
-            }
-        },
-        {
-            "$sort": {
-                "createdDate": -1
-            }
-        },
-        { "$limit": "?2" },
-        {
-            "$replaceRoot": {
-                "newRoot": {
-                    "$mergeObjects": [{ "profile": "$$ROOT" }, { "role": "$role.role", "offset": ["$createdDate"] }]
-                }
+                ]
             }
         }
-    ]
-    
+    },
+    {
+        "$lookup": {
+            "from": "groups",
+            "let": {
+                "g_id": "$group"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "_id": "$$g_id"
+                    }
+                }
+            ],
+            "as": "group"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$group"
+        }
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$and": [
+                    {
+                        "$or": [
+                            {
+                                "$eq": [
+                                    "$group.createdBy",
+                                    "?#{#param.id}"
+                                ]
+                            },
+                            {
+                                "$eq": [
+                                    "$group.discreet",
+                                    false
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "$or": [
+                            {
+                                "$gt": [
+                                    "$role",
+                                    "?#{#param.offset[0]}"
+                                ]
+                            },
+                            {
+                                "$and": [
+                                    {
+                                        "$eq": [
+                                            "$role",
+                                            "?#{#param.offset[0]}"
+                                        ]
+                                    },
+                                    {
+                                        "$lt": [
+                                            "$updatedDate",
+                                            "?#{#param.offset[1]}"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$sort": {
+            "role": 1,
+            "updatedDate": -1
+        }
+    },
+    {
+        "$limit": "?#{#param.limit}"
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$mergeObjects": [
+                    {
+                        "profile": "$$ROOT"
+                    },
+                    {
+                        "role": "$role",
+                        "offset": [
+                            "$role",
+                            "$updatedDate"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]
