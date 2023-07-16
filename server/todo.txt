@@ -204,4 +204,6 @@ New TODO:
     invisible does mean, can't even rate or see new members, just wait for the admin to be invited
 44) school/car refactor (car join first optional event - check whether it's working)
 45) badge check (not sure what is doing)
-46) EventGeneratorPromotionService implementation
+46) findMemberByEvent (should be rate bar also) while saving on rate -> Member.score will be calculated 
+    -> hence the orderby is based on Member.createdDate (join first) or Member.score (score should be calculated even Member, where the creator hasn't been rated yet)
+47) EventGeneratorPromotionService implementation

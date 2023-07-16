@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EventGeneratorPromotionService {
-    //findMemberByEvent (should be rate bar also) while saving on rate -> Member.score will be calculated 
-    // -> hence the orderby is based on Member.createdDate (join first) or Member.score (score should be calculated even Member, where the creator hasn't been rated yet)
     // for non-creator the event will have a rateBar, inside it can be discreet Event or not
     // for creator the event does not have rateBar, but the promotion.members has and it shows the rate what the creator adds to them
     // if promotion is within eventGrace from start, if stage is within eventGrace start next stage
