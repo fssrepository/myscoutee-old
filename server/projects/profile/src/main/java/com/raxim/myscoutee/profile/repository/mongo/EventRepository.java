@@ -19,7 +19,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.FeedbackDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
-import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 
 @RepositoryRestResource(collectionResourceRel = "events", path = "events")
 public interface EventRepository extends MongoRepository<Event, UUID> {
@@ -64,14 +63,6 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
         List<EventDTO> findEventByMonth(
                         @Param("param") PageParam param,
                         @Param("status") String[] status);
-
-        @Aggregation(pipeline = "findProfileByEvent")
-        List<ProfileDTO> findProfileByEvent(
-                        @Param("currentId") UUID currentId,
-                        @Param("limit") int limit,
-                        @Param("step") int step,
-                        @Param("offset") Object[] offset,
-                        @Param("status") String status);
 
         @Aggregation(pipeline = "findItemsByEvent")
         List<EventDTO> findItemsByEvent(

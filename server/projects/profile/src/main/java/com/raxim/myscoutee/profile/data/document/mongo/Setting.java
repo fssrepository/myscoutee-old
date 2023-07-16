@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Document(collection = "settings")
-public class Setting {
+public class Setting implements Cloneable {
     @Id
     @JsonProperty(value = "id")
     private UUID id;
@@ -53,5 +53,11 @@ public class Setting {
 
     public void setItems(List<FormItem> items) {
         this.items = items;
+    }
+
+    @Override
+    public Object clone()
+            throws CloneNotSupportedException {
+        return super.clone();
     }
 }

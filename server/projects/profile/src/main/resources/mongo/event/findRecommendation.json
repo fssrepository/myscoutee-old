@@ -271,7 +271,7 @@
                             "$range.start",
                             "$updatedDate"
                         ],
-                        "sortKey": "$events.createdBy"
+                        "sortKey": "$createdBy"
                     }
                 ]
             }

@@ -3,6 +3,7 @@ package com.raxim.myscoutee.profile.handler;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -24,8 +25,9 @@ public class EventParamHandler implements IParamHandler {
 
     @Override
     public PageParam handle(Profile profile, PageParam pageParam) {
-        String viewType = this.settingsService.getViewType(profile, pageParam.getType());
-        viewType = viewType != null ? viewType : AppConstants.DAY; // day is the default grouping
+        Optional<String> optViewType = this.settingsService.getValue(profile.getId(), "/activity/events",
+                pageParam.getType());
+        String viewType = optViewType.isPresent() ? optViewType.get() : AppConstants.DAY; // day is the default grouping
 
         LocalDate from = LocalDate.now();
         LocalDate createdDateFrom = LocalDate.now();

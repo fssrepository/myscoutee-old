@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Car;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
@@ -47,6 +48,7 @@ public class ProfileService {
     private final SchoolRepository schoolRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final SettingsService settingsService;
 
     public ProfileService(
             ProfileRepository profileRepository,
@@ -56,7 +58,8 @@ public class ProfileService {
             CarEventHandler carEventHandler,
             SchoolRepository schoolRepository,
             UserRepository userRepository,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            SettingsService settingsService) {
         this.profileRepository = profileRepository;
         this.eventRepository = eventRepository;
         this.profileEventHandler = profileEventHandler;
@@ -65,6 +68,26 @@ public class ProfileService {
         this.schoolRepository = schoolRepository;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
+        this.settingsService = settingsService;
+    }
+
+    public List<ProfileDTO> getProfiles(PageParam pageParam, Profile profile, String pKey, double direction,
+            int score) {
+
+        Optional<String> optMet = this.settingsService.getValue(profile.getId(), pKey, "met");
+        boolean met = optMet.isPresent() ? Boolean.parseBoolean(optMet.get()) : false;
+
+        String gender = profile.getGender().equals("m") ? "w" : "m";
+
+        // $met variable is a filter for findProfile on the list screen,
+        // can be true or false (events are not even generated, but both liked)
+        List<ProfileDTO> profileDTOs = profileRepository.findProfile(
+                pageParam,
+                CommonUtil.point(profile.getPosition()),
+                gender,
+                profile.getGroup(),
+                direction, score, met);
+        return profileDTOs;
     }
 
     public List<GroupDTO> getGroupsByProfile(UUID profileId, PageParam pageParam) {

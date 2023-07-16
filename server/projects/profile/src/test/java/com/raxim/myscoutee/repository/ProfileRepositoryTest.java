@@ -64,7 +64,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(1, profiles.size());
 
@@ -107,7 +107,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(0, profiles.size());
         }
@@ -128,7 +128,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_LIAM, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(2, profiles.size());
 
@@ -151,7 +151,7 @@ public class ProfileRepositoryTest {
                 profiles = this.profileRepository.findProfile(pageParam,
                                 AppTestConstants.LOCATION_PROFILE_LIAM, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(1, profiles.size());
 
@@ -178,7 +178,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(1, profiles.size());
                 ProfileDTO profile1 = profiles.get(0);
@@ -205,7 +205,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(2, profiles.size());
 
@@ -239,7 +239,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(1, profiles.size());
 
@@ -281,7 +281,7 @@ public class ProfileRepositoryTest {
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0);
+                                direction, 0, false);
 
                 assertEquals(1, profiles.size());
 

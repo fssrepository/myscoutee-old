@@ -29,7 +29,8 @@ public interface ProfileRepository extends MongoRepository<Profile, UUID> {
                         @Param("gender") String gender,
                         @Param("groupId") UUID groupId,
                         @Param("direction") double direction,
-                        @Param("score") int score);
+                        @Param("score") int score,
+                        @Param("met") boolean met);
 
         @Aggregation(pipeline = "findProfileNoType")
         List<ProfileDTO> findProfileNoType(

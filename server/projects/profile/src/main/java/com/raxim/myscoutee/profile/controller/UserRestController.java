@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,22 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.config.properties.ConfigProperties;
-import com.raxim.myscoutee.common.util.JsonUtil;
+import com.raxim.myscoutee.common.util.ControllerUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Badge;
-import com.raxim.myscoutee.profile.data.document.mongo.Form;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Setting;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.data.dto.rest.SettingDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.UserDTO;
-import com.raxim.myscoutee.profile.repository.mongo.FormRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.SettingRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
+import com.raxim.myscoutee.profile.service.SettingsService;
 
 @RepositoryRestController
 @RequestMapping("user")
@@ -40,28 +38,22 @@ public class UserRestController {
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
-    private final SettingRepository settingRepository;
-    private final FormRepository formRepository;
+    private final SettingsService settingsService;
     private final ConfigProperties config;
-    private final ObjectMapper objectMapper;
 
     public UserRestController(ProfileRepository profileRepository,
             UserRepository userRepository,
             LikeRepository likeRepository,
-            SettingRepository settingRepository,
-            FormRepository formRepository,
-            ConfigProperties config,
-            ObjectMapper objectMapper) {
+            SettingsService settingsService,
+            ConfigProperties config) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
-        this.settingRepository = settingRepository;
-        this.formRepository = formRepository;
+        this.settingsService = settingsService;
         this.config = config;
-        this.objectMapper = objectMapper;
     }
 
-    //user.profiles.name is the dropdownbox content, not the group name
+    // user.profiles.name is the dropdownbox content, not the group name
     @PostMapping()
     public ResponseEntity<UserDTO> saveUser(Authentication auth, @RequestPart Group group) {
         FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
@@ -106,48 +98,21 @@ public class UserRestController {
     }
 
     @GetMapping("/settings")
-    public ResponseEntity<Setting> getSetting(Authentication auth, @RequestParam("key") String key) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        User user = principal.getUser();
-        UUID profileId = user.getProfile().getId();
+    public ResponseEntity<SettingDTO> getSetting(Authentication auth, @RequestParam("key") String key) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
-        Setting setting = settingRepository.findSettingByProfileAndKey(profileId, key);
-
-        if (setting == null) {
-            Optional<Form> form = formRepository.findFormByKey(key);
-            if (form.isPresent()) {
-                Form sForm = form.get();
-
-                Setting settingToSave = new Setting();
-                settingToSave.setId(UUID.randomUUID());
-                settingToSave.setKey(key);
-                settingToSave.setProfile(profileId);
-                settingToSave.setItems(sForm.getItems());
-                Setting settingSaved = settingRepository.save(settingToSave);
-                return ResponseEntity.ok(settingSaved);
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
-        } else {
-            return ResponseEntity.ok(setting);
-        }
+        return ControllerUtil.handle((i, k) -> settingsService.getSetting(i, k),
+                profile.getId(), key,
+                HttpStatus.OK);
     }
 
     @PostMapping("/settings")
-    public ResponseEntity<Setting> saveSetting(Authentication auth, @RequestParam("key") String key,
+    public ResponseEntity<SettingDTO> saveSetting(Authentication auth, @RequestParam("key") String key,
             @RequestBody Setting setting) {
-        FirebasePrincipal principal = (FirebasePrincipal) auth.getPrincipal();
-        User user = principal.getUser();
-        UUID profileId = user.getProfile().getId();
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
 
-        Setting dbSetting = settingRepository.findSettingByProfileAndKey(profileId, key);
-        if (dbSetting != null) {
-            Setting clonedSetting = JsonUtil.clone(dbSetting, objectMapper);
-            clonedSetting.setItems(setting.getItems());
-            Setting settingsSaved = settingRepository.save(clonedSetting);
-            return ResponseEntity.ok(settingsSaved);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+        return ControllerUtil.handle((i, k, s) -> settingsService.saveSetting(i, k, s),
+                profile.getId(), key, setting,
+                HttpStatus.OK);
     }
 }

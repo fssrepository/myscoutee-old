@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,8 @@ public class EventParameterHandlerTest extends AbstractAlgoTest {
 
     @Test
     public void shouldHandleParam() {
-        when(settingsService.getViewType(any(), any()))
-                                .thenReturn(AppConstants.DAY);
+        when(settingsService.getValue(any(), any(), any()))
+                                .thenReturn(Optional.of(AppConstants.DAY));
 
         PageParam pageParam = eventParamHandler.handle(new Profile(UUID_PROFILE_OLIVER), new PageParam());
         assertEquals(AppConstants.DAY_FORMAT, pageParam.getGroupKey());
