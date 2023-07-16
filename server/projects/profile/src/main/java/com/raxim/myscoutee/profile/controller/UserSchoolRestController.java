@@ -42,6 +42,7 @@ public class UserSchoolRestController {
         this.schoolRepository = schoolRepository;
     }
 
+    // TODO: school fix - discreet group - isBusiness/isSchool event - discreet level
     @GetMapping("/schools")
     public ResponseEntity<PageDTO<SchoolDTO>> getSchools(
             Authentication auth,

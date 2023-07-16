@@ -132,6 +132,7 @@ public class GameRestController {
         }
     }
 
+    // TODO: school fix - discreet group - isBusiness/isSchool event - discreet level
     @GetMapping(value = { "/rate_none/{id}/schools", "/rate_give/{id}/schools",
             "/rate_give/{id}/schools", "/rate_give/{id}/schools", "/rate_give/{id}/schools",
             "rate_receive/{id}/schools",

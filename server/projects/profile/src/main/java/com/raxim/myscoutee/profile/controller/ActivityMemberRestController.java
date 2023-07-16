@@ -147,7 +147,7 @@ public class ActivityMemberRestController {
                                 id, code, HttpStatus.OK);
         }
 
-        // TODO: fix ParamHandlers
+        // TODO: school fix - discreet event - isBusiness/isSchool event - discreet level
         @GetMapping(value = { "events/{eventId}/members/{id}/schools" })
         public ResponseEntity<PageDTO<SchoolDTO>> getSchools(@PathVariable String id, Authentication auth,
                         @RequestParam("step") Integer step,
