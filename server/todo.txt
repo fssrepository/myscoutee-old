@@ -196,6 +196,7 @@ New TODO:
 41) if clone an event from recommendations tab, the user will be a member with Role M, status A.
     M (can invite members, or change the rule to priority etc.)
 42) /recommend has been removed (can't recommend an event, will be confusing, data privacy)
-43) if a group is discreet, event is should be discreet also (discreet level is member does not see invisible/visible/school)
+43) if a group is discreet, event is should be discreet also 
+    (discreet level is member does not see invisible/visible/invisible_school/visible_school)
     in dating group the group is visible, but in business school will be shown
     invisible does mean, can't even rate or see new members, just wait for the admin to be invited
