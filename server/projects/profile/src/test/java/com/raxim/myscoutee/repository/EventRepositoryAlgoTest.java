@@ -37,7 +37,7 @@ public class EventRepositoryAlgoTest {
     public void shouldFindCandidates() {
         List<Event> events = eventRepository.findAll();
 
-        List<EventWithCandidates> eventsWithCandidates = eventRepository.findCandidates();
+        List<EventWithCandidates> eventsWithCandidates = eventRepository.findCandidatesForPrivate();
         assertEquals(3, eventsWithCandidates.size());
         assertEquals("T", eventsWithCandidates.get(0).getEvent().getStatus());
 
@@ -49,7 +49,7 @@ public class EventRepositoryAlgoTest {
         events.get(1).getRule().setMutual(true);
         eventRepository.saveAll(events);
 
-        eventsWithCandidates = eventRepository.findCandidates();
+        eventsWithCandidates = eventRepository.findCandidatesForPrivate();
 
         eventWithCandidates1 = eventsWithCandidates.get(1);
         assertEquals("P", eventWithCandidates1.getEvent().getStatus());
@@ -58,7 +58,7 @@ public class EventRepositoryAlgoTest {
         events.get(1).getRule().setFrom(LocalDateTime.of(2021, 1, 1, 0, 0, 0));
         eventRepository.saveAll(events);
 
-        eventsWithCandidates = eventRepository.findCandidates();
+        eventsWithCandidates = eventRepository.findCandidatesForPrivate();
 
         eventWithCandidates1 = eventsWithCandidates.get(1);
         assertEquals("P", eventWithCandidates1.getEvent().getStatus());

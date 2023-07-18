@@ -1,0 +1,129 @@
+[
+    {
+        "$match": {
+            "status": "P",
+            "type": "E",
+            "access": {
+                "$in": [
+                    "F",
+                    "A"
+                ]
+            }
+        }
+    },
+    {
+        "$addFields": {
+            "candidates": {
+                "$filter": {
+                    "input": "$members",
+                    "as": "member",
+                    "cond": {
+                        "$in": [
+                            "$$member.status",
+                            [
+                                "J",
+                                "P"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "validUntil": {
+                "$dateSubtract": {
+                    "startDate": {
+                        "$toDate": "ISODate()"
+                    },
+                    "unit": "minute",
+                    "amount": "$rule.eventGrace"
+                }
+            }
+        }
+    },
+    {
+        "$set": {
+            "status": {
+                "$cond": [
+                    {
+                        "$and": [
+                            {
+                                "$lt": [
+                                    "$range.start",
+                                    "$validUntil"
+                                ]
+                            },
+                            {
+                                "$lt": [
+                                    {
+                                        "$size": "$currentMembers"
+                                    },
+                                    "$capacity.min"
+                                ]
+                            }
+                        ]
+                    },
+                    "T",
+                    {
+                        "$cond": [
+                            {
+                                "$or": [
+                                    {
+                                        "$and": [
+                                            {
+                                                "$lt": [
+                                                    "$range.start",
+                                                    "$validUntil"
+                                                ]
+                                            },
+                                            {
+                                                "$gte": [
+                                                    {
+                                                        "$size": "$currentMembers"
+                                                    },
+                                                    "$capacity.min"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "$and": [
+                                            {
+                                                "$gte": [
+                                                    "$range.start",
+                                                    "$validUntil"
+                                                ]
+                                            },
+                                            {
+                                                "$eq": [
+                                                    {
+                                                        "$size": "$currentMembers"
+                                                    },
+                                                    "$capacity.max"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "A",
+                            "P"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$candidates",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "event": "$$ROOT",
+                "candidates": "$candidates.members"
+            }
+        }
+    }
+]

@@ -21,6 +21,12 @@ public class Rule {
     @JsonProperty(value = "priority")
     private Boolean priority;
 
+    // in the case of join first, does the creator need to approve manually?
+    // if you haven't approved the min capacity before eventGrace, event is going to
+    // time out
+    @JsonProperty(value = "autoApprove")
+    private Boolean autoApprove;
+
     // the capacity should be fulfilled before the event starts with the grace
     // period
     @JsonProperty(value = "eventGrace")
@@ -31,21 +37,13 @@ public class Rule {
     @JsonProperty(value = "memberGrace")
     private int memberGrace;
 
-    // by rate (isRank = false) vs. by score (isRank = true)
-    @JsonProperty(value = "isRank")
-    private Boolean isRank;
-
     // don't invite less than 2-3 rated people for the event
     @JsonProperty(value = "rate")
     private Integer rate;
 
-    // fifa ranking etc.
+    // fifa ranking (leaderboard) etc., none is a value also, mutual rate (rate for each other mutually)
     @JsonProperty(value = "rankType")
     private String rankType;
-
-    // the first x (value of breaker) is going to the next round
-    @JsonProperty(value = "breaker")
-    private String breaker;
 
     /*
      * kesobb boviteni lehet

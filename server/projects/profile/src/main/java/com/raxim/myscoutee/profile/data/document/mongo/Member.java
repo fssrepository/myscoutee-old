@@ -23,15 +23,15 @@ public class Member {
 
     // A (Accepted), R (rejected), I (invited), K (kicked)?? - maybe by more members
     // than one, L (left) V (Verified)
-    // T (Timed-Out), M (manager), P (promoter), LL (late leave), W (on waiting
-    // list), LD (left deleted), D (deleted)
+    // T (Timed-Out), LL (late leave), W (on waiting
+    // list), LD (left deleted), D (deleted), Opt for (O), P (pending)
     // Manager, who can add members to the event, or in priority can set up some
     // rules
     // Admin can change other parts, like add new eventItem
     @JsonProperty(value = "status")
     private String status;
 
-    // User (U), Admin (A), Promoter (P)
+    // User (U), Admin (A), Promoter (P), Manager (M)
     @JsonProperty(value = "role")
     private String role;
 
@@ -48,6 +48,11 @@ public class Member {
     // event item ref - members will be removed from event item
     @JsonIgnore
     private UUID eventRef;
+
+    // (it shows the maxStage, what the member reached),
+    // the stage will be added to the group key before the status if it does exist
+    @JsonProperty(value = "stage")
+    private Integer stage;
 
     @JsonProperty(value = "score")
     private Integer score;
@@ -163,6 +168,14 @@ public class Member {
 
     public void setScores(List<Score> scores) {
         this.scores = scores;
+    }
+
+    public Integer getStage() {
+        return stage;
+    }
+
+    public void setStage(Integer stage) {
+        this.stage = stage;
     }
 
 }

@@ -73,11 +73,14 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
 
     // for individuals vs for groups (for groups does not exist in friends only
     // access)
+    // "A" = acquaintance is the default, "S" = strangers
     @JsonProperty(value = "audience")
     private String audience;
 
-    // only admin of the group can do it,
-    // this kind of event is going directly to the invitation tab of eny member of
+    // if access "A", admin can switch to invite, if access "F", creator can switch
+    // to invite, in any other case the value is true
+    // if access "A" or "F" this kind of event is going directly to the invitation
+    // tab of eny member of
     // the group
     @JsonProperty(value = "autoInvite")
     private Boolean autoInvite;

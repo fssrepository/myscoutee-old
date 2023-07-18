@@ -75,7 +75,9 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
                     return new Edge(fromNode, toNode, weight);
                 }).collect(Collectors.toSet());
 
-        List<EventWithCandidates> eventWithCandidates = this.eventRepository.findCandidates();
+        List<EventWithCandidates> eventWithCandidates = this.eventRepository.findCandidatesForPrivate();
+
+        //if the event is priority, then continue with this code, anyway time out event simply!!!
 
         List<Event> events = eventWithCandidates.stream().map(event -> {
 
@@ -93,6 +95,7 @@ public class EventGeneratorPriorityService implements IEventGeneratorService {
                     .minus(rule.getMemberGrace(),
                             ChronoUnit.MINUTES);
 
+            //do we need to timeout members, or just invite new ones???
             Set<Member> members = event.getEvent().getMembers().stream().map(member -> {
                 if ("I".equals(member.getStatus())
                         && member.getCreatedDate().isBefore(validUntil)) {

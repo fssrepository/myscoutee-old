@@ -22,6 +22,11 @@ public class Group implements Cloneable {
     @JsonProperty(value = "key")
     private UUID id;
 
+    //T = Team, G = Group
+    //inside project list out Teams, show Unassigned Team as base etc.
+    @JsonProperty(value = "type")
+    private String type;
+
     /*
      * values: dating
      */

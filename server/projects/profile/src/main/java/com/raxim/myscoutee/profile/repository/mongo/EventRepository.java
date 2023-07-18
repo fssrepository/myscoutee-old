@@ -26,8 +26,12 @@ public interface EventRepository extends MongoRepository<Event, UUID> {
         @Query("{'type': ?0}")
         List<Event> findEventByType(String type);
 
-        @Aggregation(pipeline = "findCandidates")
-        List<EventWithCandidates> findCandidates();
+        @Aggregation(pipeline = "findCandidatesForPrivate")
+        List<EventWithCandidates> findCandidatesForPrivate();
+
+        //check subEvents prefer in a different query
+        @Aggregation(pipeline = "findCandidatesForNonPrivate")
+        List<EventWithCandidates> findCandidatesForNonPrivate();
 
         @Query("{'status': 'P', 'members.profile.$id': ?0}")
         List<Event> findPendingEvents(UUID profileId);

@@ -51,7 +51,7 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
         EventGeneratorPriorityService eventGeneratorPriorityService = new EventGeneratorPriorityService(likeRepository,
                 eventRepository);
 
-        List<EventWithCandidates> eventWithCandidates = this.eventRepository.findCandidates();
+        List<EventWithCandidates> eventWithCandidates = this.eventRepository.findCandidatesForPrivate();
         assertEquals("T", eventWithCandidates.get(0).getEvent().getStatus());
         assertEquals(1, eventWithCandidates.get(2).getEvent().getMembers().size());
 

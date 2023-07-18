@@ -40,7 +40,7 @@ public class MemberParamHandler implements IParamHandler {
         Object[] tOffset = { status, score, createdDateF };
         pageParam.setOffset(tOffset);
         pageParam.setId(profile.getId());
-
+        
         return pageParam;
     }
 

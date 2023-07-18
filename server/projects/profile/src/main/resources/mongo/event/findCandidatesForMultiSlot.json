@@ -1,0 +1,34 @@
+[
+    {
+        "$match": {
+            "status": "P",
+            "type": "E",
+            "multislot": true
+        }
+    },
+    {
+        "$addFields": {
+            "currentMembers": {
+                "$filter": {
+                    "input": "$members",
+                    "as": "member",
+                    "cond": {
+                        "$eq": [
+                            "$$member.status",
+                            "A"
+                        ]
+                    }
+                }
+            },
+            "validUntil": {
+                "$dateSubtract": {
+                    "startDate": {
+                        "$toDate": "ISODate()"
+                    },
+                    "unit": "minute",
+                    "amount": "$rule.eventGrace"
+                }
+            }
+        }
+    }
+]

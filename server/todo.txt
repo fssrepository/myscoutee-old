@@ -208,9 +208,9 @@ New TODO:
 46) stats (liked, received, invited)
 47) findMemberByEvent (should be rate bar also) while saving on rate -> Member.score will be calculated 
     -> hence the orderby is based on Member.createdDate (join first) or Member.score (score should be calculated even Member, where the creator hasn't been rated yet)
-48) EventGeneratorPromotionService implementation
     // for non-creator the event will have a rateBar, inside it can be discreet Event or not
     // for creator the event does not have rateBar, but the promotion.members has and it shows the rate what the creator adds to them
+48) EventGeneratorPromotionService implementation
     // if promotion is within eventGrace from start, if stage is within eventGrace start next stage
     // stage can be closed manually before eventGrace (hence immediate calculation needs to be triggered and invite accordingly)
     // a) if any timeslot has got minimum capacity, promotion status is A
@@ -224,3 +224,78 @@ New TODO:
     // the algorithm based on stage (score or rate - breaker), rate needs to be
     // approved memberGrace in time
     // or invite an other one from all the slots of the prev Stage
+49) menu item hide by current role discreet (ui)
+    schools tab shouldn't be shown
+
+    overscroll-behavior : none; - disable pull refresh on chrome
+
+    privacy popup
+
+
+    feedbacks refactor
+
+    when you rate a promotion, it will be shown on the event screen, like pending, and you are not selected by the organizer (gray)
+    you will be added to the member list with status "P" - pending rated or "J" join
+
+    event filter (show only, where i'm active etc.) - status of member is a parameter of the queries
+
+    event tabs (nincs kulon recommendations tab)
+
+    chats/events/invitations/recommendations (events with filter, friends only or all)
+
+    a recommendations for group is going next to the group editor
+
+    a new tab in group editor called members which has a view "teams" (it contains unassigned members also and invited from outside (close friend))
+    //T = Team, G = Group
+    //inside project list out Teams, show Unassigned Team as base etc.
+    you can chat with a person, even if event is not reaching min. capacity, if the person accepted invitation
+
+    multiStage, if more than two stages does exist - (coloring) - update on save (in sync method)
+
+50) findMembersByEvent - filter bar order by mutual rate or rate give (won't be implemented by now, only rate give for a member)
+51) rule algorithm (multislot/multistage)
+    members screen either a rate bar or score bar (rank none is the score bar)
+
+    event
+
+    rule - join - rule game first stage (from the main promotion event, move members to the sub events)
+                  member stage of the main event will be set to 1
+
+    if subevent is Preferred, if is rate -> then status is "O" (Opt For)
+    if it's rate the status of the member of main event is "P" pending
+
+    1) priority (based on rate)
+       eventGrace/MemberGrace/rate/from/balanced
+       from/mutual won't be visible when access is F or A (non private) - it does mean that it's an acquitance event
+       findCandidates query is handling that if from is null and mutual is false - the difference between private (P) and A/F is that you are selecting the member of the event, not your acquitance
+    2) non-priority (join first)
+       status "J" is an "A" (autoApprove)
+       i) if autoApprove -> "J" => right away will be added to the sub event with "J", for the main event it will be status "A" and stage set to 1 - the main event for members can be a filter (current stage or all stage)
+       member has a field variable stage (it shows the maxStage, what the member reached), the stage will be added to the group key before the status if it does exist
+       ii) if the min capacity hasn't been reached and it's single slot, then T (time out)
+           if it's multislot then merge invite, and cancel, if even with single room min capacity hasn't been reached
+
+    rule - game - second stage - querying based on available first stage slots' winners
+       i) breaker removed (auto allocation based on capacity, we don't need to set first X)
+       next stage you need to make sure, how to add less rooms for participants,
+       hence the first x will count for each
+       (if it can be divided by the slots of the previous stage, first slots can fill up the places)
+    
+       ii) don't invite anybody to the next round where the average rate is lower than rule.rate, even if it's a winner
+       the event was messed up simply, and there wasn't any team work at all,
+       or we just personally rated bad all of them in the team
+52) chat
+    (chatgpt)
+
+    mqtt - mosquitto module in Go to call the spring application on connection, hence can check the json token - json token is in the username.
+
+    nginx forward -> load balancer in go - websocket (can extract mqtt messages - topic, with paho library.) shard by topic to forward to mosquitto server
+
+    with load balancer in go we can also check json token first, and just forward connection, if json token is verified. (that option does not need any customisation of mosquitto)
+
+    based on mosquito docker image, we can create a docker file includes the auth_plug module
+53) terkep:
+    el lehet kerulni a terkep szervert - event, auto-complement to search for location
+
+    instead of using map selection, load open street map data (filtered by some location) to mongodb. hence the name you can search for, and get the geo location beneath.
+    (facebook also does not have map selection, while creating event)
