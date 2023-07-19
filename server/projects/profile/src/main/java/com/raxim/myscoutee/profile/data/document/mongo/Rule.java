@@ -21,6 +21,10 @@ public class Rule {
     @JsonProperty(value = "priority")
     private Boolean priority;
 
+    // only when it's join first and simple event
+    @JsonProperty(value = "autoApprove")
+    private Boolean autoApprove;
+
     // the capacity should be fulfilled before the event starts with the grace
     // period
     @JsonProperty(value = "eventGrace")
@@ -48,6 +52,7 @@ public class Rule {
     /*
      * in the case of competition it has a different meaning
      * -> defines the most liked person inside an event can go to the next stage
+     * A and F does not make sense on first stage, just after when you roll to the next stage on a competition
      */
     @JsonProperty(value = "mutual")
     private Boolean mutual;
@@ -125,5 +130,13 @@ public class Rule {
 
     public void setRankType(String rankType) {
         this.rankType = rankType;
+    }
+
+    public Boolean getAutoApprove() {
+        return autoApprove;
+    }
+
+    public void setAutoApprove(Boolean autoApprove) {
+        this.autoApprove = autoApprove;
     }
 }

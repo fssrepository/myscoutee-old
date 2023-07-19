@@ -48,6 +48,8 @@ public class AppConstants {
         public static final String ERR_ILLEGAL_ACCESS = "err.event_illegal_access";
         public static final String ERR_INVISIBLE_PROFILE = "err.invisible_profile";
         public static final String ERR_NO_PROFILE = "err.no_profile";
+        public static final String ERR_NO_EDIT = "err.no_edit";
+        public static final String ERR_SAVE = "err.save";
         public static final String ERR_FRIENDS_ONLY = "err.friends_only";
 
 }

@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -252,6 +253,18 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         return getRule() != null && Boolean.TRUE.equals(getRule().getPriority());
     }
 
+    public boolean isAutoApprove() {
+        return getRule() != null && Boolean.TRUE.equals(getRule().getAutoApprove());
+    }
+
+    public boolean isBalanced() {
+        return getRule() != null && Boolean.TRUE.equals(getRule().getBalanced());
+    }
+
+    public boolean isMultislot() {
+        return Boolean.TRUE.equals(getMultislot());
+    }
+
     public void syncStatus() {
         if (getMembers() != null) {
 
@@ -280,13 +293,28 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                             });
                 }
 
+                Double rateMin = getRule() != null ? getRule().getRate() : 0d;
+
                 List<Member> members = getMembers().stream()
                         .filter(member -> "A".equals(member.getStatus())
-                                && "U".equals(member.getRole()))
+                                && "U".equals(member.getRole()) && (!isPriority() || member.getScore() >= rateMin))
                         .sorted(Comparator.comparing(Member::getScore)
                                 .thenComparing(Member::getCreatedDate))
                         .toList();
+
                 setNumOfMembers(members.size());
+
+                if (isBalanced()) {
+                    Map<String, Long> genderCounts = members.stream()
+                            .collect(Collectors.groupingBy(member -> member.getProfile().getGender(),
+                                    Collectors.counting()));
+
+                    long minCount = genderCounts.values().stream().min(Long::compareTo).orElse(0L);
+
+                    members = members.stream()
+                            .filter(member -> genderCounts.get(member.getProfile().getGender()) >= minCount)
+                            .collect(Collectors.toList());
+                }
 
                 if (LocalDateTime.now().isAfter(validUntil)) {
                     if (getRule() != null) {
@@ -294,7 +322,9 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                         if (getCapacity().getMin() > getNumOfMembers()) {
                             timeOut();
                         } else {
-                            setStatus("A");
+                            if (!Boolean.TRUE.equals(getMultislot())) {
+                                setStatus("A");
+                            }
                             assignToSlots(members);
                         }
 
@@ -302,12 +332,21 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                 } else {
                     if ("P".equals(getAccess())
                             && getCapacity().getMax() == getNumOfMembers()) {
-                        setStatus("A");
+                        if (!Boolean.TRUE.equals(getMultislot())) {
+                            setStatus("A");
+                        }
                         assignToSlots(members);
                     }
                 }
             }
         }
+    }
+
+    public boolean validUntilFrom(LocalDateTime localDateTime) {
+        LocalDateTime validUntilFrom = getRule() != null ? localDateTime
+                .plus(getRule().getMemberGrace(), ChronoUnit.MINUTES)
+                : LocalDateTime.MAX;
+        return LocalDateTime.now().isBefore(validUntilFrom);
     }
 
     private void assignToSlots(List<Member> members) {
@@ -324,8 +363,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                         if (counter < item.getCapacity().getMin()) {
                             item.setStatus("C");
                         } else {
-                            item.setStatus("A");
-
+                            // item status is pending, until there is not enough approval
                             for (int i = memberIdx; i < memberIdx + availableCapacity; i++) {
                                 Member currMemberForSub = (Member) members.get(i).clone();
                                 currMemberForSub.setStatus("I");
@@ -333,7 +371,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                                 item.getMembers().add(currMemberForSub);
 
                                 Member currMemberForMain = (Member) members.get(i);
-                                currMemberForMain.setStatus("A");
+                                currMemberForMain.setStatus("P"); // ???
                                 getMembers().remove(currMemberForMain);
                                 getMembers().add(currMemberForMain);
                             }
@@ -490,15 +528,6 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                     balance("J", "W", null);
                     balance("A", "W", null);
                 }
-            } else {
-
-                if (getRule() != null
-                        && Boolean.TRUE.equals(getRule().getBalanced())) {
-                    balanceByGender("W", "J", diff);
-                    balanceByGender("J", "W", null);
-                    balanceByGender("W", "PR", diff);
-                    balanceByGender("PR", "W", null);
-                }
             }
         }
 
@@ -574,13 +603,6 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     }
 
     public void shift() {
-        // ??
-        syncStatus();
-
-        if ("T".equals(getStatus()) || "A".equals(getStatus())) {
-            return;
-        }
-
         if (getItems() != null) {
             Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
                     .map(item -> item.getRange().getStart())

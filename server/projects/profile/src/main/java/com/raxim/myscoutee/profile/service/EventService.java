@@ -232,82 +232,98 @@ public class EventService {
         return List.of();
     }
 
-    public Optional<EventDTO> save(Profile profile, Event pEvent) throws CloneNotSupportedException {
+    public Optional<EventDTO> save(Profile profile, Event pEvent) throws MessageException {
         return save(profile, pEvent, null);
     }
 
     public Optional<EventDTO> save(Profile profile, Event pEvent, String parentId)
-            throws CloneNotSupportedException {
+            throws MessageException {
         List<Event> dbEvents = this.eventRepository.findParents(pEvent.getId(), 2);
+
+        if (!dbEvents.isEmpty()) {
+            Event mainEvent = dbEvents.get(dbEvents.size() - 1);
+            if ("A".equals(mainEvent.getStatus())) {
+                throw new MessageException(AppConstants.ERR_NO_EDIT);
+            }
+        }
 
         List<Event> events = new ArrayList<>();
 
-        if (dbEvents.isEmpty()) {
-            Event lEvent = (Event) pEvent.clone();
-            lEvent.setId(UUID.randomUUID());
-            lEvent.setGroup(profile.getGroup());
-            lEvent.setCreatedDate(LocalDateTime.now());
-            lEvent.setCreatedBy(profile.getId());
-            lEvent.setStatus(pEvent.getStatus());
+        try {
+            if (dbEvents.isEmpty()) {
+                Event lEvent;
 
-            events.add(lEvent);
+                lEvent = (Event) pEvent.clone();
 
-            dbEvents.add(lEvent);
-            if (parentId != null) {
-                UUID tParentUuid = UUID.fromString(parentId);
-                lEvent.setParentId(tParentUuid);
+                lEvent.setId(UUID.randomUUID());
+                lEvent.setGroup(profile.getGroup());
+                lEvent.setCreatedDate(LocalDateTime.now());
+                lEvent.setCreatedBy(profile.getId());
+                lEvent.setStatus(pEvent.getStatus());
 
-                List<Event> dbParents = this.eventRepository.findParents(tParentUuid, 2);
-                dbEvents.addAll(dbParents);
+                events.add(lEvent);
 
-                if (dbParents.size() > 1) {
+                dbEvents.add(lEvent);
+                if (parentId != null) {
+                    UUID tParentUuid = UUID.fromString(parentId);
+                    lEvent.setParentId(tParentUuid);
+
+                    List<Event> dbParents = this.eventRepository.findParents(tParentUuid, 2);
+                    dbEvents.addAll(dbParents);
+
+                    if (dbParents.size() > 1) {
+                        Event dbParent = dbEvents.get(1);
+                        dbParent.getItems().add(lEvent);
+                        dbParent.sync();
+                        events.add(dbParent);
+                    }
+                }
+
+            } else {
+                Event dbEvent = dbEvents.get(0);
+
+                Event lEvent = (Event) pEvent.clone();
+                lEvent.setId(dbEvent.getId());
+                lEvent.setGroup(dbEvent.getGroup());
+                lEvent.setCreatedDate(dbEvent.getCreatedDate());
+                lEvent.setCreatedBy(dbEvent.getCreatedBy());
+                lEvent.setStatus(dbEvent.getStatus());
+                lEvent.setParentId(dbEvent.getParentId());
+
+                lEvent.shift();
+                lEvent.sync();
+
+                events.add(lEvent);
+
+                if (dbEvents.size() > 1) {
                     Event dbParent = dbEvents.get(1);
-                    dbParent.getItems().add(lEvent);
+
+                    // check whether it's participating in a clone, and if it's the same
+                    // parent, change all the variable inside, and save both
+                    List<Event> items = dbParent.getItems().stream()
+                            .filter(item -> !item.getId().equals(dbEvent.getId())
+                                    && (item.getId().equals(dbEvent.getRef())
+                                            || item.getRef().equals(dbEvent.getRef())))
+                            .map(item -> {
+                                Event tEvent;
+                                try {
+                                    tEvent = (Event) lEvent.clone();
+                                    tEvent.setId(item.getId());
+                                    return tEvent;
+                                } catch (CloneNotSupportedException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }).filter(item -> item != null).toList();
+                    dbParent.getItems().addAll(items);
+                    events.addAll(dbParent.getItems());
                     dbParent.sync();
                     events.add(dbParent);
                 }
             }
-        } else {
-            Event dbEvent = dbEvents.get(0);
-
-            Event lEvent = (Event) pEvent.clone();
-            lEvent.setId(dbEvent.getId());
-            lEvent.setGroup(dbEvent.getGroup());
-            lEvent.setCreatedDate(dbEvent.getCreatedDate());
-            lEvent.setCreatedBy(dbEvent.getCreatedBy());
-            lEvent.setStatus(dbEvent.getStatus());
-            lEvent.setParentId(dbEvent.getParentId());
-
-            lEvent.shift();
-            lEvent.sync();
-
-            events.add(lEvent);
-
-            if (dbEvents.size() > 1) {
-                Event dbParent = dbEvents.get(1);
-
-                // check whether it's participating in a clone, and if it's the same
-                // parent, change all the variable inside, and save both
-                List<Event> items = dbParent.getItems().stream()
-                        .filter(item -> !item.getId().equals(dbEvent.getId())
-                                && (item.getId().equals(dbEvent.getRef())
-                                        || item.getRef().equals(dbEvent.getRef())))
-                        .map(item -> {
-                            Event tEvent;
-                            try {
-                                tEvent = (Event) lEvent.clone();
-                                tEvent.setId(item.getId());
-                                return tEvent;
-                            } catch (CloneNotSupportedException e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        }).filter(item -> item != null).toList();
-                dbParent.getItems().addAll(items);
-                events.addAll(dbParent.getItems());
-                dbParent.sync();
-                events.add(dbParent);
-            }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace(); // logger is needed
+            throw new MessageException(AppConstants.ERR_SAVE);
         }
 
         for (int i = 2; i < dbEvents.size(); i++) {

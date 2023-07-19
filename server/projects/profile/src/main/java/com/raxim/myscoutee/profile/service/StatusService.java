@@ -89,6 +89,11 @@ public class StatusService {
                         newMember.setUpdatedDate(LocalDateTime.now());
                         newMember.setCreatedDate(LocalDateTime.now());
                         newMember.setRole("U");
+                        if (event.isAutoApprove() && event.isMultislot()) {
+                            if ("J".equals(status)) {
+                                status = "A";
+                            }
+                        }
                         newMember.setStatus(status);
                         event.getMembers().add(newMember);
                     }
