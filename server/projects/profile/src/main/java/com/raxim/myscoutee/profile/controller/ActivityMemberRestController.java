@@ -38,8 +38,8 @@ enum MemberAction {
         leave("L"),
         accept("A"),
         kick("K"),
-        reject("R"),
-        prefer("PR"); //opt for
+        reject("R");
+        //prfer removed, because the members are assigned baed on order
 
         private final String type;
 

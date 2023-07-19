@@ -24,7 +24,7 @@ public class Member implements Cloneable {
     // A (Accepted), R (rejected), I (invited), K (kicked)?? - maybe by more members
     // than one, L (left) V (Verified)
     // T (Timed-Out), LL (late leave), W (on waiting
-    // list), LD (left deleted), D (deleted), Opt for (O), P (pending)
+    // list), LD (left deleted), D (deleted), P (pending), Selected (S)
     // Manager, who can add members to the event, or in priority can set up some
     // rules
     // Admin can change other parts, like add new eventItem

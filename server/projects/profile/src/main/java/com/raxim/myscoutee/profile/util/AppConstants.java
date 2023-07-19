@@ -52,4 +52,8 @@ public class AppConstants {
         public static final String ERR_SAVE = "err.save";
         public static final String ERR_FRIENDS_ONLY = "err.friends_only";
 
+        public static final String RANK_NONE = "none";
+        public static final String RANK_RATE = "rate";
+        public static final String RANK_FIFA = "fifa";
+
 }

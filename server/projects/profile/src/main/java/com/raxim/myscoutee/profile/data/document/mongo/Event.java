@@ -281,6 +281,17 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
             return;
         }
 
+        if (getItems() != null && isMultislot()) {
+            int min = getItems().stream().filter(item -> item.getStage() == getStage())
+                    .mapToInt(item -> item.getCapacity().getMin())
+                    .min().orElse(0);
+
+            int max = getItems().stream().filter(item -> item.getStage() == getStage())
+                    .mapToInt(item -> item.getCapacity().getMax())
+                    .sum();
+            setCapacity(RangeInt.of(min, max));
+        }
+
         if (getMembers() != null) {
 
             List<Member> activeMembers = getMembers().stream()
@@ -357,21 +368,16 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                     }
                 }
             }
-        } else if ("A".equals(getStatus())) {
-            if (isNextStageStarted()) {
-                int nextStage = getStage() + 1;
-                setStage(nextStage);
-            }
         }
     }
 
-    public boolean isNextStageStarted() {
+    public List<Event> getDueNextStageEvents() {
         int nextStage = getStage() + 1;
         List<Event> nextStageEvents = getItems().stream()
                 .filter(item -> "A".equals(item.getStatus()) && item.getStage() == nextStage
                         && !item.validEventUntilFrom())
                 .toList();
-        return !nextStageEvents.isEmpty();
+        return nextStageEvents;
     }
 
     public boolean validEventUntilFrom() {
@@ -407,6 +413,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                         } else {
                             // item status is pending, until there is not enough approval
                             for (int i = memberIdx; i < memberIdx + availableCapacity; i++) {
+
                                 Member currMemberForSub = (Member) members.get(i).clone();
                                 currMemberForSub.setStatus("I");
                                 item.getMembers().remove(currMemberForSub);
@@ -452,15 +459,6 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         if (getItems() != null) {
 
             if (Boolean.TRUE.equals(getMultislot())) {
-                int min = getItems().stream().filter(item -> item.getStage() == getStage())
-                        .mapToInt(item -> item.getCapacity().getMin())
-                        .min().orElse(0);
-
-                int max = getItems().stream().filter(item -> item.getStage() == getStage())
-                        .mapToInt(item -> item.getCapacity().getMax())
-                        .sum();
-                setCapacity(RangeInt.of(min, max));
-
                 List<Event> items = getItems().stream()
                         .collect(Collectors.groupingBy(item -> item.getRange())) // Group items by range
                         .values().stream()
@@ -492,9 +490,8 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                 setItems(items);
             }
 
-            // TODO: multislot fix hierarchy -> if item is added, than event and promotion
-            // needs to be updated until upper level
-            Optional<LocalDateTime> optStart = getItems().stream().filter(item -> item.getRange() != null)
+            Optional<LocalDateTime> optStart = getItems().stream()
+                    .filter(item -> item.getRange() != null && item.getStage() == getStage())
                     .map(item -> item.getRange().getStart())
                     .min((cap1, cap2) -> cap1.isBefore(cap2) ? -1 : 1);
 
@@ -506,7 +503,8 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                 }
             }
 
-            Optional<LocalDateTime> optEnd = getItems().stream().filter(item -> item.getRange() != null)
+            Optional<LocalDateTime> optEnd = getItems().stream()
+                    .filter(item -> item.getRange() != null && item.getStage() == getStage())
                     .map(item -> item.getRange().getEnd())
                     .max((cap1, cap2) -> cap1.isAfter(cap2) ? -1 : 1);
 

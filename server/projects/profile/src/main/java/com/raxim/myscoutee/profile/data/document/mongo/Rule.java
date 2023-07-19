@@ -39,7 +39,7 @@ public class Rule {
     @JsonProperty(value = "rate")
     private Integer rate;
 
-    // fifa ranking (leaderboard) etc., none is a value also, mutual rate (rate for
+    // fifa ranking (leaderboard) etc., none is a value also, rate (rate for
     // each other mutually)
     @JsonProperty(value = "rankType")
     private String rankType;
