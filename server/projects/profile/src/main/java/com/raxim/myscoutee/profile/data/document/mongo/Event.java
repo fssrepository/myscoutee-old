@@ -475,10 +475,10 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
 
         // algorithm will calculate whether new member needs to be added, when someone
         // leaves
-        if (!Boolean.TRUE.equals(getMultislot())) {
-            if (getCapacity() != null) {
+        if (getCapacity() != null) {
+            int diff = getCapacity().getMax() - getNumOfMembers();
 
-                int diff = getCapacity().getMax() - getNumOfMembers();
+            if (!Boolean.TRUE.equals(getMultislot())) {
 
                 if (getRule() != null
                         && Boolean.TRUE.equals(getRule().getBalanced())) {
@@ -490,10 +490,20 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                     balance("J", "W", null);
                     balance("A", "W", null);
                 }
+            } else {
+
+                if (getRule() != null
+                        && Boolean.TRUE.equals(getRule().getBalanced())) {
+                    balanceByGender("W", "J", diff);
+                    balanceByGender("J", "W", null);
+                    balanceByGender("W", "PR", diff);
+                    balanceByGender("PR", "W", null);
+                }
             }
         }
 
         syncStatus();
+
     }
 
     private void balance(String fromStatus, String toStatus, Integer pDiff) {
