@@ -123,6 +123,7 @@ public class Fifa {
                             list -> CommonUtil.getFirstXWithEqual(list, firstXWinner)));
 
             if (lResults.size() > firstXWinner) {
+                lResults = CommonUtil.getLastSameElements(lResults);
                 Collections.shuffle(lResults);
             }
 

@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -21,13 +21,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.function.TriFunction;
 import org.bson.BsonBinary;
 import org.bson.BsonBinarySubType;
 import org.bson.UuidRepresentation;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
@@ -164,5 +161,22 @@ public class CommonUtil {
                 .collect(Collectors.toList());
 
         return sortedFirstXWithEqual;
+    }
+
+    public static <T> List<T> getLastSameElements(List<T> list) {
+        List<T> lastGroup = new ArrayList<>();
+
+        for (int i = list.size() - 1; i > 0; i--) {
+            T currentElement = list.get(i);
+            T previousElement = list.get(i - 1);
+
+            if (currentElement.equals(previousElement)) {
+                lastGroup.add(0, currentElement);
+            } else {
+                break;
+            }
+        }
+
+        return lastGroup;
     }
 }
