@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -152,5 +153,16 @@ public class CommonUtil {
     public static <T, R> Stream<R> mapIndexed(List<T> list, IndexedFunction<T, R> mapper) {
         return IntStream.range(0, list.size())
                 .mapToObj(index -> mapper.apply(index, list.get(index)));
+    }
+
+    public static <T> List<T> getFirstXWithEqual(List<T> list, int firstX) {
+        T firstXElement = list.get(firstX - 1);
+        Predicate<T> isEqualToFirstXElement = element -> element.equals(firstXElement);
+
+        List<T> sortedFirstXWithEqual = list.stream()
+                .takeWhile(isEqualToFirstXElement.or(isEqualToFirstXElement.negate()))
+                .collect(Collectors.toList());
+
+        return sortedFirstXWithEqual;
     }
 }

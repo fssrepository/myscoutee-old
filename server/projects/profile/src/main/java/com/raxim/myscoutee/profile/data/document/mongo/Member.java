@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 // role for event
 @Document(collection = "members")
-public class Member implements Cloneable {
+public class Member implements Cloneable, Comparable<Member> {
 
     public static final Set<String> MET = Set.of("A", "L", "LL", "V", "LD");
 
@@ -54,7 +54,10 @@ public class Member implements Cloneable {
     private int stage;
 
     @JsonProperty(value = "score")
-    private Double score;
+    private Double score = 0.0d;
+
+    @JsonProperty(value = "result")
+    private Result result;
 
     public Member(Profile profile) {
         this(profile, "A", "U");
@@ -125,6 +128,22 @@ public class Member implements Cloneable {
         this.eventRef = eventRef;
     }
 
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -150,14 +169,6 @@ public class Member implements Cloneable {
         return true;
     }
 
-    public Double getScore() {
-        return score;
-    }
-
-    public void setScore(Double score) {
-        this.score = score;
-    }
-
     public int getStage() {
         return stage;
     }
@@ -170,6 +181,22 @@ public class Member implements Cloneable {
     public Object clone()
             throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    @Override
+    public int compareTo(Member m2) {
+        int scoresComparison = m2.score.compareTo(this.score);
+        if (scoresComparison != 0) {
+            return scoresComparison;
+        }
+
+        if (result != null && m2.result != null) {
+            int resultComparision = this.result.compareTo(m2.result);
+            if (resultComparision != 0) {
+                return resultComparision;
+            }
+        }
+        return m2.createdDate.compareTo(this.createdDate);
     }
 
 }

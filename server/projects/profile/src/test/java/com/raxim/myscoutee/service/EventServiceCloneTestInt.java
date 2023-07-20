@@ -27,6 +27,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.CloneDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 
 @DataMongoTest
@@ -44,6 +45,9 @@ public class EventServiceCloneTestInt extends AbstractAlgoTest {
         @Autowired
         private EventRepository eventRepository;
 
+        @Autowired
+        private ScoreMatrixRepository scoreMatrixRepository;
+
         private Converters<? extends Convertable<?>, ? extends Convertable<?>> converters;
 
         private EventService eventService;
@@ -52,7 +56,7 @@ public class EventServiceCloneTestInt extends AbstractAlgoTest {
         public void init() {
                 converters = new Converters<>(List.of(new EventConverter()));
                 eventService = new EventService(eventRepository,
-                                profileRepository, converters);
+                                profileRepository, converters, scoreMatrixRepository);
         }
 
         @Test

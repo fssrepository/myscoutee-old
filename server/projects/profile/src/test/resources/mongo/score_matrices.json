@@ -1,0 +1,56 @@
+[
+    {
+        "_id": {
+            "$binary": "NkaorobBPrNUDApiL0o1tg==",
+            "$type": "03"
+        },
+        "name": "fifa",
+        "type": "W",
+        "score": 3
+    },
+    {
+        "_id": {
+            "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
+            "$type": "03"
+        },
+        "name": "fifa",
+        "type": "D",
+        "score": 1
+    },
+    {
+        "_id": {
+            "$binary": "vldSpDImQDm8GnsRzFMYJQ==",
+            "$type": "03"
+        },
+        "name": "fifa",
+        "type": "YD",
+        "score": -1
+    },
+    {
+        "_id": {
+            "$binary": "pUQakRBTZ8lMwwVGHzQ3sg==",
+            "$type": "03"
+        },
+        "name": "fifa",
+        "type": "IR",
+        "score": -3
+    },
+    {
+        "_id": {
+            "$binary": "f0XjJP5nYzMiKNTVqFsTlg==",
+            "$type": "03"
+        },
+        "name": "fifa",
+        "type": "IR",
+        "score": -4
+    },
+    {
+        "_id": {
+            "$binary": "jEzsC2l500NzJTdJoWk7ow==",
+            "$type": "03"
+        },
+        "name": "fifa",
+        "type": "IR",
+        "score": -5
+    }
+]

@@ -90,13 +90,15 @@ public class ActivityMemberRestController {
 
         // LeaderBoard object
         @GetMapping({ "events/{eventId}/leaderboard" })
-        public ResponseEntity<List<Match>> getLeaderBoard(@PathVariable String eventId) {
-
-                return null;
+        public ResponseEntity<List<MemberDTO>> getLeaderBoard(@PathVariable String eventId) {
+                return ControllerUtil.handleList((ei) -> eventService.getLeaderboard(ei),
+                                eventId,
+                                HttpStatus.OK);
         }
 
-        @PostMapping({ "events/{eventId}/matches" })
-        public ResponseEntity<MatchDTO> saveMatch(@PathVariable String eventId, @RequestBody Match match) {
+        @PostMapping({ "events/{eventId}/matches/{matchId}" })
+        public ResponseEntity<MatchDTO> saveMatch(@PathVariable String eventId,
+                        @PathVariable String matchId, @RequestBody Match match) {
                 return ControllerUtil.handle((i, s) -> eventService.saveMatch(i, s),
                                 eventId, match,
                                 HttpStatus.OK);

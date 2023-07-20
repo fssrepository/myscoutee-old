@@ -27,6 +27,7 @@ import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.converter.Convertable;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.EventBase;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.Tree;
+import com.raxim.myscoutee.profile.util.AppConstants;
 
 @Document(collection = "events")
 public class Event extends EventBase implements Convertable<Event>, Tree<Event> {
@@ -137,6 +138,8 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     private List<Feedback> feedbacks;
 
     // it is used to calculate absolute score of the members
+    @DBRef
+    @JsonIgnore
     private Set<Match> matches;
 
     @GeoSpatialIndexed(name = "position", type = GeoSpatialIndexType.GEO_2DSPHERE)
@@ -324,8 +327,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                 List<Member> members = getMembers().stream()
                         .filter(member -> "A".equals(member.getStatus())
                                 && "U".equals(member.getRole()) && (!isPriority() || member.getScore() >= rateMin))
-                        .sorted(Comparator.comparing(Member::getScore)
-                                .thenComparing(Member::getCreatedDate))
+                        .sorted()
                         .toList();
 
                 setNumOfMembers(members.size());

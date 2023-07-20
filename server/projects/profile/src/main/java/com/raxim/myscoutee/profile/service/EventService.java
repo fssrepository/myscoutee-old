@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -15,11 +16,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.model.geojson.Point;
+import com.raxim.myscoutee.algo.Fifa;
 import com.raxim.myscoutee.profile.converter.Converters;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Match;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.Result;
+import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
 import com.raxim.myscoutee.profile.data.dto.rest.CloneDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.CodeDTO;
@@ -30,24 +34,39 @@ import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
 @Service
 public class EventService {
     private final EventRepository eventRepository;
     private final ProfileRepository profileRepository;
+    private final ScoreMatrixRepository scoreMatrixRepository;
     private final Converters converters;
 
     public EventService(EventRepository eventRepository,
             ProfileRepository profileRepository,
-            Converters converters) {
+            Converters converters, ScoreMatrixRepository scoreMatrixRepository) {
         this.eventRepository = eventRepository;
         this.profileRepository = profileRepository;
         this.converters = converters;
+        this.scoreMatrixRepository = scoreMatrixRepository;
     }
 
     public List<Token> getAllActiveTokens(UUID[] refIds) {
         return eventRepository.findTokensByEvent(refIds);
+    }
+
+    public List<MemberDTO> getLeaderboard(String eventId) {
+        Optional<Event> optEvent = eventRepository.findById(UUID.fromString(eventId));
+        if (optEvent.isPresent()) {
+            Event event = optEvent.get();
+            List<MemberDTO> memberDTOs = event.getMembers().stream()
+                    .sorted().map(member -> new MemberDTO(member))
+                    .toList();
+            return memberDTOs;
+        }
+        return List.of();
     }
 
     public List<MemberDTO> getMembersByEvent(PageParam pageParam, String eventId) {
@@ -55,29 +74,43 @@ public class EventService {
                 new String[] { "A", "I", "J", "W" });
     }
 
-    public List<Match> getLeaderBoard(String id) {
-        Optional<Event> eventRes = id != null ? this.eventRepository.findById(UUID.fromString(id))
-                : Optional.empty();
-        if (eventRes.isPresent()) {
-            Event event = eventRes.get();
-            // event.getMatches().stream()
-            return new ArrayList<>(event.getMatches());
-        }
-        return List.of();
-    }
-
     public Optional<MatchDTO> saveMatch(String id, Match pMatch) {
         Optional<Event> eventRes = id != null ? this.eventRepository.findById(UUID.fromString(id))
                 : Optional.empty();
+
         if (eventRes.isPresent()) {
             Event event = eventRes.get();
-            if (event.getMatches().contains(pMatch)) {
-                event.getMatches().remove(pMatch);
-            }
-            event.getMatches().add(pMatch);
-        }
 
-        //calculate member score on both, and save to score
+            event.getMatches().stream()
+                    .filter(match -> match.getId().equals(pMatch.getId()))
+                    .forEach(match -> {
+                        match.setScores(pMatch.getScores());
+                    });
+
+            if (event.getRule() != null
+                    && event.getRule().getRankType() != null) {
+
+                List<ScoreMatrix> scoreMatrices = this.scoreMatrixRepository.findByName(event.getRule().getRankType());
+
+                // all matches what the memberId participated in.
+                List<Match> matches = event.getMatches().stream()
+                        .filter(match -> match.getMembers().stream()
+                                .anyMatch(memberId -> pMatch.getMembers().contains(memberId)))
+                        .toList();
+
+                Fifa fifa = new Fifa(matches, scoreMatrices);
+                Map<UUID, Result> results = fifa.calc();
+
+                event.getMembers().stream()
+                        .filter(member -> pMatch.getMembers().contains(member.getProfile().getId())).forEach(member -> {
+                            member.setResult(results.get(member.getProfile().getId()));
+                        });
+            }
+
+            this.eventRepository.save(event);
+
+            return Optional.of(new MatchDTO(pMatch));
+        }
 
         return Optional.empty();
     }

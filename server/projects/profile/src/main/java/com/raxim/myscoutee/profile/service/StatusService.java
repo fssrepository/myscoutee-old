@@ -8,8 +8,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.Like;
-import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;

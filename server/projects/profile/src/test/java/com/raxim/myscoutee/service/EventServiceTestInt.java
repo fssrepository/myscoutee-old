@@ -31,6 +31,7 @@ import com.raxim.myscoutee.profile.exception.MessageException;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
 import com.raxim.myscoutee.profile.service.EventService;
 import com.raxim.myscoutee.profile.service.StatusService;
 import com.raxim.myscoutee.profile.util.AppConstants;
@@ -53,6 +54,9 @@ public class EventServiceTestInt extends AbstractAlgoTest {
         @Autowired
         private LikeRepository likeRepository;
 
+        @Autowired
+        private ScoreMatrixRepository scoreMatrixRepository;
+
         private Converters converters = new Converters();
 
         private EventService eventService;
@@ -61,7 +65,7 @@ public class EventServiceTestInt extends AbstractAlgoTest {
         @BeforeEach
         public void init() {
                 eventService = new EventService(eventRepository,
-                                profileRepository, converters);
+                                profileRepository, converters, scoreMatrixRepository);
                 statusService = new StatusService(profileRepository, eventRepository, likeRepository);
         }
 

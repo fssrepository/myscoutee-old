@@ -1,19 +1,20 @@
 package com.raxim.myscoutee.profile.service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
 import com.raxim.myscoutee.algo.BCTree;
 import com.raxim.myscoutee.algo.BCTreeIterator;
 import com.raxim.myscoutee.algo.CTree;
+import com.raxim.myscoutee.algo.Fifa;
 import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.DGraph;
 import com.raxim.myscoutee.algo.dto.Edge;
@@ -25,8 +26,10 @@ import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Rule;
+import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
 import com.raxim.myscoutee.profile.service.iface.IEventGeneratorService;
 import com.raxim.myscoutee.profile.util.AppConstants;
 import com.raxim.myscoutee.profile.util.EventUtil;
@@ -35,14 +38,18 @@ import com.raxim.myscoutee.profile.util.EventUtil;
 public class EventGeneratorService implements IEventGeneratorService {
     private final EventRepository eventRepository;
     private final LikeRepository likeRepository;
+    private final ScoreMatrixRepository scoreMatrixRepository;
 
-    public EventGeneratorService(EventRepository eventRepository, LikeRepository likeRepository) {
+    public EventGeneratorService(EventRepository eventRepository, LikeRepository likeRepository,
+            ScoreMatrixRepository scoreMatrixRepository) {
         this.eventRepository = eventRepository;
         this.likeRepository = likeRepository;
+        this.scoreMatrixRepository = scoreMatrixRepository;
     }
 
     @Override
     public List<Event> generate() {
+
         List<LikeGroup> likeGroups = likeRepository.findLikeGroups();
 
         // merge likes
@@ -78,8 +85,17 @@ public class EventGeneratorService implements IEventGeneratorService {
 
         List<Event> events = this.eventRepository.findEvents();
 
+        Map<String, List<ScoreMatrix>> scoreMatricesByType = new HashMap<>();
+
         List<Event> handledEvents = events.stream().map(event -> {
             event.syncStatus();
+
+            if (!scoreMatricesByType.containsKey(event.getRule().getRankType())) {
+                List<ScoreMatrix> scoreMatrices = this.scoreMatrixRepository.findByName(event.getRule().getRankType());
+                scoreMatricesByType.put(event.getRule().getRankType(), scoreMatrices);
+            }
+
+            List<ScoreMatrix> scoreMatrices = scoreMatricesByType.get(event.getRule().getRankType());
 
             int maxStage = event.getMaxStage();
             if (maxStage > 0 && "A".equals(event.getStatus())) {
@@ -158,13 +174,17 @@ public class EventGeneratorService implements IEventGeneratorService {
                                 }
                             }
                         } else {
-                            cMembers = cItem.getMembers().stream()
+                            Stream<Member> sMembers = cItem.getMembers().stream()
                                     .filter(member -> "A".equals(member.getStatus())
                                             && "U".equals(member.getRole())
-                                            && (!cItem.isPriority() || member.getScore() >= rateMin))
-                                    .sorted(Comparator.comparing(Member::getScore)
-                                            .thenComparing(Member::getCreatedDate))
-                                    .limit(firstXWinner).toList();
+                                            && (!cItem.isPriority() || member.getScore() >= rateMin));
+
+                            if (AppConstants.RANK_FIFA.equals(event.getRule().getRankType())) {
+                                Fifa fifa = new Fifa(new ArrayList<>(event.getMatches()), scoreMatrices);
+                                cMembers = fifa.getFirstXMembers(firstXWinner, sMembers);
+                            } else {
+                                cMembers = sMembers.sorted().limit(firstXWinner).toList();
+                            }
                         }
 
                         return cMembers.stream();
