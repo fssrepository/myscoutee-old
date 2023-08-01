@@ -12,6 +12,10 @@ public class SettingUtil {
         if (dbSetting.isPresent()) {
             Setting setting = dbSetting.get().getSetting();
 
+            if(setting == null) {
+                return Optional.empty();
+            }
+
             Optional<FormItem> optFormItem = setting.getItems().stream()
                     .filter(item -> item.getName().equals(valueName))
                     .findFirst();

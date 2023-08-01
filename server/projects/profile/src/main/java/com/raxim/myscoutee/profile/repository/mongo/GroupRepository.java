@@ -20,7 +20,8 @@ public interface GroupRepository extends MongoRepository<Group, UUID> {
         List<Group> findSystemGroups();
 
         @Aggregation(pipeline = "findAllGroups")
-        List<GroupDTO> findAllGroups(PageParam pageParam,
+        List<GroupDTO> findAllGroups(
+                        @Param("param") PageParam pageParam,
                         @Param("loc") Point loc,
                         @Param("access") String access);
 

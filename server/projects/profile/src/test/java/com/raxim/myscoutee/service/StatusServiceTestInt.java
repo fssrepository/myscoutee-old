@@ -51,11 +51,12 @@ public class StatusServiceTestInt extends AbstractAlgoTest {
         public void shouldEventAdminLeave() throws MessageException {
                 String[] memberStatuses = new String[] { "A", "I", "J", "W" };
                 String status = "A";
+                double score = Double.MAX_VALUE;
                 LocalDate createdDate = LocalDate.of(1901, 1, 1);
                 String createdDateF = createdDate.atStartOfDay(ZoneId.systemDefault())
                                 .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-                String[] tOffset = new String[] { status, createdDateF };
+                Object[] tOffset = new Object[] { status, score, createdDateF };
 
                 PageParam pageParam = new PageParam();
                 pageParam.setId(AppTestConstants.UUID_PROFILE_OLIVER);

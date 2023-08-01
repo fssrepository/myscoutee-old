@@ -34,6 +34,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Sequence;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.SequenceRepository;
@@ -58,6 +59,9 @@ public class LikeServiceTest extends AbstractAlgoTest {
 
         @Mock
         private SequenceRepository sequenceRepository;
+
+        @Mock
+        private EventRepository eventRepository;
 
         @Captor
         private ArgumentCaptor<List<Like>> captorLikes;

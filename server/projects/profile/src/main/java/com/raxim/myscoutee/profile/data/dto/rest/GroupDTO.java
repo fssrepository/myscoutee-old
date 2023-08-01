@@ -1,8 +1,5 @@
 package com.raxim.myscoutee.profile.data.dto.rest;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
@@ -22,9 +19,6 @@ public class GroupDTO extends PageItemDTO {
 
     @JsonProperty(value = "role")
     private Object role;
-
-    @JsonIgnore
-    private List<Object> offset;
 
     public GroupDTO() {
     }
@@ -55,14 +49,6 @@ public class GroupDTO extends PageItemDTO {
 
     public void setRole(Object role) {
         this.role = role;
-    }
-
-    public List<Object> getOffset() {
-        return offset;
-    }
-
-    public void setOffset(List<Object> offset) {
-        this.offset = offset;
     }
 
     public String getAccess() {

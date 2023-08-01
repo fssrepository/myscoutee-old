@@ -1,6 +1,7 @@
 package com.raxim.myscoutee.profile.data.document.mongo.iface;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,7 +57,7 @@ public abstract class EventBase {
 
     @JsonIgnore
     @JsonProperty(value = "members")
-    private Set<Member> members;
+    private Set<Member> members = new HashSet<>();
 
     public String getType() {
         return type;

@@ -18,6 +18,9 @@ public class MemberDTO extends PageItemDTO {
     @JsonProperty(value = "rate")
     private Integer rate;
 
+    public MemberDTO() {
+    }
+
     public MemberDTO(Member member) {
         this.member = member;
     }
