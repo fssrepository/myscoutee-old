@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import com.raxim.myscoutee.algo.BCTree;
 import com.raxim.myscoutee.algo.BCTreeIterator;
 import com.raxim.myscoutee.algo.CTree;
@@ -27,6 +29,7 @@ import com.raxim.myscoutee.profile.util.EventUtil;
 /*
  * who has already met, invited by priority
  */
+@Service
 public class EventGeneratorByPriorityService implements IEventGeneratorService {
     private final LikeService likeService;
     private final EventRepository eventRepository;

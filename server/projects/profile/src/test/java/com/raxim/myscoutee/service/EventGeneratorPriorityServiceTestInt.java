@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -26,10 +25,12 @@ import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
+import com.raxim.myscoutee.profile.repository.mongo.SequenceRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorByPriorityService;
 import com.raxim.myscoutee.profile.service.LikeService;
 
-@Disabled
 @DataMongoTest
 @DirtiesContext
 @Import({ RepositoryConfig.class, JsonConfig.class })
@@ -43,13 +44,21 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
         private static final UUID UUID_PROFILE_SOPHIA = UUID.fromString("39402632-a452-57be-2518-53cc117b1abc");
 
         @Autowired
-        private LikeService likeService;
+        private ProfileRepository profileRepository;
+
+        @Autowired
+        private LikeRepository likeRepository;
+
+        @Autowired
+        private SequenceRepository sequenceRepository;
 
         @Autowired
         private EventRepository eventRepository;
 
         @Test
         public void shouldGeneratePriorityEvent() {
+                LikeService likeService = new LikeService(profileRepository, likeRepository, eventRepository,
+                                sequenceRepository);
                 EventGeneratorByPriorityService eventGeneratorPriorityService = new EventGeneratorByPriorityService(
                                 likeService,
                                 eventRepository);
