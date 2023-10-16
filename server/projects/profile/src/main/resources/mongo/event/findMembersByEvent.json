@@ -76,10 +76,20 @@
                     "branches": [
                         {
                             "case": {
-                                "$ne": [
-                                    "$likes",
-                                    null
-                                ]
+                                "$not": {
+                                    "$in": [
+                                        {
+                                            "$ifNull": [
+                                                "$likes",
+                                                null
+                                            ]
+                                        },
+                                        [
+                                            null,
+                                            []
+                                        ]
+                                    ]
+                                }
                             },
                             "then": "$likes.rate"
                         }
@@ -190,11 +200,11 @@
                             "$cond": [
                                 {
                                     "$ifNull": [
-                                        "$likes",
+                                        "$score",
                                         null
                                     ]
                                 },
-                                "$likes.rate",
+                                "$score",
                                 null
                             ]
                         },

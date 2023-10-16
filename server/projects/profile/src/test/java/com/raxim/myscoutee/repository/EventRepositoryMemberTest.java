@@ -7,7 +7,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -25,7 +24,6 @@ import com.raxim.myscoutee.profile.data.dto.rest.MemberDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 
-@Disabled
 @DataMongoTest
 @DirtiesContext
 @Import({ RepositoryConfig.class })
@@ -42,12 +40,12 @@ public class EventRepositoryMemberTest {
         public void shouldGetMembersForEvent() {
                 String[] memberStatuses = new String[] { "A", "I", "J", "W" };
                 String status = "A";
-                double score = Double.MAX_VALUE; 
+                double score = Double.MAX_VALUE;
                 LocalDate createdDate = LocalDate.of(1901, 1, 1);
                 String createdDateF = createdDate.atStartOfDay(ZoneId.systemDefault())
                                 .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-                Object[] tOffset = new Object[] { status,  score, createdDateF };
+                Object[] tOffset = new Object[] { status, score, createdDateF };
 
                 PageParam pageParam = new PageParam();
                 pageParam.setId(AppTestConstants.UUID_PROFILE_OLIVER);
