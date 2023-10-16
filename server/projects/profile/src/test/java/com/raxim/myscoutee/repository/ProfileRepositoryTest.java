@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,6 @@ import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
-@Disabled
 @DataMongoTest
 @DirtiesContext
 @Import({ RepositoryConfig.class })
@@ -264,8 +262,8 @@ public class ProfileRepositoryTest {
                 Set<Member> members = new HashSet<>();
                 Member memberOliver = new Member(profileOliver);
                 members.add(memberOliver);
-                Member memberAmelia = new Member(profileMia);
-                members.add(memberAmelia);
+                Member memberMia = new Member(profileMia);
+                members.add(memberMia);
                 event.setMembers(members);
 
                 this.eventRepository.save(event);
@@ -283,7 +281,7 @@ public class ProfileRepositoryTest {
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, true, null);
 
                 assertEquals(1, profiles.size());
 

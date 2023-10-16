@@ -423,7 +423,7 @@
                             {
                                 "$ne": [
                                     ":#{#selectedId}",
-                                    true
+                                    null
                                 ]
                             },
                             {
