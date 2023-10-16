@@ -819,7 +819,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         }
 
         this.setRefCnt(clonedEvent.getRefCnt() + 1);
-        clonedEvent.setRef(this.getRef());
+        clonedEvent.setRef(this.getId());
 
         if ("T".equals(this.getType())) {
             clonedEvent.setType("E");

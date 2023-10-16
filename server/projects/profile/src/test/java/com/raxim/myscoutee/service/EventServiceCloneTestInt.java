@@ -25,6 +25,7 @@ import com.raxim.myscoutee.profile.converter.EventConverter;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.dto.rest.CloneDTO;
+import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
@@ -59,6 +60,7 @@ public class EventServiceCloneTestInt extends AbstractAlgoTest {
                                 profileRepository, converters, scoreMatrixRepository);
         }
 
+        //clone + changeStatus
         @Test
         public void shouldCloneEvent() throws CloneNotSupportedException {
                 CloneDTO cloneDTO = new CloneDTO(3);
@@ -66,10 +68,18 @@ public class EventServiceCloneTestInt extends AbstractAlgoTest {
                 Profile profile = profileRepository.findById(AppTestConstants.UUID_PROFILE_SOPHIA).get();
                 Event event = eventRepository.findById(AppTestConstants.UUID_EVENT_1).get();
 
-                this.eventService.cloneBy(event.getId().toString(), profile, cloneDTO);
+                List<EventDTO> clonedEventDTOs = this.eventService.cloneBy(event.getId().toString(), profile, cloneDTO);
+
+                EventDTO clonedEventDTO = clonedEventDTOs.stream()
+                                .filter(eventDTO -> eventDTO.getItem().getRef() != null).findFirst().get();
 
                 List<Event> events = this.eventRepository.findAll();
                 assertEquals(12, events.size());
 
+                List<EventDTO> eventDTOs = this.eventService.changeStatus(
+                                clonedEventDTO.getItem().getId().toString(),
+                                "A");
+
+                assertEquals(2, eventDTOs.size());
         }
 }
