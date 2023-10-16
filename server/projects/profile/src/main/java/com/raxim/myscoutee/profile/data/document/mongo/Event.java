@@ -27,7 +27,6 @@ import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.converter.Convertable;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.EventBase;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.Tree;
-import com.raxim.myscoutee.profile.util.AppConstants;
 
 @Document(collection = "events")
 public class Event extends EventBase implements Convertable<Event>, Tree<Event> {
@@ -455,11 +454,11 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     public void sync() {
 
         // timed out/active/finished
-        if ("T".equals(getStatus()) || "A".equals(getStatus()) || "F".equals(getStatus())) {
+        if ("T".equals(getStatus()) || "F".equals(getStatus())) {
             return;
         }
 
-        if (getItems() != null) {
+        if (getItems() != null && !"A".equals(getStatus())) {
 
             if (Boolean.TRUE.equals(getMultislot())) {
                 List<Event> items = getItems().stream()
@@ -520,11 +519,11 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
             }
         }
 
-        LocalDateTime graceTime = getRule() != null ? getRange().getStart()
-                .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
-                : getRange().getStart();
-
         if (getMembers() != null) {
+
+            LocalDateTime graceTime = getRule() != null ? getRange().getStart()
+                    .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
+                    : getRange().getStart();
 
             List<Member> members = getMembers().stream()
                     .filter(member -> "A".equals(member.getStatus())
@@ -578,7 +577,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
 
         // algorithm will calculate whether new member needs to be added, when someone
         // leaves
-        if (getCapacity() != null) {
+        if (getCapacity() != null && !"A".equals(getStatus())) {
             int diff = getCapacity().getMax() - getNumOfMembers();
 
             if (!Boolean.TRUE.equals(getMultislot())) {
@@ -596,7 +595,9 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
             }
         }
 
-        syncStatus();
+        if (!"A".equals(getStatus())) {
+            syncStatus();
+        }
 
     }
 
