@@ -85,25 +85,23 @@ public class LikeService {
                     return new Edge(fromNode, toNode, weight);
                 }).collect(Collectors.toSet());
 
-        List<Set<Edge>> ignoredEdges;
+        List<Set<Edge>> ignoredEdges = new ArrayList<>();
 
-        if (ignoredStatuses.contains("F")) {
-            ignoredEdges = new ArrayList<>();
-        } else {
+        if (!ignoredStatuses.contains("F")) {
             List<Event> events = eventRepository.findAll();
 
-            ignoredEdges = events.stream().map(event -> {
+            events.stream().forEach(event -> {
                 Set<Member> members = event.getMembers()
                         .stream()
                         .filter(member -> Member.MET.contains(member.getStatus()))
                         .collect(Collectors.toSet());
 
-                return EventUtil.permutate(members);
-            }).toList();
+                Set<Edge> ignoredEdge = EventUtil.permutate(members);
+                ignoredEdges.add(ignoredEdge);
+            });
         }
 
         ignoredEdges.add(ignoredEdgesByStatus);
-
         return new FilteredEdges(nodes, edges, ignoredEdges);
     }
 

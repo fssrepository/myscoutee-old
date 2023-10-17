@@ -6,6 +6,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,11 +18,14 @@ import com.raxim.myscoutee.algo.BCTree;
 import com.raxim.myscoutee.algo.CTree;
 import com.raxim.myscoutee.algo.dto.DGraph;
 import com.raxim.myscoutee.algo.dto.Range;
+import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
+import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
 import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
+import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.iface.IEventGeneratorService;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
@@ -33,15 +37,15 @@ public class EventGeneratorRandomService implements IEventGeneratorService {
 
     public static final String SCHEDULE_RANDOM_GROUP = "RANDOM_GROUP";
 
-    // private final ScheduleRepository scheduleRepository;
+    private final ScheduleRepository scheduleRepository;
     private final LikeService likeService;
     private final EventRepository eventRepository;
     private final ObjectMapper objectMapper;
 
-    public EventGeneratorRandomService(/* ScheduleRepository scheduleRepository, */
+    public EventGeneratorRandomService(ScheduleRepository scheduleRepository,
             LikeService likeService, EventRepository eventRepository,
             ObjectMapper objectMapper) {
-        // this.scheduleRepository = scheduleRepository;
+        this.scheduleRepository = scheduleRepository;
         this.likeService = likeService;
         this.eventRepository = eventRepository;
         this.objectMapper = objectMapper;
@@ -51,17 +55,13 @@ public class EventGeneratorRandomService implements IEventGeneratorService {
     public List<Event> generate() {
         System.out.println("---- generate start -----");
 
-        /*
-         * Optional<Schedule> schedule =
-         * scheduleRepository.findByKey(SCHEDULE_RANDOM_GROUP);
-         * long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
-         * long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
-         * Range flags = schedule.map(sch -> JsonUtil.jsonToObject(sch.getFlags(),
-         * Range.class, objectMapper))
-         * .orElse(new Range(6, 12));
-         */
+        Optional<Schedule> schedule = scheduleRepository.findByKey(SCHEDULE_RANDOM_GROUP);
+        long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
+        long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
 
-        Range flags = new Range(6, 12);
+        Range flags = schedule.map(sch -> JsonUtil.jsonToObject(sch.getFlags(),
+                Range.class, objectMapper))
+                .orElse(new Range(6, 12));
 
         FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
 

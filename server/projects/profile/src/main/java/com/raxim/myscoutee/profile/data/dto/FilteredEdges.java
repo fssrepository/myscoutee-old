@@ -12,6 +12,10 @@ public class FilteredEdges {
     private final List<Edge> edges;
     private final List<Set<Edge>> ignoredEdges;
 
+    public FilteredEdges() {
+        this(null, null, null);
+    }
+
     public FilteredEdges(Map<String, Profile> nodes, List<Edge> edges, List<Set<Edge>> ignoredEdges) {
         this.nodes = nodes;
         this.edges = edges;

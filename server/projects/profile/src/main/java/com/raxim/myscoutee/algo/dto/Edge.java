@@ -6,6 +6,10 @@ public class Edge {
     private final Node to;
     private final double weight;
 
+    public Edge() {
+        this(null, null, 0d);
+    }
+
     public Node getFrom() {
         return from;
     }

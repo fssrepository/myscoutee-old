@@ -5,17 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -27,19 +28,18 @@ import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.AppTestConstants;
 import com.raxim.myscoutee.common.config.JsonConfig;
-import com.raxim.myscoutee.common.data.TestEvent;
 import com.raxim.myscoutee.common.data.TestLike;
 import com.raxim.myscoutee.common.data.TestProfile;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
-import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
+import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
-import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorRandomService;
+import com.raxim.myscoutee.profile.service.LikeService;
 
 @DirtiesContext
 @ExtendWith({ SpringExtension.class })
@@ -55,7 +55,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
         private ScheduleRepository scheduleRepository;
 
         @Mock
-        private LikeRepository likeRepository;
+        private LikeService likeService;
 
         @Mock
         private EventRepository eventRepository;
@@ -64,20 +64,14 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
         @Spy
         private ObjectMapper objectMapper;
 
+        @Captor
+        private ArgumentCaptor<List<Event>> captorEvents;
+
         @Test
         public void testShouldGetBalancedGroup() throws IOException {
                 // json property override
                 objectMapper.addMixIn(Profile.class, TestProfile.class);
                 objectMapper.addMixIn(Like.class, TestLike.class);
-
-                Like[] likeArray = loadJson(this, "algo/likes.json",
-                                Like[].class, objectMapper);
-
-                List<LikeGroup> likesBoth = Arrays.asList(likeArray)
-                                .stream().collect(Collectors.groupingBy(Like::getCnt))
-                                .entrySet().stream()
-                                .map(entry -> new LikeGroup(entry.getKey(), entry.getValue()))
-                                .collect(Collectors.toList());
 
                 String flags = jsonToString(FLAGS_DEFAULT,
                                 objectMapper);
@@ -87,14 +81,16 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 when(scheduleRepository.findByKey(EventGeneratorRandomService.SCHEDULE_RANDOM_GROUP))
                                 .thenReturn(scheduleResp);
 
-                when(likeRepository.findLikeGroups())
-                                .thenReturn(likesBoth);
-                /*
-                 * when(likeRepository.findLikeGroupsByBatch(0L, 1000L))
-                 * .thenReturn(likesBoth);
-                 */
+                FilteredEdges filteredEdges = loadJson(this, "algo/filteredEdges.json",
+                                FilteredEdges.class, objectMapper);
+                when(likeService.getEdges(Set.of("A")))
+                                .thenReturn(filteredEdges);
 
-                List<Event> generatedEvents = eventGeneratorService.generate();
+                eventGeneratorService.generate();
+
+                Mockito.verify(eventRepository).saveAll(captorEvents.capture());
+                List<Event> generatedEvents = captorEvents.getValue();
+
                 assertEquals(3, generatedEvents.size());
 
                 // group1
@@ -122,18 +118,33 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                                 AppTestConstants.UUID_PROFILE_EMMA);
                 allProfilesMatched = matchAll(group3, expectedUuidsForGroup3);
                 assertTrue(allProfilesMatched);
+        }
 
-                // ignored
-                objectMapper.addMixIn(Event.class, TestEvent.class);
+        @Test
+        public void testShouldGetBalancedGroupWithIgnored() throws IOException {
 
-                Event[] eventArray = loadJson(this, "rest/events.json",
-                                Event[].class,
+                // json property override
+                objectMapper.addMixIn(Profile.class, TestProfile.class);
+                objectMapper.addMixIn(Like.class, TestLike.class);
+
+                String flags = jsonToString(FLAGS_DEFAULT,
                                 objectMapper);
-                List<Event> events = Arrays.asList(eventArray);
+                Optional<Schedule> scheduleResp = Optional.of(
+                                new Schedule(0L, 1000L,
+                                                flags));
+                when(scheduleRepository.findByKey(EventGeneratorRandomService.SCHEDULE_RANDOM_GROUP))
+                                .thenReturn(scheduleResp);
 
-                when(eventRepository.findAll()).thenReturn(events);
+                FilteredEdges filteredEdges = loadJson(this, "algo/filteredEdgesWithIgnored.json",
+                                FilteredEdges.class, objectMapper);
+                when(likeService.getEdges(Set.of("A")))
+                                .thenReturn(filteredEdges);
 
-                generatedEvents = eventGeneratorService.generate();
+                eventGeneratorService.generate();
+
+                Mockito.verify(eventRepository).saveAll(captorEvents.capture());
+                List<Event> generatedEvents = captorEvents.getValue();
+
                 assertEquals(2, generatedEvents.size());
 
                 // group1
@@ -142,7 +153,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
 
                 List<UUID> expectedUuidsForGroup1F = List.of(AppTestConstants.UUID_PROFILE_LUCAS,
                                 AppTestConstants.UUID_PROFILE_SOPHIA);
-                allProfilesMatched = matchAll(group1F, expectedUuidsForGroup1F);
+                boolean allProfilesMatched = matchAll(group1F, expectedUuidsForGroup1F);
                 assertTrue(allProfilesMatched);
 
                 Set<Member> group2F = generatedEvents.get(1).getMembers();
@@ -152,6 +163,5 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                                 AppTestConstants.UUID_PROFILE_EMMA);
                 allProfilesMatched = matchAll(group2F, expectedUuidsForGroup2F);
                 assertTrue(allProfilesMatched);
-
         }
 }

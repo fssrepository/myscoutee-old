@@ -1,0 +1,141 @@
+{
+    "nodes": {
+        "39402632-a452-57be-2518-53cc117b1abc": {
+            "key": "39402632-a452-57be-2518-53cc117b1abc",
+            "gender": "w",
+            "status": "A"
+        },
+        "8f4bd3a8-1195-01b0-172a-a04f052f5982": {
+            "key": "8f4bd3a8-1195-01b0-172a-a04f052f5982",
+            "gender": "m",
+            "status": "A"
+        },
+        "eb494fba-6c56-752f-5123-c414c8c86599": {
+            "key": "eb494fba-6c56-752f-5123-c414c8c86599",
+            "gender": "w",
+            "status": "A"
+        },
+        "694ef9b8-e486-bdf2-6510-7d05f19db486": {
+            "key": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+            "gender": "m",
+            "status": "A"
+        },
+        "fc4c72f8-a905-e1d1-05f8-c0d9914e158c": {
+            "key": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+            "gender": "w",
+            "status": "A"
+        },
+        "4f4d0e96-3b96-e4e1-1f0f-2a5a03c52ba4": {
+            "key": "4f4d0e96-3b96-e4e1-1f0f-2a5a03c52ba4",
+            "gender": "m",
+            "status": "A"
+        },
+        "534ccc6b-2547-4bf0-ad91-dca739943ea4": {
+            "key": "534ccc6b-2547-4bf0-ad91-dca739943ea4",
+            "gender": "m",
+            "status": "A"
+        },
+        "2f7e01ce-1336-37d4-e69e-efc88d2ee81a": {
+            "key": "2f7e01ce-1336-37d4-e69e-efc88d2ee81a",
+            "gender": "m",
+            "status": "A"
+        }
+    },
+    "edges": [
+        {
+            "from": {
+                "id": "39402632-a452-57be-2518-53cc117b1abc",
+                "type": "w"
+            },
+            "to": {
+                "id": "534ccc6b-2547-4bf0-ad91-dca739943ea4",
+                "type": "m"
+            },
+            "weight": 3.0
+        },
+        {
+            "from": {
+                "id": "39402632-a452-57be-2518-53cc117b1abc",
+                "type": "w"
+            },
+            "to": {
+                "id": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+                "type": "m"
+            },
+            "weight": 5.538461538461538
+        },
+        {
+            "from": {
+                "id": "694ef9b8-e486-bdf2-6510-7d05f19db486",
+                "type": "m"
+            },
+            "to": {
+                "id": "eb494fba-6c56-752f-5123-c414c8c86599",
+                "type": "w"
+            },
+            "weight": 5.333333333333333
+        },
+        {
+            "from": {
+                "id": "2f7e01ce-1336-37d4-e69e-efc88d2ee81a",
+                "type": "m"
+            },
+            "to": {
+                "id": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+                "type": "w"
+            },
+            "weight": 3.428571428571429
+        },
+        {
+            "from": {
+                "id": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+                "type": "w"
+            },
+            "to": {
+                "id": "4f4d0e96-3b96-e4e1-1f0f-2a5a03c52ba4",
+                "type": "m"
+            },
+            "weight": 6.857142857142858
+        },
+        {
+            "from": {
+                "id": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+                "type": "w"
+            },
+            "to": {
+                "id": "8f4bd3a8-1195-01b0-172a-a04f052f5982",
+                "type": "m"
+            },
+            "weight": 7.466666666666667
+        }
+    ],
+    "ignoredEdges": [
+        [
+            {
+                "from": {
+                    "id": "534ccc6b-2547-4bf0-ad91-dca739943ea4",
+                    "type": "m"
+                },
+                "to": {
+                    "id": "39402632-a452-57be-2518-53cc117b1abc",
+                    "type": "w"
+                },
+                "weight": 0.0
+            }
+        ],
+        [
+            {
+                "from": {
+                    "id": "fc4c72f8-a905-e1d1-05f8-c0d9914e158c",
+                    "type": "w"
+                },
+                "to": {
+                    "id": "2f7e01ce-1336-37d4-e69e-efc88d2ee81a",
+                    "type": "m"
+                },
+                "weight": 0.0
+            }
+        ],
+        []
+    ]
+}

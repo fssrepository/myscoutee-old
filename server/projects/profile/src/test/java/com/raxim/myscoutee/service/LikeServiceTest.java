@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,12 +29,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
 import com.raxim.myscoutee.common.config.JsonConfig;
+import com.raxim.myscoutee.common.data.TestEvent;
 import com.raxim.myscoutee.common.data.TestLike;
 import com.raxim.myscoutee.common.data.TestProfile;
+import com.raxim.myscoutee.common.util.JsonUtil;
+import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Sequence;
+import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
@@ -71,7 +77,7 @@ public class LikeServiceTest extends AbstractAlgoTest {
         private ObjectMapper objectMapper;
 
         @Test
-        public void testShouldAllLikesSave() throws IOException {
+        public void shouldAllLikesSave() throws IOException {
                 objectMapper.addMixIn(Profile.class, TestProfile.class);
                 objectMapper.addMixIn(Like.class, TestLike.class);
 
@@ -131,4 +137,40 @@ public class LikeServiceTest extends AbstractAlgoTest {
                 assertEquals(4, like4.getCnt());
 
         }
+
+        @Test
+        public void shouldGetEdges() throws IOException {
+                // json property override
+                objectMapper.addMixIn(Profile.class, TestProfile.class);
+                objectMapper.addMixIn(Like.class, TestLike.class);
+
+                Like[] likeArray = loadJson(this, "algo/likes.json",
+                                Like[].class, objectMapper);
+
+                List<LikeGroup> likesBoth = Arrays.asList(likeArray)
+                                .stream().collect(Collectors.groupingBy(Like::getCnt))
+                                .entrySet().stream()
+                                .map(entry -> new LikeGroup(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList());
+
+                when(likeRepository.findLikeGroups())
+                                .thenReturn(likesBoth);
+
+                // ignored
+                objectMapper.addMixIn(Event.class, TestEvent.class);
+
+                Event[] eventArray = loadJson(this, "rest/events.json",
+                                Event[].class,
+                                objectMapper);
+                List<Event> events = Arrays.asList(eventArray);
+
+                when(eventRepository.findAll()).thenReturn(events);
+
+                FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
+
+                assertEquals(6, filteredEdges.getEdges().size());
+                assertEquals(3, filteredEdges.getIgnoredEdges().size());
+                assertEquals(8, filteredEdges.getNodes().size());
+        }
+
 }
