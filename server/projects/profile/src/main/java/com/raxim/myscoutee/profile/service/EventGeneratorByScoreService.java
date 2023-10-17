@@ -47,8 +47,6 @@ public class EventGeneratorByScoreService implements IEventGeneratorService {
 
     @Override
     public List<Event> generate(FilteredEdges filteredEdges, String flags) {
-        // FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
-
         List<Event> events = this.eventRepository.findEvents();
 
         Map<String, List<ScoreMatrix>> scoreMatricesByType = new HashMap<>();

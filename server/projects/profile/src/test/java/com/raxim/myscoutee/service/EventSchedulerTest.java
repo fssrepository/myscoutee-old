@@ -19,6 +19,6 @@ public class EventSchedulerTest {
 
     @Test
     public void generateEvent() throws Exception {
-        this.eventScheduler.generateEvents();
+        this.eventScheduler.generateRandomEvents();
     }
 }

@@ -25,7 +25,7 @@ public class CalcRestController {
     @GetMapping("/priority_none/{lastTime}")
     public ResponseEntity<Void> calcPriorityNone(@PathVariable String lastTime) {
         try {
-            eventScheduler.generateEvents();
+            eventScheduler.generateRandomEvents();
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }

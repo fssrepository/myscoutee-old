@@ -39,8 +39,6 @@ public class EventGeneratorByPriorityService implements IEventGeneratorService {
     }
 
     public List<Event> generate(FilteredEdges filteredEdges, String flags) {
-        // FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
-
         List<EventWithCandidates> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
 
         List<Event> handledEvents = eventWithCandidates.stream().map(event -> {

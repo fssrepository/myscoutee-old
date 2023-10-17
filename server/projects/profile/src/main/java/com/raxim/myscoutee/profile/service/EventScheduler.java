@@ -22,16 +22,22 @@ import com.raxim.myscoutee.profile.util.AppConstants;
 public class EventScheduler {
 
     private final UserRepository userRepository;
-    private final EventGeneratorRandomService eventGeneratorService;
+    private final EventGeneratorRandomService eventGeneratorRandomService;
+    private final EventGeneratorByPriorityService eventGeneratorByPriorityService;
+    private final EventGeneratorByScoreService eventGeneratorByScoreService;
     private final LikeService likeService;
     private final ScheduleRepository scheduleRepository;
 
     public EventScheduler(
             UserRepository userRepository,
             EventGeneratorRandomService eventGeneratorService,
+            EventGeneratorByPriorityService eventGeneratorByPriorityService,
+            EventGeneratorByScoreService eventGeneratorByScoreService,
             LikeService likeService, ScheduleRepository scheduleRepository) {
         this.userRepository = userRepository;
-        this.eventGeneratorService = eventGeneratorService;
+        this.eventGeneratorRandomService = eventGeneratorService;
+        this.eventGeneratorByPriorityService = eventGeneratorByPriorityService;
+        this.eventGeneratorByScoreService = eventGeneratorByScoreService;
         this.likeService = likeService;
         this.scheduleRepository = scheduleRepository;
     }
@@ -39,7 +45,25 @@ public class EventScheduler {
     @Scheduled(cron = "0 0 3 * * MON")
     public void autoGenerateRooms() {
         try {
-            generateEvents();
+            generateRandomEvents();
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Scheduled(cron = "0 0 3 * * MON")
+    public void autoPriorityRooms() {
+        try {
+            generateByPriorityEvents();
+        } catch (FirebaseMessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Scheduled(cron = "0 0 3 * * MON")
+    public void autoScoreRooms() {
+        try {
+            generateByScoreEvents();
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
@@ -98,7 +122,7 @@ public class EventScheduler {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    public void generateEvents() throws FirebaseMessagingException {
+    public void generateRandomEvents() throws FirebaseMessagingException {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -110,7 +134,45 @@ public class EventScheduler {
 
         FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
 
-        eventGeneratorService.generate(filteredEdges, flags);
+        eventGeneratorRandomService.generate(filteredEdges, flags);
+
+        sendRandomEventNotification();
+
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
+    public void generateByPriorityEvents() throws FirebaseMessagingException {
+        Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Optional<Schedule> schedule = scheduleRepository.findByKey(AppConstants.SCHEDULE_RANDOM_GROUP);
+        long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
+        long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
+
+        String flags = schedule.map(Schedule::getFlags).orElse(null);
+
+        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+
+        eventGeneratorByPriorityService.generate(filteredEdges, flags);
+
+        sendRandomEventNotification();
+
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
+    public void generateByScoreEvents() throws FirebaseMessagingException {
+        Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Optional<Schedule> schedule = scheduleRepository.findByKey(AppConstants.SCHEDULE_RANDOM_GROUP);
+        long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
+        long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
+
+        String flags = schedule.map(Schedule::getFlags).orElse(null);
+
+        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+
+        eventGeneratorByScoreService.generate(filteredEdges, flags);
 
         sendRandomEventNotification();
 
