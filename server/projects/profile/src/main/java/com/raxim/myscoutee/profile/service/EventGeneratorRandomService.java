@@ -35,7 +35,7 @@ public class EventGeneratorRandomService implements IEventGeneratorService {
         }
 
         EventGeneratorByRandom eventGeneratorByRandom = new EventGeneratorByRandom(filteredEdges, lFlags);
-        List<Event> eventsToSave = eventGeneratorByRandom.generate(null);
+        List<Event> eventsToSave = eventGeneratorByRandom.generate();
 
         List<Event> savedEvents = this.eventRepository.saveAll(eventsToSave);
         return savedEvents;

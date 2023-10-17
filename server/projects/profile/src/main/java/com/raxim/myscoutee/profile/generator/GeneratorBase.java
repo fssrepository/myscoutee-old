@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 
-public abstract class GeneratorBase<T, U> {
+public abstract class GeneratorBase<T> {
     private final FilteredEdges filteredEdges;
     private final Object flags;
 
@@ -21,5 +21,5 @@ public abstract class GeneratorBase<T, U> {
         return flags;
     }
 
-    public abstract List<T> generate(List<U> u);
+    public abstract List<T> generate();
 }

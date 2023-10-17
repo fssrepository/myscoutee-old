@@ -26,18 +26,20 @@ import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.util.AppConstants;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
-public class EventGeneratorByScore extends GeneratorBase<Event, Event> {
+public class EventGeneratorByScore extends GeneratorBase<Event> {
 
+    private final List<Event> events;
     private final Map<String, List<ScoreMatrix>> scoreMatricesByType;
 
-    public EventGeneratorByScore(FilteredEdges filteredEdges, String flags,
+    public EventGeneratorByScore(List<Event> events, FilteredEdges filteredEdges, String flags,
             Map<String, List<ScoreMatrix>> scoreMatricesByType) {
         super(filteredEdges, flags);
+        this.events = events;
         this.scoreMatricesByType = scoreMatricesByType;
     }
 
     @Override
-    public List<Event> generate(List<Event> events) {
+    public List<Event> generate() {
         List<Event> handledEvents = events.stream().map(event -> {
             event.syncStatus();
 

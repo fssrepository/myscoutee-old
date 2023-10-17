@@ -23,14 +23,17 @@ import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.util.AppConstants;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
-public class EventGeneratorByPriority extends GeneratorBase<Event, EventWithCandidates> {
+public class EventGeneratorByPriority extends GeneratorBase<Event> {
+    private final List<EventWithCandidates> eventWithCandidates;
 
-    public EventGeneratorByPriority(FilteredEdges filteredEdges, String flags) {
+    public EventGeneratorByPriority(List<EventWithCandidates> eventWithCandidates, FilteredEdges filteredEdges,
+            String flags) {
         super(filteredEdges, flags);
+        this.eventWithCandidates = eventWithCandidates;
     }
 
     @Override
-    public List<Event> generate(List<EventWithCandidates> eventWithCandidates) {
+    public List<Event> generate() {
         List<Event> handledEvents = eventWithCandidates.stream().map(event -> {
             event.getEvent().syncStatus();
 

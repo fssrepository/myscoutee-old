@@ -25,8 +25,9 @@ public class EventGeneratorByPriorityService implements IEventGeneratorService {
     public List<Event> generate(FilteredEdges filteredEdges, String flags) {
         List<EventWithCandidates> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
 
-        EventGeneratorByPriority eventGeneratorByPriority = new EventGeneratorByPriority(filteredEdges, flags);
-        List<Event> eventsToSave = eventGeneratorByPriority.generate(eventWithCandidates);
+        EventGeneratorByPriority eventGeneratorByPriority = new EventGeneratorByPriority(eventWithCandidates,
+                filteredEdges, flags);
+        List<Event> eventsToSave = eventGeneratorByPriority.generate();
 
         List<Event> savedEvents = this.eventRepository.saveAll(eventsToSave);
         return savedEvents;

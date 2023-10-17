@@ -19,14 +19,14 @@ import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
-public class EventGeneratorByRandom extends GeneratorBase<Event, Event> {
+public class EventGeneratorByRandom extends GeneratorBase<Event> {
 
     public EventGeneratorByRandom(FilteredEdges filteredEdges, Object flags) {
         super(filteredEdges, flags);
     }
 
     @Override
-    public List<Event> generate(List<Event> eventWithCandidates) {
+    public List<Event> generate() {
 
         Range lFlags = (Range) getFlags();
 

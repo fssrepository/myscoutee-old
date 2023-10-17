@@ -37,9 +37,9 @@ public class EventGeneratorByScoreService implements IEventGeneratorService {
         Map<String, List<ScoreMatrix>> scoreMatricesByType = dbScoreMatrices.stream()
                 .collect(Collectors.groupingBy(ScoreMatrix::getName));
 
-        EventGeneratorByScore eventGeneratorByScore = new EventGeneratorByScore(filteredEdges, flags,
+        EventGeneratorByScore eventGeneratorByScore = new EventGeneratorByScore(events, filteredEdges, flags,
                 scoreMatricesByType);
-        List<Event> eventsToSave = eventGeneratorByScore.generate(events);
+        List<Event> eventsToSave = eventGeneratorByScore.generate();
 
         List<Event> savedEvents = this.eventRepository.saveAll(eventsToSave);
         return savedEvents;
