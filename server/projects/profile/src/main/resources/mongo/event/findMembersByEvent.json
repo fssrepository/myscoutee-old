@@ -200,11 +200,11 @@
                             "$cond": [
                                 {
                                     "$ifNull": [
-                                        "$score",
+                                        "$likes",
                                         null
                                     ]
                                 },
-                                "$score",
+                                "$likes.rate",
                                 null
                             ]
                         },

@@ -27,13 +27,29 @@ import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 public class Base64Test {
 
     @Test
+    public void base64L() {
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_OLIVER));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_EMMA));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_AVA));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_ETHAN));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_LUCAS));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_LIAM));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_SOPHIA));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_AMELIA));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_MIA));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_CHARLOTTE));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_LILY));
+        System.out.println(CommonUtil.asBase64(AppTestConstants.UUID_PROFILE_EVELYIN));
+    }
+
+    @Test
     public void base64() {
         UUID uuid = UUID.randomUUID();
         System.out.println(uuid);
         System.out.println(CommonUtil.asBase64(uuid));
         System.out.println(UUID.fromString("8f4bd3a8-1195-01b0-172a-a04f052f5982").toString());
         System.out.println(CommonUtil.asBase64(UUID.fromString("8f4bd3a8-1195-01b0-172a-a04f052f5982")));
-        System.out.println(CommonUtil.asUUID("jEzsC2l500NzJTdJoWk7ow=="));
+        System.out.println(CommonUtil.asUUID("YUhbtS1lqrUIaNFYPQtbtA=="));
     }
 
     @Test

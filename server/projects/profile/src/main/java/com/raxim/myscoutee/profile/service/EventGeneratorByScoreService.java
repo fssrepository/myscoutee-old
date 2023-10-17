@@ -32,7 +32,8 @@ public class EventGeneratorByScoreService implements IEventGeneratorService {
     public List<Event> generate(FilteredEdges filteredEdges, String flags) {
         List<Event> events = this.eventRepository.findEvents();
 
-        List<String> rankTypes = events.stream().map(event -> event.getRule().getRankType()).toList();
+        List<String> rankTypes = events.stream()
+                .flatMap(event -> event.getItems().stream().map(sEvent -> sEvent.getRule().getRankType())).toList();
         List<ScoreMatrix> dbScoreMatrices = this.scoreMatrixRepository.findByNames(rankTypes);
 
         Map<String, List<ScoreMatrix>> scoreMatricesByType = dbScoreMatrices.stream()

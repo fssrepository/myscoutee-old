@@ -43,36 +43,40 @@ public class EventGeneratorByScore extends GeneratorBase<Event> {
         List<Event> handledEvents = events.stream().map(event -> {
             event.syncStatus();
 
-            List<ScoreMatrix> scoreMatrices = scoreMatricesByType.get(event.getRule().getRankType());
-
             int maxStage = event.getMaxStage();
             if (maxStage > 0 && "A".equals(event.getStatus())) {
-                List<Event> dueNextStageEvents = event.getDueNextStageEvents();
-                if (!dueNextStageEvents.isEmpty()) {
+
+                List<Event> nextStageEvents;
+                List<Event> currStageEvents;
+
+                if (event.isStageFinished()) {
+                    currStageEvents = event.getItemsByStage(event.getStage());
                     int nextStage = event.getStage() + 1;
                     event.setStage(nextStage);
+                } else {
+                    currStageEvents = List.of(event);
                 }
 
-                int maxCapacity = dueNextStageEvents.stream().mapToInt(item -> item.getCapacity().getMax()).sum();
+                nextStageEvents = event.getItemsByStage(event.getStage());
 
-                List<Event> currStageEvents = event.getItems().stream()
-                        .filter(item -> "A".equals(item.getStatus()) && item.getStage() == event.getStage()).toList();
+                Event nextItem = nextStageEvents.get(0);
+
+                int maxCapacity = nextStageEvents.stream().mapToInt(item -> item.getCapacity().getMax()).sum();
 
                 int firstXWinner = (int) Math.ceil((double) maxCapacity / currStageEvents.size());
-                if (event.getRule() != null) {
+                if (nextItem.getRule() != null) {
+                    Rule nextRule = nextItem.getRule();
 
                     List<Member> winners = currStageEvents.stream().flatMap(cItem -> {
-                        Double rateMin = cItem.getRule() != null ? cItem.getRule().getRate() : 0d;
-
+                        // nextEvent.cItem.getRule
                         List<Member> cMembers = new ArrayList<>();
-                        if (Boolean.TRUE.equals(cItem.getRule().getMutual())) {
-                            Rule rule = cItem.getRule();
+                        if (Boolean.TRUE.equals(nextItem.getRule().getMutual())) {
 
                             Set<Edge> sIgnoredEdges = EventUtil.permutate(cItem.getMembers());
 
                             Set<Edge> sIgnoredEdgesByRate = getFilteredEdges().getEdges().stream()
-                                    .filter(edge -> rule.getRate() != null &&
-                                            edge.getWeight() >= rule.getRate())
+                                    .filter(edge -> nextRule.getRate() != null &&
+                                            edge.getWeight() >= nextRule.getRate())
                                     .collect(Collectors.toSet());
                             List<Set<Edge>> ignoredEdges = List.of(sIgnoredEdges, sIgnoredEdgesByRate);
                             ignoredEdges.addAll(getFilteredEdges().getIgnoredEdges());
@@ -95,11 +99,10 @@ public class EventGeneratorByScore extends GeneratorBase<Event> {
                                     })
                                     .collect(Collectors.toSet());
 
-                            Range range = new Range(firstXWinner,
-                                    cItem.getCapacity().getMax() - activeNodes.size());
+                            Range range = new Range(firstXWinner, firstXWinner);
 
                             List<String> types;
-                            if (Boolean.TRUE.equals(event.getRule().getBalanced())) {
+                            if (Boolean.TRUE.equals(nextRule.getBalanced())) {
                                 types = List.of(AppConstants.MAN, AppConstants.WOMAN);
                             } else {
                                 types = List.of();
@@ -127,10 +130,11 @@ public class EventGeneratorByScore extends GeneratorBase<Event> {
                         } else {
                             Stream<Member> sMembers = cItem.getMembers().stream()
                                     .filter(member -> "A".equals(member.getStatus())
-                                            && "U".equals(member.getRole())
-                                            && (!cItem.isPriority() || member.getScore() >= rateMin));
+                                            && "U".equals(member.getRole()));
 
-                            if (AppConstants.RANK_FIFA.equals(event.getRule().getRankType())) {
+                            List<ScoreMatrix> scoreMatrices = scoreMatricesByType
+                                    .get(nextRule.getRankType());
+                            if (AppConstants.RANK_FIFA.equals(nextRule.getRankType())) {
                                 Fifa fifa = new Fifa(new ArrayList<>(event.getMatches()), scoreMatrices);
                                 cMembers = fifa.getFirstXMembers(firstXWinner, sMembers);
                             } else {

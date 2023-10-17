@@ -26,7 +26,11 @@ public class AppTestConstants {
     public static final UUID UUID_EVENT_11 = UUID.fromString("43d37969-0bec-4c8c-a33b-69a149372573");
     public static final UUID UUID_EVENT_111 = UUID.fromString("b5aa652d-b55b-4861-b45b-0b3d58d16808");
     public static final String UUID_EVENT_111_FAKE_NAME = "FAKE_111";
-    public static final UUID UUID_EVENT_ITEM_32 = UUID.fromString("541a9f25-7594-41e6-9707-0055be0a48f1");
+    
+    public static final UUID UUID_EVENT_ITEM_32_M1_S1 = UUID.fromString("541a9f25-7594-41e6-9707-0055be0a48f1");
+    public static final UUID UUID_EVENT_ITEM_32_M1_S2 = UUID.fromString("e063f444-9881-45e0-9ee1-b67bef9431dd");
+    public static final UUID UUID_EVENT_ITEM_33_M2_S1 = UUID.fromString("b5aa652d-b55b-4861-b45b-0b3d58d16808");
+    
     public final static UUID UUID_GROUP_DATING = UUID.fromString("b33ec186-aea8-4636-b635-4a2f620a0c54");
 
     public final static Point LOCATION_PROFILE_LIAM = new Point(new Position(List.of(47.497912, 19.040235)));

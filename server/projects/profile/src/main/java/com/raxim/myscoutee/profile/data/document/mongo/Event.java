@@ -37,7 +37,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     @JsonIgnore
     private UUID parentId;
 
-    // type = event (E) vs template??? (T) vs Item (I = item)
+    // type = event (E) vs template??? (T) vs Item (I = item), slot (S)
     // urlRef -> //car, accomodation etc.
 
     // urlRef is the template
@@ -278,6 +278,10 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         return getRange() != null && LocalDateTime.now().isAfter(getRange().getEnd());
     }
 
+    public boolean isStageFinished() {
+        return getItemsByStage(getStage()).stream().allMatch(item -> item.isFinished());
+    }
+
     public void syncStatus() {
         if (isFinished()) {
             setStatus("F");
@@ -300,19 +304,16 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
             List<Member> activeMembers = getMembers().stream()
                     .filter(member -> "A".equals(member.getStatus())).toList();
 
-            if (activeMembers.size() == 0) {
-                setStatus("C");
+            if (activeMembers.size() == 0 && isStarted()) {
+                setStatus("T");
                 return;
             }
 
             if ("P".equals(getStatus())) {
-                LocalDateTime validUntil = getRule() != null ? getRange().getStart()
-                        .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
-                        : getRange().getStart();
 
                 // access is A or F
                 if (!"P".equals(getAccess())
-                        && LocalDateTime.now().isAfter(validUntil)) {
+                        && isStarted()) {
                     getMembers().stream()
                             .filter(member -> "J".equals(member.getStatus())
                                     && "U".equals(member.getRole()))
@@ -343,51 +344,52 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                             .collect(Collectors.toList());
                 }
 
-                if (LocalDateTime.now().isAfter(validUntil)) {
+                if (isStarted()) {
                     if (getRule() != null) {
 
                         if (getCapacity().getMin() > getNumOfMembers()) {
                             timeOut();
                         } else {
-                            if (!Boolean.TRUE.equals(getMultislot())) {
-                                setStatus("A");
-                            }
-                            if (getStage() == 0) {
-                                assignToSlots(members);
-                            }
+                            // if (!Boolean.TRUE.equals(getMultislot())) {
+                            setStatus("A");
+                            // }
+                            /*
+                             * if (getStage() == 0) {
+                             * assignToSlots(members);
+                             * }
+                             */
                         }
 
                     }
                 } else {
                     if ("P".equals(getAccess())
                             && getCapacity().getMax() == getNumOfMembers()) {
-                        if (!Boolean.TRUE.equals(getMultislot())) {
-                            setStatus("A");
-                        }
-                        if (getStage() == 0) {
-                            assignToSlots(members);
-                        }
+                        // if (!Boolean.TRUE.equals(getMultislot())) {
+                        setStatus("A");
+                        // }
+                        /*
+                         * if (getStage() == 0) {
+                         * assignToSlots(members);
+                         * }
+                         */
                     }
                 }
             }
         }
     }
 
-    public List<Event> getDueNextStageEvents() {
-        int nextStage = getStage() + 1;
-        List<Event> nextStageEvents = getItems().stream()
-                .filter(item -> "A".equals(item.getStatus()) && item.getStage() == nextStage
-                        && !item.validEventUntilFrom())
+    public List<Event> getItemsByStage(int i) {
+        return getItems().stream()
+                .filter(item -> item.getStage() == i)
                 .toList();
-        return nextStageEvents;
     }
 
-    public boolean validEventUntilFrom() {
-        LocalDateTime validUntilFrom = "P".equals(getStatus()) && getRule() != null
+    public boolean isStarted() {
+        LocalDateTime startDate = getRule() != null
                 ? getRange().getStart()
                         .minus(getRule().getEventGrace(), ChronoUnit.MINUTES)
                 : getRange().getStart();
-        return LocalDateTime.now().isBefore(validUntilFrom);
+        return LocalDateTime.now().isAfter(startDate);
     }
 
     public void assignToSlots(List<Member> members) {
@@ -397,24 +399,14 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                 int counter = getNumOfMembers();
                 for (Event item : getItems()) {
 
-                    item.syncStatus();
-
-                    if (!item.validEventUntilFrom()) {
-                        if (item.getCapacity().getMin() > item.getNumOfMembers()) {
-                            item.setStatus("T");
-                        } else {
-                            item.setStatus("A");
-                        }
-                    }
-
                     if (item.getStage() == getStage() && "P".equals(item.getStatus())) {
                         int availableCapacity = item.getCapacity().getMax() - item.getNumOfMembers();
-                        counter -= availableCapacity;
                         if (counter < item.getCapacity().getMin()) {
-                            item.setStatus("C");
+                            item.setStatus("T");
                         } else {
                             // item status is pending, until there is not enough approval
-                            for (int i = memberIdx; i < memberIdx + availableCapacity; i++) {
+                            int limit = Math.min(members.size(), memberIdx + availableCapacity);
+                            for (int i = memberIdx; i < limit; i++) {
 
                                 Member currMemberForSub = (Member) members.get(i).clone();
                                 currMemberForSub.setStatus("I");
@@ -428,7 +420,9 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                             }
                             memberIdx += availableCapacity;
                         }
+                        counter -= availableCapacity;
                     }
+                    item.syncStatus();
                 }
             }
 
@@ -549,11 +543,11 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
 
                 if (promoterCnt == 0) {
                     List<Event> events = getItems().stream().map(item -> {
-                        item.setStatus("C");
+                        item.setStatus("T");
                         return item;
                     }).toList();
                     setItems(events);
-                    setStatus("C");
+                    setStatus("T");
                 }
             } else {
                 int adminCnt = (int) getMembers().stream()
