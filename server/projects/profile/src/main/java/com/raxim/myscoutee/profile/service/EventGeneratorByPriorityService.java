@@ -32,18 +32,14 @@ import com.raxim.myscoutee.profile.util.EventUtil;
  */
 @Service
 public class EventGeneratorByPriorityService implements IEventGeneratorService {
-    private final LikeService likeService;
     private final EventRepository eventRepository;
 
-    public EventGeneratorByPriorityService(
-            LikeService likeService,
-            EventRepository eventRepository) {
-        this.likeService = likeService;
+    public EventGeneratorByPriorityService(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 
-    public List<Event> generate() {
-        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+    public List<Event> generate(FilteredEdges filteredEdges, String flags) {
+        // FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
 
         List<EventWithCandidates> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
 

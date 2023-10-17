@@ -1,5 +1,8 @@
 package com.raxim.myscoutee.profile.service;
 
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,19 +12,28 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Notification;
 import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
+import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
+import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
+import com.raxim.myscoutee.profile.util.AppConstants;
 
 @Service
 public class EventScheduler {
 
     private final UserRepository userRepository;
     private final EventGeneratorRandomService eventGeneratorService;
+    private final LikeService likeService;
+    private final ScheduleRepository scheduleRepository;
 
     public EventScheduler(
             UserRepository userRepository,
-            EventGeneratorRandomService eventGeneratorService) {
+            EventGeneratorRandomService eventGeneratorService,
+            LikeService likeService, ScheduleRepository scheduleRepository) {
         this.userRepository = userRepository;
         this.eventGeneratorService = eventGeneratorService;
+        this.likeService = likeService;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Scheduled(cron = "0 0 3 * * MON")
@@ -90,7 +102,15 @@ public class EventScheduler {
         Authentication auth = new FirebaseAuthenticationToken("scheduler", "");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        eventGeneratorService.generate();
+        Optional<Schedule> schedule = scheduleRepository.findByKey(AppConstants.SCHEDULE_RANDOM_GROUP);
+        long lastIdx = schedule.map(Schedule::getLastIdx).orElse(0L);
+        long batchSize = schedule.map(Schedule::getBatchSize).orElse(1000L);
+
+        String flags = schedule.map(Schedule::getFlags).orElse(null);
+
+        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
+
+        eventGeneratorService.generate(filteredEdges, flags);
 
         sendRandomEventNotification();
 

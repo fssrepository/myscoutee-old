@@ -26,6 +26,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
+import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
@@ -62,7 +63,6 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
                 LikeService likeService = new LikeService(profileRepository, likeRepository, eventRepository,
                                 sequenceRepository);
                 EventGeneratorByPriorityService eventGeneratorPriorityService = new EventGeneratorByPriorityService(
-                                likeService,
                                 eventRepository);
 
                 List<EventWithCandidates> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
@@ -73,12 +73,15 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
                 Event event = this.eventRepository.findById(eventWithCandidates.get(0).getEvent().getId()).get();
                 assertEquals("P", event.getStatus());
 
-                //manipulate startdate enddate of event
-                RangeLocal rangeLocal = new RangeLocal(LocalDateTime.now().minusMinutes(20), LocalDateTime.now().plusHours(2));
+                // manipulate startdate enddate of event
+                RangeLocal rangeLocal = new RangeLocal(LocalDateTime.now().minusMinutes(20),
+                                LocalDateTime.now().plusHours(2));
                 event.setRange(rangeLocal);
                 this.eventRepository.save(event);
 
-                eventGeneratorPriorityService.generate();
+                FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+
+                eventGeneratorPriorityService.generate(filteredEdges, null);
 
                 event = this.eventRepository.findById(eventWithCandidates.get(0).getEvent().getId()).get();
                 assertEquals("T", event.getStatus());

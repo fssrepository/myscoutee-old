@@ -38,19 +38,16 @@ import com.raxim.myscoutee.profile.util.EventUtil;
 @Service
 public class EventGeneratorByScoreService implements IEventGeneratorService {
     private final EventRepository eventRepository;
-    private final LikeService likeService;
     private final ScoreMatrixRepository scoreMatrixRepository;
 
-    public EventGeneratorByScoreService(EventRepository eventRepository, LikeService likeService,
-            ScoreMatrixRepository scoreMatrixRepository) {
+    public EventGeneratorByScoreService(EventRepository eventRepository, ScoreMatrixRepository scoreMatrixRepository) {
         this.eventRepository = eventRepository;
-        this.likeService = likeService;
         this.scoreMatrixRepository = scoreMatrixRepository;
     }
 
     @Override
-    public List<Event> generate() {
-        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+    public List<Event> generate(FilteredEdges filteredEdges, String flags) {
+        // FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
 
         List<Event> events = this.eventRepository.findEvents();
 

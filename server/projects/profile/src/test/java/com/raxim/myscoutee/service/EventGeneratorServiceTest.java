@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,7 +33,6 @@ import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
 import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
@@ -73,20 +71,14 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 objectMapper.addMixIn(Profile.class, TestProfile.class);
                 objectMapper.addMixIn(Like.class, TestLike.class);
 
-                String flags = jsonToString(FLAGS_DEFAULT,
-                                objectMapper);
-                Optional<Schedule> scheduleResp = Optional.of(
-                                new Schedule(0L, 1000L,
-                                                flags));
-                when(scheduleRepository.findByKey(EventGeneratorRandomService.SCHEDULE_RANDOM_GROUP))
-                                .thenReturn(scheduleResp);
+                String flags = jsonToString(FLAGS_DEFAULT, objectMapper);
 
                 FilteredEdges filteredEdges = loadJson(this, "algo/filteredEdges.json",
                                 FilteredEdges.class, objectMapper);
                 when(likeService.getEdges(Set.of("A")))
                                 .thenReturn(filteredEdges);
 
-                eventGeneratorService.generate();
+                eventGeneratorService.generate(filteredEdges, flags);
 
                 Mockito.verify(eventRepository).saveAll(captorEvents.capture());
                 List<Event> generatedEvents = captorEvents.getValue();
@@ -127,20 +119,14 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 objectMapper.addMixIn(Profile.class, TestProfile.class);
                 objectMapper.addMixIn(Like.class, TestLike.class);
 
-                String flags = jsonToString(FLAGS_DEFAULT,
-                                objectMapper);
-                Optional<Schedule> scheduleResp = Optional.of(
-                                new Schedule(0L, 1000L,
-                                                flags));
-                when(scheduleRepository.findByKey(EventGeneratorRandomService.SCHEDULE_RANDOM_GROUP))
-                                .thenReturn(scheduleResp);
+                String flags = jsonToString(FLAGS_DEFAULT, objectMapper);
 
                 FilteredEdges filteredEdges = loadJson(this, "algo/filteredEdgesWithIgnored.json",
                                 FilteredEdges.class, objectMapper);
                 when(likeService.getEdges(Set.of("A")))
                                 .thenReturn(filteredEdges);
 
-                eventGeneratorService.generate();
+                eventGeneratorService.generate(filteredEdges, flags);
 
                 Mockito.verify(eventRepository).saveAll(captorEvents.capture());
                 List<Event> generatedEvents = captorEvents.getValue();

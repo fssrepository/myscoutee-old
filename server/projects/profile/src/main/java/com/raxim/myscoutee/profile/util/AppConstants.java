@@ -3,7 +3,6 @@ package com.raxim.myscoutee.profile.util;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bson.BsonType;
@@ -56,5 +55,7 @@ public class AppConstants {
         public static final String RANK_NONE = "none";
         public static final String RANK_RATE = "rate";
         public static final String RANK_FIFA = "fifa";
+
+        public static final String SCHEDULE_RANDOM_GROUP = "RANDOM_GROUP";
 
 }
