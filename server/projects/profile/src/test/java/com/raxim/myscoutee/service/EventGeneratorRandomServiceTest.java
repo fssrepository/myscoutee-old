@@ -42,12 +42,12 @@ import com.raxim.myscoutee.profile.service.LikeService;
 @DirtiesContext
 @ExtendWith({ SpringExtension.class })
 @ContextConfiguration(classes = JsonConfig.class)
-public class EventGeneratorServiceTest extends AbstractAlgoTest {
+public class EventGeneratorRandomServiceTest extends AbstractAlgoTest {
 
         private static final Range FLAGS_DEFAULT = new Range(2, 3);
 
         @InjectMocks
-        private EventGeneratorRandomService eventGeneratorService;
+        private EventGeneratorRandomService eventGeneratorRandomService;
 
         @Mock
         private ScheduleRepository scheduleRepository;
@@ -78,7 +78,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 when(likeService.getEdges(Set.of("A")))
                                 .thenReturn(filteredEdges);
 
-                eventGeneratorService.generate(filteredEdges, flags);
+                eventGeneratorRandomService.generate(filteredEdges, flags);
 
                 Mockito.verify(eventRepository).saveAll(captorEvents.capture());
                 List<Event> generatedEvents = captorEvents.getValue();
@@ -126,7 +126,7 @@ public class EventGeneratorServiceTest extends AbstractAlgoTest {
                 when(likeService.getEdges(Set.of("A")))
                                 .thenReturn(filteredEdges);
 
-                eventGeneratorService.generate(filteredEdges, flags);
+                eventGeneratorRandomService.generate(filteredEdges, flags);
 
                 Mockito.verify(eventRepository).saveAll(captorEvents.capture());
                 List<Event> generatedEvents = captorEvents.getValue();

@@ -15,7 +15,8 @@ import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
 import com.raxim.myscoutee.profile.service.iface.IEventGeneratorService;
 
 /*
- * who did met before, selecton is by score (the members are scored -> multistage competition also using it to assign the firstX member)
+ * who did met before, selecton is by score 
+ * (the members are scored -> multistage competition also using it to assign the firstX member)
  */
 @Service
 public class EventGeneratorByScoreService implements IEventGeneratorService {
