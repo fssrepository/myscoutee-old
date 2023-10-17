@@ -350,28 +350,14 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
                         if (getCapacity().getMin() > getNumOfMembers()) {
                             timeOut();
                         } else {
-                            // if (!Boolean.TRUE.equals(getMultislot())) {
                             setStatus("A");
-                            // }
-                            /*
-                             * if (getStage() == 0) {
-                             * assignToSlots(members);
-                             * }
-                             */
                         }
 
                     }
                 } else {
                     if ("P".equals(getAccess())
                             && getCapacity().getMax() == getNumOfMembers()) {
-                        // if (!Boolean.TRUE.equals(getMultislot())) {
                         setStatus("A");
-                        // }
-                        /*
-                         * if (getStage() == 0) {
-                         * assignToSlots(members);
-                         * }
-                         */
                     }
                 }
             }
