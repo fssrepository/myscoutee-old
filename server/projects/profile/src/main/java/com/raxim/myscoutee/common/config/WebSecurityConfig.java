@@ -41,10 +41,10 @@ public class WebSecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class)
+        /*http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
                 .httpBasic(httpBasic -> httpBasic.disable())
-                .csrf(csrf -> csrf.disable());
+                .csrf(csrf -> csrf.disable());*/
         return http.build();
     }
 

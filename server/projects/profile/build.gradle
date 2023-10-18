@@ -14,6 +14,11 @@ repositories {
 	mavenCentral()
 }
 
+jar {
+    enabled = false
+	bootJar.enabled = true
+}
+
 dependencies {
 	implementation 'com.google.firebase:firebase-admin:7.1.1'
 	implementation 'org.apache.httpcomponents:httpasyncclient'

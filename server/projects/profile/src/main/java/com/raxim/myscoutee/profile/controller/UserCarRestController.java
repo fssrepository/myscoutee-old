@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
@@ -28,7 +29,7 @@ import com.raxim.myscoutee.profile.handler.CarParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.service.CarService;
 
-@RepositoryRestController
+@RestController
 @RequestMapping("user")
 public class UserCarRestController {
     private final CarService carService;

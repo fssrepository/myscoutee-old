@@ -3,12 +3,12 @@ package com.raxim.myscoutee.profile.controller;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
@@ -24,7 +24,7 @@ import com.raxim.myscoutee.profile.handler.SchoolParamHandler;
 import com.raxim.myscoutee.profile.service.ProfileService;
 import com.raxim.myscoutee.profile.service.SchoolService;
 
-@RepositoryRestController
+@RestController
 @RequestMapping("games")
 public class GameRestController {
 

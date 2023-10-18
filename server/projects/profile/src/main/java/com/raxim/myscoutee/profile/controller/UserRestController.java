@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.config.properties.ConfigProperties;
@@ -31,7 +31,7 @@ import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 import com.raxim.myscoutee.profile.service.SettingsService;
 import com.raxim.myscoutee.profile.service.UserService;
 
-@RepositoryRestController
+@RestController
 @RequestMapping("user")
 public class UserRestController {
     private final ProfileRepository profileRepository;

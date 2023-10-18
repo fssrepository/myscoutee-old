@@ -28,8 +28,7 @@ import com.raxim.myscoutee.profile.handler.TemplateParamHandler;
 import com.raxim.myscoutee.profile.service.GroupService;
 import com.raxim.myscoutee.profile.service.UserService;
 
-@RepositoryRestController
-@RequestMapping("groups")
+@RepositoryRestController("groups")
 public class GroupRestController {
 
     private final GroupService groupService;

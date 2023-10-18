@@ -1,16 +1,16 @@
 package com.raxim.myscoutee.profile.controller;
 
-import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 import com.raxim.myscoutee.profile.service.EventScheduler;
 
-@RepositoryRestController
+@RestController
 @RequestMapping("calc")
 public class CalcRestController {
 

@@ -58,12 +58,12 @@ services:
       #- /etc/localtime:/etc/localtime:ro
     networks:
       - myscoutee
-    # ports:
-    #   - 27017-27019:27017-27019
+    ports:
+      - 27017-27019:27017-27019
   profilemanagement:
     image: ${MYSCOUTEE_IMAGE}
-    # build:
-    #   context: projects/profile
+    build:
+       context: projects/profile
     container_name: myscoutee
     hostname: myscoutee
     environment:

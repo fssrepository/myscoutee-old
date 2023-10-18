@@ -11,3 +11,8 @@ git config --global user.email {email}
 git config --global user.name {name}
 git config --global user.password {personal access token - Profile -> Settings -> Develpoper Settings (last menu item)}
 
+./gradlew bootRun
+
+gradle build
+docker-compose build --no-cache (build context)
+docker-compose up

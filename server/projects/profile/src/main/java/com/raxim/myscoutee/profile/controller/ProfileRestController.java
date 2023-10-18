@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
@@ -21,8 +20,7 @@ import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.service.LikeService;
 
-@RepositoryRestController
-@RequestMapping("profiles")
+@RepositoryRestController("profiles")
 public class ProfileRestController {
 
     private final ProfileRepository profileRepository;

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.util.CommonUtil;
@@ -56,7 +56,7 @@ enum GroupAction {
     }
 }
 
-@RepositoryRestController
+@RestController
 @RequestMapping("user")
 public class UserGroupRestController {
     private final GroupService groupService;
