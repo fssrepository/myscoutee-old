@@ -10,13 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.raxim.myscoutee.common.util.FileUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.School;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-@BasePathAwareController
+//@BasePathAwareController
+@RestController
+@RequestMapping("/")
 public class BaseOverrideRestController {
     @RequestMapping(path = {
             "schools", "schools/{id}", "cars", "cars/{id}", "items", "items/{id}",

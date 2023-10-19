@@ -7,9 +7,10 @@
     #rla="routerLinkActive"
     [active]="rla.isActive"
   >
+  <!--[matBadge]="navService.notif[link.path]" matBadgeColor="accent"-->
   <mat-icon *ngIf="link.data.icon !== 'person'"
       [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
-      [color]="rla.isActive ? 'warn' : 'primary'" [matBadge]="navService.notif[link.path]" matBadgeColor="accent"
+      [color]="rla.isActive ? 'warn' : 'primary'"
     >
       {{ link.data.icon }}
     </mat-icon>
@@ -46,9 +47,10 @@
     #rla="routerLinkActive"
     [active]="rla.isActive"
   >
+  <!--[matBadge]="navService.notif[link.path]" matBadgeColor="accent"-->
     <mat-icon
       [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
-      [color]="rla.isActive ? 'warn' : 'primary'" [matBadge]="navService.notif[link.path]" matBadgeColor="accent"
+      [color]="rla.isActive ? 'warn' : 'primary'"
     >
       {{ link.data.icon }}
     </mat-icon>
@@ -74,9 +76,10 @@
     #rla="routerLinkActive"
     [active]="rla.isActive"
   >
+  <!--[matBadge]="navService.notif[link.path]" matBadgeColor="accent"-->
     <mat-icon
       [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
-      [color]="rla.isActive ? 'warn' : 'primary'" [matBadge]="navService.notif[link.path]" matBadgeColor="accent"
+      [color]="rla.isActive ? 'warn' : 'primary'"
     >
       {{ link.data.icon }}
     </mat-icon>

@@ -12,7 +12,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Feedback;
 public class RestDataConfig implements RepositoryRestConfigurer {
 
     @Override
-    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry registry) {
         config.exposeIdsFor(Event.class);
         config.exposeIdsFor(Feedback.class);
     }

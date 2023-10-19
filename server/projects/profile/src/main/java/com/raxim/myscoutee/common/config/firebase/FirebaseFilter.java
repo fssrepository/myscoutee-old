@@ -1,9 +1,7 @@
 package com.raxim.myscoutee.common.config.firebase;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +23,6 @@ public class FirebaseFilter extends OncePerRequestFilter {
     private static final String AUTH_LINK = "X-Authorization-Link";
 
     private final FirebaseService firebaseService;
-    private final Set<String> authSet = new HashSet<>();
 
     public FirebaseFilter(FirebaseService firebaseService) {
         this.firebaseService = firebaseService;
@@ -42,19 +39,14 @@ public class FirebaseFilter extends OncePerRequestFilter {
             return;
         } else {
             try {
-                if (!authSet.contains(xAuth)) {
-                    authSet.add(xAuth);
+                FirebaseCredential credential = parseToken(xAuth);
+                String xLink = request.getHeader(AUTH_LINK);
 
-                    FirebaseCredential credential = parseToken(xAuth);
-                    String xLink = request.getHeader(AUTH_LINK);
+                UserDetails userDetails = firebaseService.loadUserByUsername(credential.getEmail(), xLink);
+                Authentication auth = new FirebaseAuthenticationToken(userDetails, credential,
+                        userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
 
-                    UserDetails userDetails = firebaseService.loadUserByUsername(credential.getEmail(), xLink);
-                    Authentication auth = new FirebaseAuthenticationToken(userDetails, credential,
-                            userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-
-                    authSet.remove(xAuth);
-                }
                 filterChain.doFilter(request, response);
             } catch (FirebaseTokenInvalidException e) {
                 throw new SecurityException(e);

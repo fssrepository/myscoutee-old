@@ -893,7 +893,7 @@
     /***/
     0: function _(module, exports, __webpack_require__) {
       module.exports = __webpack_require__(
-      /*! /home/raxim/myscoutee/frontend/src/main.ts */
+      /*! /home/raxim/workspace/myscoutee/frontend/src/main.ts */
       "zUnb");
       /***/
     },
@@ -8181,9 +8181,7 @@
 
           var _r6 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵreference"](1);
 
-          var ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵnextContext"](2);
-
-          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("fontSet", _r6.isActive ? "material-icons" : "material-icons-outlined")("color", _r6.isActive ? "warn" : "primary")("matBadge", ctx_r7.navService.notif[link_r5.path]);
+          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("fontSet", _r6.isActive ? "material-icons" : "material-icons-outlined")("color", _r6.isActive ? "warn" : "primary");
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"](1);
 
@@ -8219,7 +8217,7 @@
         if (rf & 1) {
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "a", 7, 8);
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](2, AppComponent_nav_0_a_1_mat_icon_2_Template, 2, 4, "mat-icon", 9);
+          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](2, AppComponent_nav_0_a_1_mat_icon_2_Template, 2, 3, "mat-icon", 9);
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](3, AppComponent_nav_0_a_1_mat_icon_3_Template, 2, 4, "mat-icon", 10);
 
@@ -8386,13 +8384,11 @@
 
           var _r24 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵreference"](1);
 
-          var ctx_r12 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵnextContext"](2);
-
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("routerLink", link_r23.path)("active", _r24.isActive);
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"](2);
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("fontSet", _r24.isActive ? "material-icons" : "material-icons-outlined")("color", _r24.isActive ? "warn" : "primary")("matBadge", ctx_r12.navService.notif[link_r23.path]);
+          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("fontSet", _r24.isActive ? "material-icons" : "material-icons-outlined")("color", _r24.isActive ? "warn" : "primary");
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"](1);
 
@@ -8434,7 +8430,7 @@
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](7, AppComponent_nav_1_a_7_Template, 4, 6, "a", 6);
+          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](7, AppComponent_nav_1_a_7_Template, 4, 5, "a", 6);
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
         }
@@ -8470,13 +8466,11 @@
 
           var _r29 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵreference"](1);
 
-          var ctx_r27 = _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵnextContext"](2);
-
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("routerLink", link_r28.path)("active", _r29.isActive);
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"](2);
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("fontSet", _r29.isActive ? "material-icons" : "material-icons-outlined")("color", _r29.isActive ? "warn" : "primary")("matBadge", ctx_r27.navService.notif[link_r28.path]);
+          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵproperty"]("fontSet", _r29.isActive ? "material-icons" : "material-icons-outlined")("color", _r29.isActive ? "warn" : "primary");
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵadvance"](1);
 
@@ -8488,7 +8482,7 @@
         if (rf & 1) {
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementStart"](0, "nav", 21);
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](1, AppComponent_nav_5_a_1_Template, 4, 6, "a", 6);
+          _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](1, AppComponent_nav_5_a_1_Template, 4, 5, "a", 6);
 
           _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵelementEnd"]();
         }
@@ -8717,54 +8711,33 @@
                         _this26.msg().then(function (x) {
                           console.log('Messaging initialized!');
                         });
-
-                        var group = value['user'].group;
-                        var groups = value['groups'];
-                        var groupType;
-
-                        var _iterator3 = _createForOfIteratorHelper(groups),
-                            _step3;
-
-                        try {
-                          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-                            var item = _step3.value;
-
-                            if (item.group.key === group) {
-                              groupType = src_environments_environment__WEBPACK_IMPORTED_MODULE_4__["environment"].groupTypes[item.group.type];
-                              _this26.navService.groupName = item.group.name[0];
-                              _this26.navService.groupType = item.group.type;
-                              break;
-                            }
+                        /*const group = value['user'].group;
+                        const groups = value['groups'];
+                                       let groupType;
+                        for (const item of groups) {
+                          if (item.group.key === group) {
+                            groupType = environment.groupTypes[item.group.type];
+                            this.navService.groupName = item.group.name[0];
+                            this.navService.groupType = item.group.type;
+                            break;
                           }
-                        } catch (err) {
-                          _iterator3.e(err);
-                        } finally {
-                          _iterator3.f();
                         }
-
-                        var notif = {};
-
-                        var _iterator4 = _createForOfIteratorHelper(value['likes']),
-                            _step4;
-
-                        try {
-                          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-                            var like = _step4.value;
-                            notif[groupType + '/' + like.root] = like.value;
-                          }
-                        } catch (err) {
-                          _iterator4.e(err);
-                        } finally {
-                          _iterator4.f();
+                                       const notif = {};
+                        for (const like of value['likes']) {
+                          notif[groupType + '/' + like.root] = like.value;
                         }
-
-                        _this26.navService.notif = notif;
-
-                        if (value['user'].profile === undefined || value['user'].profile.status === 'I') {
-                          _this26.router.navigate([groupType + '/user']);
+                        this.navService.notif = notif;
+                                       if (
+                          value['user'].profile === undefined ||
+                          value['user'].profile.status === 'I'
+                        ) {
+                          this.router.navigate([groupType + '/user']);
                         } else {
-                          _this26.router.navigate([groupType]);
-                        }
+                          this.router.navigate([groupType]);
+                        }*/
+
+
+                        _this26.router.navigate(['dating']);
                       },
                       error: function error(err) {
                         _this26.router.navigate(['dating/user']);
@@ -8896,7 +8869,7 @@
         },
         decls: 7,
         vars: 7,
-        consts: [["mat-tab-nav-bar", "", "mat-align-tabs", "center", 4, "ngIf"], [3, "ngStyle"], ["outlet", "outlet"], ["mat-tab-nav-bar", "", "mat-align-tabs", "center", "class", "mat-tab-footer", 4, "ngIf"], ["attribution", "setup_tool", "page_id", "106303131653978", 1, "fb-customerchat"], ["mat-tab-nav-bar", "", "mat-align-tabs", "center"], ["mat-tab-link", "", "routerLinkActive", "", 3, "routerLink", "active", 4, "ngFor", "ngForOf"], ["mat-tab-link", "", "routerLinkActive", "", 3, "routerLink", "active"], ["rla", "routerLinkActive"], ["matBadgeColor", "accent", 3, "fontSet", "color", "matBadge", 4, "ngIf"], [3, "matBadge", "fontSet", "color", 4, "ngIf"], ["matBadgeColor", "accent", 3, "fontSet", "color", "matBadge"], [3, "matBadge", "fontSet", "color"], ["mat-icon-button", "", 1, "mat-item", 3, "click"], [1, "mat-basket-container-small", 2, "top", "8px"], ["matRipple", "", 3, "ngClass", "click", 4, "ngFor", "ngForOf"], ["matRipple", "", 3, "ngClass", "click"], ["style", "width: 40px;", 4, "ngIf"], [4, "ngIf"], [2, "width", "40px"], [3, "src"], ["mat-tab-nav-bar", "", "mat-align-tabs", "center", 1, "mat-tab-footer"]],
+        consts: [["mat-tab-nav-bar", "", "mat-align-tabs", "center", 4, "ngIf"], [3, "ngStyle"], ["outlet", "outlet"], ["mat-tab-nav-bar", "", "mat-align-tabs", "center", "class", "mat-tab-footer", 4, "ngIf"], ["attribution", "setup_tool", "page_id", "106303131653978", 1, "fb-customerchat"], ["mat-tab-nav-bar", "", "mat-align-tabs", "center"], ["mat-tab-link", "", "routerLinkActive", "", 3, "routerLink", "active", 4, "ngFor", "ngForOf"], ["mat-tab-link", "", "routerLinkActive", "", 3, "routerLink", "active"], ["rla", "routerLinkActive"], [3, "fontSet", "color", 4, "ngIf"], [3, "matBadge", "fontSet", "color", 4, "ngIf"], [3, "fontSet", "color"], [3, "matBadge", "fontSet", "color"], ["mat-icon-button", "", 1, "mat-item", 3, "click"], [1, "mat-basket-container-small", 2, "top", "8px"], ["matRipple", "", 3, "ngClass", "click", 4, "ngFor", "ngForOf"], ["matRipple", "", 3, "ngClass", "click"], ["style", "width: 40px;", 4, "ngIf"], [4, "ngIf"], [2, "width", "40px"], [3, "src"], ["mat-tab-nav-bar", "", "mat-align-tabs", "center", 1, "mat-tab-footer"]],
         template: function AppComponent_Template(rf, ctx) {
           if (rf & 1) {
             _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵtemplate"](0, AppComponent_nav_0_Template, 2, 1, "nav", 0);

@@ -88,6 +88,10 @@ export class HttpService {
           let headers = new HttpHeaders();
           headers = headers.append(AUTH_FIREBASE_HEADER, this.navService.token);
 
+          console.log(location.origin + '/backend/profiles/like');
+          console.log(headers);
+          console.log(res);
+
           this.httpClient
             .post(location.origin + '/backend/profiles/like', res, {
               headers,
@@ -177,6 +181,10 @@ export class HttpService {
   ) {
     let headers = new HttpHeaders();
     headers = headers.append(AUTH_FIREBASE_HEADER, this.navService.token);
+
+    console.log(location.origin + '/backend' + urlPart);
+    console.log("token" + headers);
+    console.log("params" + params);
 
     return this.httpClient
       .post(location.origin + '/backend' + urlPart, body, { headers, params })

@@ -16,3 +16,7 @@ git config --global user.password {personal access token - Profile -> Settings -
 gradle build -x test
 docker-compose build --no-cache (build context)
 docker-compose up
+
+shift + fn + f5 (refresh page without cache)
+
+ng serve --ssl (dummy https)

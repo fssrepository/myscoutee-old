@@ -133,7 +133,6 @@ public class Profile implements Cloneable {
 
     @GeoSpatialIndexed(name = "position", type = GeoSpatialIndexType.GEO_2DSPHERE)
     @JsonDeserialize(using = GeoJsonPointDeserializer.class)
-    @JsonIgnore
     private GeoJsonPoint position;
 
     /*
@@ -336,6 +335,7 @@ public class Profile implements Cloneable {
         this.schools = schools;
     }
 
+    @JsonIgnore
     public GeoJsonPoint getPosition() {
         return position;
     }

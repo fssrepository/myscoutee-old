@@ -266,14 +266,17 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
             .getIdToken()
             .then((token) => {
               this.navService.token = token;
-
+              
+              console.log("/user");
               this.httpService.get('/user').subscribe({
                 next: (value) => {
+                  console.log(value);
+
                   this.msg().then((x) => {
                     console.log('Messaging initialized!');
                   });
 
-                  const group = value['user'].group;
+                  /*const group = value['user'].group;
                   const groups = value['groups'];
 
                   let groupType;
@@ -299,7 +302,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.router.navigate([groupType + '/user']);
                   } else {
                     this.router.navigate([groupType]);
-                  }
+                  }*/
+
+                  this.router.navigate(['dating']);
                 },
                 error: (err) => {
                   this.router.navigate(['dating/user']);
@@ -310,7 +315,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
               //  this.router.navigate(['dating']);
               // });
             })
-            .catch((error) => {});
+            .catch((error) => {
+              console.log(error);
+            });
         } else {
           if (this.timer !== undefined) {
             clearInterval(this.timer);

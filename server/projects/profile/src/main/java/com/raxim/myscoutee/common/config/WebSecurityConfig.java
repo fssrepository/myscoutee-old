@@ -31,7 +31,8 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web
                 .ignoring()
-                .requestMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico");
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico",
+                        "/user/profile/images/**");
     }
 
     @Autowired

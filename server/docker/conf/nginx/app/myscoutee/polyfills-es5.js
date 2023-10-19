@@ -379,7 +379,7 @@
     /***/
     1: function _(module, exports, __webpack_require__) {
       __webpack_require__(
-      /*! /home/raxim/myscoutee/frontend/node_modules/@angular-devkit/build-angular/src/webpack/es5-polyfills.js */
+      /*! /home/raxim/workspace/myscoutee/frontend/node_modules/@angular-devkit/build-angular/src/webpack/es5-polyfills.js */
       "voQr");
 
       __webpack_require__(
@@ -387,7 +387,7 @@
       "R0gw");
 
       module.exports = __webpack_require__(
-      /*! /home/raxim/myscoutee/frontend/src/polyfills.ts */
+      /*! /home/raxim/workspace/myscoutee/frontend/src/polyfills.ts */
       "hN/g");
       /***/
     },

@@ -182,7 +182,9 @@ public class ProfileService {
         }
         clonedProfile.setScore(ProfileUtil.score(clonedProfile));
 
-        ProfileUtil.saveVoice(voice, clonedProfile.getVoice());
+        if(clonedProfile.getVoice() != null) {
+            ProfileUtil.saveVoice(voice, clonedProfile.getVoice());
+        }
 
         Profile profileSaved = this.profileRepository.save(clonedProfile);
         this.userRepository.addProfile(userId, profileSaved);
