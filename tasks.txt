@@ -1,0 +1,12 @@
+now:
+1) check event gear icon -> remove (filters will be added later)
+2) check event game/new gear icon -> figure out the basic filters - age etc. - recommended people here also
+3) add chat menu at the top (chat icon) -> if you accept invitation, then it goes to event tab
+4) expose the url of random event generation
+5) replace the notification icon with calendar icon
+
+future:
+
+1) game kepernyo
+    a) double_rate az 5. icon (filter on new, matched, met)
+    b) add filter to 4. icon (filter on met or new)

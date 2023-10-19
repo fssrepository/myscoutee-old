@@ -82,7 +82,7 @@ New TODO:
 23) activity/events/slots utvonalon lehet elerni addEvent
 24) don't allow (put to wait list) other participant to join or invite until the ratio is not balanced (number of man/woman is equal)
     invite man or woman first
-25) if event has the same range.tart and range.end => it will be shown in the same slot group on the screen,
+25) if event has the same range.start and range.end => it will be shown in the same slot group on the screen,
     but as it hasn't been cloned, other ones won't update it, while editing.
 26) assign admins to event (either me or different profiles)
 27) if there are slots in different time the first slot is the most preferred members, if the member hasn't added any preference (prefer for, available for)

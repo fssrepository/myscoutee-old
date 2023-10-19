@@ -436,7 +436,7 @@ const routes: Routes = [
           double: true,
         },
       },
-      {
+      /*{
         path: 'rate_met',
         component: MsList,
         data: {
@@ -446,7 +446,7 @@ const routes: Routes = [
         },
         // filter button - hasonlosag vagy lokalizacio (ez ugyanaz amikor a resztvevoket valasztja ki egy esemenyhez)
         // basket component filter button
-      },
+      },*/
       // ?state=active,pending,none
     ],
   },
