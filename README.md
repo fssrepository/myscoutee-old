@@ -23,7 +23,7 @@ ng serve --ssl (dummy https)
 
 update angular:
 
-npm i
+npm i (install)
 
 1) npm install -g n
 2) n lts
