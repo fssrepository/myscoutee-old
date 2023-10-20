@@ -5,7 +5,7 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -23,7 +23,7 @@ const AUDIO_LENGTH = 10000;
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   professions: any;
   physiques: any;
@@ -53,7 +53,7 @@ export class ProfileComponent implements OnInit {
   @ViewChild('voiceObj', { static: true }) voiceObj: ElementRef;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<ProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,

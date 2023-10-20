@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -13,7 +13,7 @@ import { EditorComponent } from '../../editor/editor.component';
   templateUrl: './group.component.html',
 })
 export class GroupFormComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   images: any;
 
@@ -21,7 +21,7 @@ export class GroupFormComponent implements OnInit {
   private url: any;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<GroupFormComponent>,
     public dialog: MatDialog,
     private httpService: HttpService,

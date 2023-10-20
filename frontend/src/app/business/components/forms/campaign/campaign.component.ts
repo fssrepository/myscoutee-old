@@ -10,9 +10,9 @@ import {
 } from '@angular/core';
 import {
   AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormGroup,
   ValidationErrors,
   ValidatorFn,
   Validators,
@@ -54,7 +54,7 @@ export class CampaignFormComponent implements OnInit, AfterViewInit {
   @ViewChild('groupPanel', { static: true, read: ViewContainerRef })
   groupPanelRef: ViewContainerRef;
 
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   images: any;
 
@@ -70,7 +70,7 @@ export class CampaignFormComponent implements OnInit, AfterViewInit {
 
   constructor(
     private cfr: ComponentFactoryResolver,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<CampaignFormComponent>,
     public dialog: MatDialog,
     private httpService: HttpService,
@@ -208,7 +208,7 @@ export class CampaignFormComponent implements OnInit, AfterViewInit {
 
         const tValue = result[0].info.value;
         if (tValue !== undefined && tValue.capacity !== undefined) {
-          const slots = this.formGroup.controls['slots'] as FormArray;
+          const slots = this.formGroup.controls['slots'] as UntypedFormArray;
           slots.clear();
 
           const range = this.formGroup.get('data').get('range');
@@ -277,7 +277,7 @@ export class CampaignFormComponent implements OnInit, AfterViewInit {
 
     formGroup.addControl(
       'slots',
-      new FormArray(slots, [Validators.required, Validators.minLength(1)])
+      new UntypedFormArray(slots, [Validators.required, Validators.minLength(1)])
     );
   }
 
@@ -325,7 +325,7 @@ export class CampaignFormComponent implements OnInit, AfterViewInit {
       event.stopPropagation();
     }
 
-    (this.formGroup.controls['slots'] as FormArray).insert(
+    (this.formGroup.controls['slots'] as UntypedFormArray).insert(
       0,
       this.createSlot(opts)
     );
@@ -337,12 +337,12 @@ export class CampaignFormComponent implements OnInit, AfterViewInit {
     event.preventDefault();
     event.stopPropagation();
 
-    (this.formGroup.controls['slots'] as FormArray).removeAt(i);
+    (this.formGroup.controls['slots'] as UntypedFormArray).removeAt(i);
 
     this.slotsNum--;
   }
 
-  createSlot(data): FormGroup {
+  createSlot(data): UntypedFormGroup {
     return this.fb.group({
       range: this.fb.group(
         {

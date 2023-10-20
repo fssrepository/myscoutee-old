@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { NavigationService } from 'src/app/navigation.service';
@@ -19,7 +19,7 @@ interface Option {
   templateUrl: './group-filter.component.html',
 })
 export class GroupFilterComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   progress: any = { mode: 'determine', value: 0, color: 'primary' };
 
@@ -30,7 +30,7 @@ export class GroupFilterComponent implements OnInit {
   setting: any;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<GroupFilterComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dataService: DataService,
@@ -59,13 +59,13 @@ export class GroupFilterComponent implements OnInit {
 
     this.httpService.get(this.url, params).subscribe({
       next: (result) => {
-        let formGroup = new FormGroup({});
+        let formGroup = new UntypedFormGroup({});
 
         this.setting = result;
         this.setting.items.map((item) => {
           switch (item.type) {
             case 'os':
-              formGroup.addControl(item.name, new FormControl([...item.data]));
+              formGroup.addControl(item.name, new UntypedFormControl([...item.data]));
             default:
           }
         });

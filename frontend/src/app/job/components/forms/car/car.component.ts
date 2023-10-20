@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -13,7 +13,7 @@ import { EditorComponent } from '../../editor/editor.component';
   templateUrl: './car.component.html',
 })
 export class CarFormComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   images: any;
 
@@ -21,7 +21,7 @@ export class CarFormComponent implements OnInit {
   private url: any;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<CarFormComponent>,
     public dialog: MatDialog,
     private httpService: HttpService,

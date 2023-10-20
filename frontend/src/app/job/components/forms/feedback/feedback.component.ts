@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -13,13 +13,13 @@ import { DataService } from 'src/app/services/data.service';
   templateUrl: './feedback.component.html',
 })
 export class FeedbackFormComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   progress: any = { mode: 'determine', value: 100, color: 'primary' };
   private url: any;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<FeedbackFormComponent>,
     public dialog: MatDialog,
     private dataService: DataService,

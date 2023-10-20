@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -15,7 +15,7 @@ const DESC_MAX = 160;
   templateUrl: './profile-status.component.html',
 })
 export class ProfileStatusComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   roles: any;
   statuses: any;
@@ -24,7 +24,7 @@ export class ProfileStatusComponent implements OnInit {
   private url: any;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<ProfileStatusComponent>,
     public dialog: MatDialog,
     private httpService: HttpService,

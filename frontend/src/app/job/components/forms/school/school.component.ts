@@ -2,9 +2,9 @@ import { HttpEventType } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import {
   AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormGroup,
   ValidationErrors,
   ValidatorFn,
   Validators,
@@ -25,7 +25,7 @@ import { HttpService } from 'src/app/services/http.service';
   templateUrl: './school.component.html',
 })
 export class SchoolComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   types: any;
   professions: any;
@@ -51,7 +51,7 @@ export class SchoolComponent implements OnInit {
   private url: any;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<SchoolComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
@@ -128,11 +128,11 @@ export class SchoolComponent implements OnInit {
 
     formGroup.addControl(
       'slots',
-      new FormArray(slots, [Validators.required, Validators.minLength(1)])
+      new UntypedFormArray(slots, [Validators.required, Validators.minLength(1)])
     );
   }
 
-  createSlot(data): FormGroup {
+  createSlot(data): UntypedFormGroup {
     const offset = new Date().getTimezoneOffset() * 60000;
     const dateFrom = new Date(Date.now() - offset);
 
@@ -161,7 +161,7 @@ export class SchoolComponent implements OnInit {
       event.stopPropagation();
     }
 
-    (this.formGroup.controls['slots'] as FormArray).insert(
+    (this.formGroup.controls['slots'] as UntypedFormArray).insert(
       0,
       this.createSlot(opts)
     );
@@ -173,7 +173,7 @@ export class SchoolComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
 
-    (this.formGroup.controls['slots'] as FormArray).removeAt(i);
+    (this.formGroup.controls['slots'] as UntypedFormArray).removeAt(i);
 
     this.slotsNum--;
   }

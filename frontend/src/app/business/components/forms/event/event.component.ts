@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {
   AbstractControl,
-  FormBuilder,
-  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormGroup,
   ValidationErrors,
   ValidatorFn,
   Validators,
@@ -19,7 +19,7 @@ const DESC_MAX = 160;
   templateUrl: './event.component.html',
 })
 export class EventFormComponent implements OnInit {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   categories: any;
   currencies: any;
@@ -38,7 +38,7 @@ export class EventFormComponent implements OnInit {
 
   // main event flag - only one main event does exist, which contains assign car and signal chat group
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<EventFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dataService: DataService,
@@ -227,16 +227,16 @@ export class EventFormComponent implements OnInit {
   }
 
   onTypeChange(event) {
-    (this.formGroup.controls['data'] as FormGroup).controls[
+    (this.formGroup.controls['data'] as UntypedFormGroup).controls[
       'chatKey'
     ].clearValidators();
 
     const chatUrlValidators = this.validatorsForChatKey(event.value);
-    (this.formGroup.controls['data'] as FormGroup).controls[
+    (this.formGroup.controls['data'] as UntypedFormGroup).controls[
       'chatKey'
     ].setValidators([...chatUrlValidators]);
 
-    (this.formGroup.controls['data'] as FormGroup).controls[
+    (this.formGroup.controls['data'] as UntypedFormGroup).controls[
       'chatKey'
     ].updateValueAndValidity();
   }

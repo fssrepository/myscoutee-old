@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import firebase from 'firebase/app';
@@ -18,7 +18,7 @@ export class SettingComponent implements OnInit {
 
   url: any;
 
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 
   groups: any = [];
 
@@ -28,7 +28,7 @@ export class SettingComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<SettingComponent>,
     public dialog: MatDialog,
     private httpService: HttpService,
