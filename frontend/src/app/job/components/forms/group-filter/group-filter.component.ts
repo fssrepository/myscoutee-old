@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { ActivatedRoute } from '@angular/router';
 import { NavigationService } from 'src/app/navigation.service';
 import { DataService } from 'src/app/services/data.service';
