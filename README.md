@@ -20,3 +20,10 @@ docker-compose up
 shift + fn + f5 (refresh page without cache)
 
 ng serve --ssl (dummy https)
+
+update angular:
+1) npm install -g n
+2) n lts
+3) n latest
+4) n prune
+5) npm install -g npm@latest
