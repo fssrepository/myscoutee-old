@@ -33,3 +33,8 @@ npm i (install)
 
 angular material 15 refactor -> css is wrong
 https://rc.material.angular.io/guide/mdc-migration
+
+export declare class FacebookModule {
+    static forRoot(): ModuleWithProviders<any>;
+}
+
