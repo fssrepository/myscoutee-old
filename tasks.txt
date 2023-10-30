@@ -10,9 +10,16 @@ bugs:
 4) at new profile the form is not loading
 5) progress bar coloring - material style has been changed -> should be bug fixed
 
+Tests:
+1) register 2 profiles (man/woman)
+2) rate on each other, check whether all the like screen is listing properly
+3) run manual random event and check whether event appears
+4) check whether the scheduler is working
 
-
-
+Chat:
+-----
+1) testing notification and websocket also (for event generation also)
+2) mqtt layer for nginx in go (authentication)
 
 ---------------------------------------------------------------------------------------------------------------------------
 
