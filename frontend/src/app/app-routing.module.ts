@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuardService as AuthGuard } from './auth-guard.service';
 import { LoginComponent } from './login/login.component';
+import { MsMenu } from 'src/lib';
 
 // https://github.com/Mokkapps/angular-manual-lazy-load-demo/blob/master/src/app/lazy-loader.service.ts
 // firebase notification lazy load
@@ -43,4 +44,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

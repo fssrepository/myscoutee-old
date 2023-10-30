@@ -16,9 +16,9 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { SwPush, SwUpdate } from '@angular/service-worker';
-import firebase from 'firebase/app';
-import 'firebase/messaging';
-import { FacebookService, InitParams } from 'ngx-facebook';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/messaging';
 import { environment } from 'src/environments/environment';
 import { slideInAnimation } from './animation';
 import { NavigationService } from './navigation.service';
@@ -62,11 +62,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }*/
 
-  private initFacebookService(): void {
-    const initParams: InitParams = { xfbml: true, version: 'v10.0' };
-    this.facebookService.init(initParams);
-  }
-
   constructor(
     private router: Router,
     private zone: NgZone,
@@ -74,7 +69,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     private updates: SwUpdate,
     private push: SwPush,
     private httpService: HttpService,
-    private facebookService: FacebookService,
     private activatedRoute: ActivatedRoute,
     private listService: ListService,
     private domSanitizer: DomSanitizer

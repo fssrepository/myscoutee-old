@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui';
 import { NavigationService } from '../navigation.service';
 import { HttpService } from '../services/http.service';
