@@ -17,7 +17,9 @@
     <div id="loader">{{ msg['expl.loading'] }}</div>
   </div>
 
-  <div *ngIf="msg" class="mat-into-panel">
+  <div class="mat-into-panel" *ngIf="msg" [innerHtml]="msg['expl.howto']"></div>
+
+  <!--<div *ngIf="msg" class="mat-into-panel">
     <h2>{{ msg['expl.intro'] }}</h2>
     <iframe
       *ngFor="let video of msg['expl.videos']"
@@ -55,7 +57,7 @@
     class="mat-into-panel"
     *ngIf="msg"
     [innerHtml]="msg['expl.security']"
-  ></div>
+  ></div>-->
 
   <div class="mat-into-panel">
     <h2 *ngIf="msg">{{ msg['expl.report'] }}</h2>
