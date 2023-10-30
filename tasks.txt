@@ -8,7 +8,7 @@ bugs:
 
 1) changing image, is not saved
 2) on profile clicking on image, should show all the 3 images (1th one third of the panel => first ikmage, second third => second image)
-3) update image next tim is forbidden
+3) update image next time is forbidden
 4) at new profile the form is not loading
 5) event paging not working
 6) progress bar coloring - material style has been changed -> should be bug fixed
