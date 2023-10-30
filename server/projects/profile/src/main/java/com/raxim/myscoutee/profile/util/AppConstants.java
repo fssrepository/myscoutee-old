@@ -26,6 +26,8 @@ public class AppConstants {
         public static final String WEEK = "w";
         public static final String DAY = "d";
 
+        public static final String GROUP_NAME = "group";
+
         public static final String MONTH_FORMAT = "%Y-%m";
         public static final String WEEK_FORMAT = "%Y %U";
         public static final String DAY_FORMAT = "%Y-%m-%d";

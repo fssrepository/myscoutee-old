@@ -27,8 +27,9 @@ public class EventParamHandler implements IParamHandler {
 
     @Override
     public PageParam handle(Profile profile, PageParam pageParam) {
+        System.out.println("uuid" + profile.getId());
         Optional<SettingDTO> settingDTO = this.settingsService.getSetting(profile.getId(), "/activity/events");
-        Optional<String> optViewType = SettingUtil.getValue(settingDTO, pageParam.getType());
+        Optional<String> optViewType = SettingUtil.getValue(settingDTO, AppConstants.GROUP_NAME);
         String viewType = optViewType.isPresent() ? optViewType.get() : AppConstants.DAY; // day is the default grouping
 
         LocalDate from = LocalDate.now();
@@ -49,7 +50,7 @@ public class EventParamHandler implements IParamHandler {
             groupKey = AppConstants.MONTH_FORMAT;
         } else if (AppConstants.WEEK.equals(viewType)) {
             groupKey = AppConstants.WEEK_FORMAT;
-        } else if (AppConstants.DAY.equals(viewType)) {
+        } else {
             groupKey = AppConstants.DAY_FORMAT;
         }
 

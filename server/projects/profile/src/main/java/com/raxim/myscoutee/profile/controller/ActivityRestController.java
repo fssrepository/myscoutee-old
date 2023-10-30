@@ -76,7 +76,7 @@ public class ActivityRestController {
             List<Object> lOffset = CommonUtil.offset(events, pageParam.getOffset());
 
             return ResponseEntity.ok(
-                    new PageDTO<>(events, lOffset, 0, pageParam.getType()));
+                    new PageDTO<>(events, lOffset, 0, pageParam.getStep()));
         } else {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
         }
