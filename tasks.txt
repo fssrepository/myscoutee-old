@@ -1,18 +1,10 @@
 now:
 1) check event gear icon -> remove (filters will be added later)
 2) check event game/new gear icon -> figure out the basic filters - age etc. - recommended people here also
-3) add chat menu at the top (chat icon) -> if you accept invitation, then it goes to event tab
-4) expose the url of random event generation
-5) replace the notification icon with calendar icon
-6) age range filter on games non_rate screen
+3) expose the url of random event generation
+4) age range filter on games non_rate screen
 
 cron job for random generator + chat (event) leave (disable friends only for the time being)
-
-future:
-
-1) game kepernyo
-    a) double_rate az 5. icon (filter on new, matched, met)
-    b) add filter to 4. icon (filter on met or new)
 
 bugs:
 -----
@@ -23,3 +15,9 @@ bugs:
 4) at new profile the form is not loading
 5) event paging not working
 6) progress bar coloring - material style has been changed -> should be bug fixed
+
+future:
+
+1) game kepernyo
+    a) double_rate az 5. icon (filter on new, matched, met)
+    b) add filter to 4. icon (filter on met or new)

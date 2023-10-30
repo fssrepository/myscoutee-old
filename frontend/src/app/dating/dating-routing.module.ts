@@ -25,13 +25,43 @@ const routes: Routes = [
       icon: 'notifications',
     },
     children: [
-      { path: '', redirectTo: 'events', pathMatch: 'full' },
+      { path: '', redirectTo: 'chats', pathMatch: 'full' },
+      {
+        path: 'chats',
+        component: MsList,
+        data: {
+          reuse: true,
+          icon: 'chat',
+          actions: [
+            /*{
+              component: EventFormComponent,
+              type: 'add',
+              icon: 'add',
+            },
+            {
+              component: QrcodeComponent,
+              type: 'verify',
+            },
+            {
+              component: QrcodeComponent,
+              type: 'code',
+            },
+            {
+              component: EventFormComponent,
+              type: 'edit',
+            },*/
+          ],
+          multiple: true,
+          event: true, //temporary
+          animation: 'One'
+        },
+      },
       {
         path: 'events',
         component: MsList,
         data: {
           reuse: true,
-          //icon: 'insert_invitation',
+          icon: 'event',
           actions: [
             /*{
               component: EventFormComponent,
