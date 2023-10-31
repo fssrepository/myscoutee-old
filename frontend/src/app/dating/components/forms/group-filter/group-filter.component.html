@@ -16,12 +16,20 @@
   <form default [formGroup]="formGroup" *ngIf="formGroup">
     <fieldset *ngFor="let item of setting.items">
       <legend>{{item.name}}</legend>
-      <div legend-right>{{ item.options[formGroup.controls[item.name].value].viewValue }}</div>
+      <div legend-right *ngIf="item.type == 'ms'">{{ item.options[formGroup.controls[item.name].value].viewValue }}</div>
+      <div legend-right *ngIf="item.type == 'os'">{{ formGroup.controls[item.name].controls[0].value + " - " + formGroup.controls[item.name].controls[1].value}}</div>
       <mat-slider
         min="0"
-        [max]="item.options.length - 1"
+        [max]="item.options.length - 1" *ngIf="item.type == 'os'"
       >
       <input [formControlName]="item.name" (input)="onData(item.name, $event)" matSliderThumb>
+    </mat-slider>
+    <mat-slider
+        [min]="item.range.min"
+        [max]="item.range.max" *ngIf="item.type == 'ms'" [formArrayName]="item.name"
+      >
+      <input [formControlName]="0" (input)="onData(item.name, $event, 0)" matSliderStartThumb>
+      <input [formControlName]="1" (input)="onData(item.name, $event, 1)" matSliderEndThumb>
     </mat-slider>
     </fieldset>
   </form>

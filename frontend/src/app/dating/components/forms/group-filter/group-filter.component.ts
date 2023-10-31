@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { NavigationService } from 'src/app/navigation.service';
@@ -49,8 +49,14 @@ export class GroupFilterComponent implements OnInit {
     this.key = actionUrl.substring(actionUrl.indexOf('/'));
   }
 
-  onData(key, evt): void {
-    this.formGroup.controls[key].setValue(evt.target.value);
+  onData(key, evt, idx?): void {
+    if (idx != undefined) {
+      var valueArray = this.formGroup.controls[key].getRawValue();
+      valueArray[idx] = evt.target.value;
+      this.formGroup.controls[key].setValue(evt.target.value);
+    } else {
+      this.formGroup.controls[key].setValue(evt.target.value);
+    }
   }
 
   ngOnInit(): void {
@@ -63,9 +69,15 @@ export class GroupFilterComponent implements OnInit {
 
         this.setting = result["setting"];
         this.setting.items.map((item) => {
+          item["range"] = { "min": 18, "max": 100 }
+          item["data"] = ["30", "50"];
           switch (item.type) {
             case 'os':
               formGroup.addControl(item.name, new UntypedFormControl([...item.data]));
+              break;
+            case 'ms':
+              formGroup.addControl(item.name, new UntypedFormArray([new UntypedFormControl(item.data[0]), new UntypedFormControl(item.data[1])]));
+              break;
             default:
           }
         });
