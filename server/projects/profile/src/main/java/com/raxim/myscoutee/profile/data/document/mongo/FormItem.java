@@ -19,6 +19,17 @@ public class FormItem {
     @JsonProperty(value = "options")
     private List<FormOption> options;
 
+    @JsonProperty(value = "range")
+    private Object range;
+
+    public Object getRange() {
+        return range;
+    }
+
+    public void setRange(Object range) {
+        this.range = range;
+    }
+
     public String getName() {
         return name;
     }

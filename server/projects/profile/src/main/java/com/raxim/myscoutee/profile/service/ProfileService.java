@@ -1,6 +1,10 @@
 package com.raxim.myscoutee.profile.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,11 +12,15 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.threeten.bp.Instant;
 
+import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.SettingUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
+import com.raxim.myscoutee.profile.data.dto.rest.ISODateRange;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
@@ -76,6 +84,14 @@ public class ProfileService {
         Optional<String> optMet = SettingUtil.getValue(optSetting, "met");
         boolean met = optMet.isPresent() ? Boolean.parseBoolean(optMet.get()) : false;
 
+        Optional<Range> ageRangeOpt = SettingUtil.getRange(optSetting, "age");
+        Range ageRange = ageRangeOpt.isPresent() ? ageRangeOpt.get() : new Range(18, 100);
+
+        LocalDateTime bStart = LocalDateTime.now().minus(ageRange.getMax(), ChronoUnit.YEARS);
+        LocalDateTime bEnd = LocalDateTime.now().minus(ageRange.getMin(), ChronoUnit.YEARS);
+
+        RangeLocal rangeLocal = new RangeLocal(bStart, bEnd);
+
         Optional<String> optGender = SettingUtil.getValue(optSetting, "gender");
 
         Optional<String> optDirection = SettingUtil.getValue(optSetting, "direction");
@@ -103,7 +119,7 @@ public class ProfileService {
                 CommonUtil.point(profile.getPosition()),
                 gender,
                 profile.getGroup(),
-                direction, score, met, selectUuid);
+                direction, score, met, selectUuid, rangeLocal);
         return profileDTOs;
     }
 
@@ -182,7 +198,7 @@ public class ProfileService {
         }
         clonedProfile.setScore(ProfileUtil.score(clonedProfile));
 
-        if(clonedProfile.getVoice() != null) {
+        if (clonedProfile.getVoice() != null) {
             ProfileUtil.saveVoice(voice, clonedProfile.getVoice());
         }
 

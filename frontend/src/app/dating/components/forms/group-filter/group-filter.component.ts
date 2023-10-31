@@ -69,8 +69,6 @@ export class GroupFilterComponent implements OnInit {
 
         this.setting = result["setting"];
         this.setting.items.map((item) => {
-          item["range"] = { "min": 18, "max": 100 }
-          item["data"] = ["30", "50"];
           switch (item.type) {
             case 'os':
               formGroup.addControl(item.name, new UntypedFormControl([...item.data]));

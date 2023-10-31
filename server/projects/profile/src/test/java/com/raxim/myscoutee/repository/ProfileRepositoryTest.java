@@ -4,11 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,8 @@ import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
+import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
+import com.raxim.myscoutee.profile.data.dto.rest.ISODateRange;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
@@ -48,6 +55,16 @@ public class ProfileRepositoryTest {
         @Autowired
         private EventRepository eventRepository;
 
+        private static RangeLocal ageRange;
+
+        @BeforeAll
+        public static void init() {
+                LocalDateTime bStart = LocalDateTime.now().minus(100, ChronoUnit.YEARS);
+                LocalDateTime bEnd = LocalDateTime.now().minus(18, ChronoUnit.YEARS);
+
+                ageRange = new RangeLocal(bStart, bEnd);
+        }
+
         @Test
         public void testShouldFindProfilesNotRatedForOliver() {
                 double direction = 0.0;
@@ -64,7 +81,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(1, profiles.size());
 
@@ -107,7 +124,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(0, profiles.size());
         }
@@ -128,7 +145,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_LIAM, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(2, profiles.size());
 
@@ -151,7 +168,7 @@ public class ProfileRepositoryTest {
                 profiles = this.profileRepository.findProfile(pageParam,
                                 AppTestConstants.LOCATION_PROFILE_LIAM, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(1, profiles.size());
 
@@ -178,7 +195,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(1, profiles.size());
                 ProfileDTO profile1 = profiles.get(0);
@@ -205,7 +222,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(2, profiles.size());
 
@@ -239,7 +256,7 @@ public class ProfileRepositoryTest {
                                 pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, false, null);
+                                direction, 0, false, null, ageRange);
 
                 assertEquals(1, profiles.size());
 
@@ -281,7 +298,7 @@ public class ProfileRepositoryTest {
                 List<ProfileDTO> profiles = this.profileRepository.findProfile(pageParam,
                                 AppTestConstants.LOCATION_PROFILE_OLIVER, AppConstants.WOMAN,
                                 AppTestConstants.UUID_GROUP_DATING,
-                                direction, 0, true, null);
+                                direction, 0, true, null, ageRange);
 
                 assertEquals(1, profiles.size());
 

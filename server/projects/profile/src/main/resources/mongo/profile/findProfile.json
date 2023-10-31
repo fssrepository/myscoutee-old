@@ -13,7 +13,11 @@
                 },
                 "gender": ":#{#gender}",
                 "group": ":#{#groupId}",
-                "status": "A"
+                "status": "A",
+                "birthday": {
+                    "$gte": "?#{#bRange.start}",
+                    "$lte": "?#{#bRange.end}"
+                }
             }
         }
     },

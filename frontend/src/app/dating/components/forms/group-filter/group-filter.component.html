@@ -16,8 +16,8 @@
   <form default [formGroup]="formGroup" *ngIf="formGroup">
     <fieldset *ngFor="let item of setting.items">
       <legend>{{item.name}}</legend>
-      <div legend-right *ngIf="item.type == 'ms'">{{ item.options[formGroup.controls[item.name].value].viewValue }}</div>
-      <div legend-right *ngIf="item.type == 'os'">{{ formGroup.controls[item.name].controls[0].value + " - " + formGroup.controls[item.name].controls[1].value}}</div>
+      <div legend-right *ngIf="item.type == 'os'">{{ item.options[formGroup.controls[item.name].value].viewValue }}</div>
+      <div legend-right *ngIf="item.type == 'ms'">{{ formGroup.controls[item.name].controls[0].value + " - " + formGroup.controls[item.name].controls[1].value}}</div>
       <mat-slider
         min="0"
         [max]="item.options.length - 1" *ngIf="item.type == 'os'"

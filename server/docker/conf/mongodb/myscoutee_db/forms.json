@@ -1,12 +1,17 @@
 [
   {
-    "_id": { "$binary": "rUfQu0Wvb/14FVFQa3/Rlw==", "$type": "03" },
+    "_id": {
+      "$binary": "rUfQu0Wvb/14FVFQa3/Rlw==",
+      "$type": "03"
+    },
     "key": "/activity/events",
     "items": [
       {
         "name": "group",
         "type": "os",
-        "data": [0],
+        "data": [
+          0
+        ],
         "options": [
           {
             "value": "d",
@@ -25,13 +30,30 @@
     ]
   },
   {
-    "_id": { "$binary": "OUKNzrDi/yMyfis61/9/iw==", "$type": "03" },
+    "_id": {
+      "$binary": "OUKNzrDi/yMyfis61/9/iw==",
+      "$type": "03"
+    },
     "key": "/games/rate_none",
     "items": [
       {
+        "name": "age",
+        "type": "ms",
+        "data": [
+          18,
+          100
+        ],
+        "range": {
+          "min": 18,
+          "max": 100
+        }
+      },
+      {
         "name": "group",
         "type": "os",
-        "data": [0],
+        "data": [
+          0
+        ],
         "options": [
           {
             "value": "1",
