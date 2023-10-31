@@ -1,7 +1,7 @@
 bugs:
 -----
 
-1) like is not working
+1) likes should be saved, while going to a different tab
 
 Tests:
 1) register 2 profiles (man/woman)
