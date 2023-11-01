@@ -1,4 +1,3 @@
 [{"_id":{"$binary":"PkoHFjkq6xouVW/lzz01pQ==","$type":"03"},"name":"Dating","type":"d","system":true, "createdDate":{"$date":"2021-10-10T21:15:09.000Z"}},
-{"_id":{"$binary":"JkuFmztyTan6+r+BpptDjA==","$type":"03"},"name":"Team Building","type":"t","system":true, "createdDate":{"$date":"2021-10-10T21:15:09.000Z"}},
 {"_id":{"$binary":"2Eeb9mPpijple7kQ4bPiqA==","$type":"03"},"name":"Business","type":"b","system":true, "createdDate":{"$date":"2021-10-10T21:15:09.000Z"}}
 ]

@@ -55,8 +55,10 @@ export class MsEditor implements OnInit, OnChanges {
             console.log('success!');
         });*/
 
-    if (this.data !== undefined) {
+    if (this.data.src !== undefined) {
       this.data.src = this.data.src + '?' + Date.now();
+    } else {
+      this.data.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     }
 
     let transform = new Transform();

@@ -192,42 +192,6 @@
                                 }
                             }
                         },
-                        "rateFrom": {
-                            "$sum": {
-                                "$switch": {
-                                    "branches": [
-                                        {
-                                            "case": {
-                                                "$and": [
-                                                    {
-                                                        "$eq": [
-                                                            "$createdBy.$id",
-                                                            "?#{#param.id}"
-                                                        ]
-                                                    },
-                                                    {
-                                                        "$eq": [
-                                                            "$from.$id",
-                                                            "?#{#param.id}"
-                                                        ]
-                                                    },
-                                                    {
-                                                        "$in": [
-                                                            "$status",
-                                                            [
-                                                                "A"
-                                                            ]
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            "then": "$rate"
-                                        }
-                                    ],
-                                    "default": 0
-                                }
-                            }
-                        },
                         "rateAPG": {
                             "$sum": {
                                 "$switch": {
@@ -413,12 +377,6 @@
             "likes.rate": {
                 "$ifNull": [
                     "$likes.rate",
-                    0
-                ]
-            },
-            "likes.rateFrom": {
-                "$ifNull": [
-                    "$likes.rateFrom",
                     0
                 ]
             },
@@ -712,10 +670,53 @@
         "$limit": "?#{#param.limit}"
     },
     {
+        "$lookup": {
+            "from": "likes",
+            "let": {
+                "p_id": "$_id"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$eq": [
+                                        "$type",
+                                        "P"
+                                    ]
+                                },
+                                {
+                                    "$eq": [
+                                        "$from.$id",
+                                        "?#{#param.id}"
+                                    ]
+                                },
+                                {
+                                    "$eq": [
+                                        "$to.$id",
+                                        "$$p_id"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "as": "currLikes"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$currLikes",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
         "$addFields": {
-            "likes.rate": {
+            "rateFrom": {
                 "$ifNull": [
-                    "$likes.rate",
+                    "$currLikes.rate",
                     0
                 ]
             }
@@ -737,7 +738,7 @@
                                         ":#{#direction}"
                                     ]
                                 },
-                                "then": "$likes.rateFrom",
+                                "then": "$rateFrom",
                                 "else": 0
                             }
                         },
