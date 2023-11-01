@@ -7,7 +7,7 @@
   class="int_scroll"
   [ngClass]="{'snap' : !isLoading && !isRefreshed && isSelected}"
 >
-  <mat-icon *ngIf="group" mat-group (click)="setting()">settings</mat-icon>
+  <mat-icon *ngIf="filter" mat-group (click)="setting()">settings</mat-icon>
   <div class="panel_t">
     <div class="overlay" *ngIf="overlayData">
       <ms-panel

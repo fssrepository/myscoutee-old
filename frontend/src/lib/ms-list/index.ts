@@ -151,6 +151,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
 
   isEvent = false; //temporary
   group = undefined;
+  filter = undefined;
 
   range: { from: Date; to: Date } = { from: new Date(), to: new Date() };
 
@@ -828,6 +829,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
       this.double = v.double;
       this.isEvent = v.event;
       this.group = v.group;
+      this.filter = v.filter;
     });
 
     // subscribe for DATA channel

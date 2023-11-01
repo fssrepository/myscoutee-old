@@ -393,6 +393,7 @@ const routes: Routes = [
           icon: 'rate_ext_new',
           double: true,
           group: 'dist',
+          filter: true
         },
       },
       {
