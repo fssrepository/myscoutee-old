@@ -490,6 +490,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
                   ? this.navService.selected['info'].id
                   : undefined,
               to: this.selectedItems[selectedItem].info['createdBy'],
+              type: this.selectedItems[selectedItem].info['value'].type,
               ref: selectedItem,
               rate: evt,
             });
@@ -500,6 +501,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
                   ? this.navService.selected['info'].id
                   : undefined,
               to: selectedItem,
+              type: this.selectedItems[selectedItem].info['value'].type,
               ref: this.selectedItems[selectedItem].info['ref'],
               rate: evt,
             });

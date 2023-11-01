@@ -45,9 +45,9 @@ export class HttpService {
     };
 
     //batch like
-    /*setInterval(() => {
+    setInterval(() => {
       this.sync();
-    }, 30000);*/
+    }, 30000);
   }
   // private REST_API_SERVER = 'http://localhost:4200';
 

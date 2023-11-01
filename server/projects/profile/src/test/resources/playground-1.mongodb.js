@@ -1,22 +1,42 @@
-[
+/* global use, db */
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+// The result of the last command run in a playground is shown on the results panel.
+// By default the first 20 documents will be returned with a cursor.
+// Use 'console.log()' to print to the debug output.
+// For more documentation on playgrounds please refer to
+// https://www.mongodb.com/docs/mongodb-vscode/playgrounds/
+
+// Select the database to use.
+use('myscoutee_db');
+
+// Here we run an aggregation and open a cursor to the results.
+// Use '.toArray()' to exhaust the cursor to return the whole result set.
+// You can use '.hasNext()/.next()' to iterate through the cursor page by page.
+db.getCollection('profiles').aggregate([
     {
         "$geoNear": {
-            "near": ":#{#loc}",
+            "near": {
+                "type": "Point", "coordinates": [19.1149536,
+                    47.4685519]
+            },
             "spherical": true,
-            "minDistance": "?#{#param.offset[0]}",
+            "minDistance": 0.0,
             "distanceField": "distance",
             "query": {
                 "_id": {
                     "$nin": [
-                        "?#{#param.id}"
+                        BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                     ]
                 },
-                "gender": ":#{#gender}",
-                "group": ":#{#groupId}",
+                "gender": "m",
+                "group": BinData(3, "PkoHFjkq6xouVW/lzz01pQ=="),
                 "status": "A",
                 "birthday": {
-                    "$gte": "?#{#bRange.start}",
-                    "$lte": "?#{#bRange.end}"
+                    "$gte": new Date(-1456926546880),
+                    "$lte": new ISODate("2005-11-01T10:10:53.121Z")
                 }
             }
         }
@@ -45,7 +65,7 @@
                                             "$and": [
                                                 {
                                                     "$ne": [
-                                                        ":#{#selectId}",
+                                                        null,
                                                         null
                                                     ]
                                                 },
@@ -70,19 +90,19 @@
                                                         {
                                                             "$ne": [
                                                                 "$from.$id",
-                                                                "?#{#param.id}"
+                                                                BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                             ]
                                                         },
                                                         {
                                                             "$ne": [
                                                                 "$to.$id",
-                                                                "?#{#param.id}"
+                                                                BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                             ]
                                                         },
                                                         {
                                                             "$eq": [
                                                                 "$createdBy.$id",
-                                                                "?#{#param.id}"
+                                                                BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                             ]
                                                         }
                                                     ]
@@ -100,7 +120,7 @@
                                                 {
                                                     "$eq": [
                                                         "$to.$id",
-                                                        "?#{#param.id}"
+                                                        BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                     ]
                                                 }
                                             ]
@@ -116,7 +136,7 @@
                                                 {
                                                     "$eq": [
                                                         "$from.$id",
-                                                        "?#{#param.id}"
+                                                        BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                     ]
                                                 }
                                             ]
@@ -151,7 +171,7 @@
                                                     {
                                                         "$eq": [
                                                             "$to.$id",
-                                                            "?#{#param.id}"
+                                                            BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                         ]
                                                     },
                                                     {
@@ -172,7 +192,7 @@
                                                     {
                                                         "$eq": [
                                                             "$from.$id",
-                                                            "?#{#param.id}"
+                                                            BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                         ]
                                                     },
                                                     {
@@ -200,7 +220,7 @@
                                   {
                                     "$eq": [
                                       "$from.$id",
-                                      "?#{#param.id}"
+                                      BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                     ]
                                   },
                                   {
@@ -417,7 +437,7 @@
                         "$abs": {
                             "$subtract": [
                                 "$score",
-                                "?#{#param.offset[1]}"
+                                10.0
                             ]
                         }
                     }
@@ -426,7 +446,7 @@
             "createdDate": {
                 "$ifNull": [
                     "$createdDate",
-                    "ISODate()"
+                    new ISODate("2023-11-01T12:25:04.093Z")
                 ]
             }
         }
@@ -439,16 +459,16 @@
                         "$floor": {
                             "$divide": [
                                 "$distance",
-                                "?#{#param.step}"
+                                5
                             ]
                         }
                     },
-                    "?#{#param.step}"
+                    5
                 ]
             }
         }
     },
-    {
+    /*{
         "$match": {
             "$expr": {
                 "$and": [
@@ -456,14 +476,14 @@
                         "$or": [
                             {
                                 "$ne": [
-                                    ":#{#selectedId}",
+                                    null,
                                     null
                                 ]
                             },
                             {
                                 "$eq": [
                                     "$likes.direction",
-                                    ":#{#direction}"
+                                    1.5
                                 ]
                             }
                         ]
@@ -473,7 +493,7 @@
                             {
                                 "$gt": [
                                     "$groupKey",
-                                    "?#{#param.offset[0]}"
+                                    0.0
                                 ]
                             },
                             {
@@ -481,7 +501,7 @@
                                     {
                                         "$eq": [
                                             "$groupKey",
-                                            "?#{#param.offset[0]}"
+                                            0.0
                                         ]
                                     },
                                     {
@@ -489,7 +509,7 @@
                                             {
                                                 "$lt": [
                                                     "$likes.rate",
-                                                    "?#{#param.offset[1]}"
+                                                    10.0
                                                 ]
                                             },
                                             {
@@ -497,7 +517,7 @@
                                                     {
                                                         "$eq": [
                                                             "$likes.rate",
-                                                            "?#{#param.offset[1]}"
+                                                            10.0
                                                         ]
                                                     },
                                                     {
@@ -505,7 +525,7 @@
                                                             {
                                                                 "$gt": [
                                                                     "$likes.distance",
-                                                                    "?#{#param.offset[2]}"
+                                                                    0.0
                                                                 ]
                                                             },
                                                             {
@@ -513,15 +533,13 @@
                                                                     {
                                                                         "$eq": [
                                                                             "$likes.distance",
-                                                                            "?#{#param.offset[2]}"
+                                                                            0.0
                                                                         ]
                                                                     },
                                                                     {
                                                                         "$lt": [
                                                                             "$createdDate",
-                                                                            {
-                                                                                "$toDate": "?#{#param.offset[3]}"
-                                                                            }
+                                                                            new ISODate("2023-11-01T00:00:00Z")
                                                                         ]
                                                                     }
                                                                 ]
@@ -587,7 +605,7 @@
                                                                     {
                                                                         "$eq": [
                                                                             "$$this.profile.$id",
-                                                                            "?#{#param.id}"
+                                                                            BinData(3, "qkqdQP7vzFQuTdpr1xojmg==")
                                                                         ]
                                                                     }
                                                                 ]
@@ -657,7 +675,7 @@
                             {
                                 "$ne": [
                                     1.5,
-                                    ":#{#direction}"
+                                    1.5
                                 ]
                             },
                             {
@@ -673,12 +691,12 @@
                             {
                                 "$eq": [
                                     1.5,
-                                    ":#{#direction}"
+                                    1.5
                                 ]
                             },
                             {
                                 "$eq": [
-                                    ":#{#met}",
+                                    false,
                                     "$met"
                                 ]
                             }
@@ -697,7 +715,7 @@
         }
     },
     {
-        "$limit": "?#{#param.limit}"
+        "$limit": 20
     },
     {
         "$addFields": {
@@ -708,7 +726,7 @@
                 ]
             }
         }
-    },
+    },*/
     {
         "$replaceRoot": {
             "newRoot": {
@@ -722,7 +740,7 @@
                                 "if": {
                                     "$ne": [
                                         2.0,
-                                        ":#{#direction}"
+                                        1.5
                                     ]
                                 },
                                 "then": "$likes.rateFrom",
@@ -742,4 +760,4 @@
             }
         }
     }
-]
+]);

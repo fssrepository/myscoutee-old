@@ -25,7 +25,7 @@ public class LikeParamHandler implements IParamHandler {
     public PageParam handle(Profile profile, PageParam pageParam) {
 
         double minDistance = 0d;
-        double rate = 0d;
+        double rate = 10d;
         double distance = 0d;
         LocalDate createdDateFrom = LocalDate.now();
 

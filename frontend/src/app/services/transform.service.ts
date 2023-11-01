@@ -672,6 +672,8 @@ export class TransformService {
   }
 
   transformProfile(id, value, url, inList, refresh, param?): any {
+    value['type'] = "P";
+    
     const age =
       value['birthday'] !== undefined
         ? Math.floor(
