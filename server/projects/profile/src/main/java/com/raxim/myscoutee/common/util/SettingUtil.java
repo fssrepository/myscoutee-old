@@ -26,7 +26,7 @@ public class SettingUtil {
                 FormItem formItem = optFormItem.get();
 
                 // based on formItem type - at the moment only option is supported
-                Integer key = Integer.valueOf(((ArrayList<String>) formItem.getData()).get(0));
+                Integer key = Integer.valueOf(((ArrayList<Integer>) formItem.getData()).get(0));
                 String value = setting.getItems().get(0).getOptions().get(key).getValue();
                 return Optional.of(value);
             }
