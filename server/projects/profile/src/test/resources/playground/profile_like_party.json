@@ -1,0 +1,65 @@
+[
+    {
+        "$match": {
+            "$and": [
+                {
+                    "createdBy.$id": [
+                        {
+                            "$binary": {
+                                "base64": "VMzv/kCdSqqaIxrXa9pNLg==",
+                                "subType": "04"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "to": [
+                        {
+                            "$binary": {
+                                "base64": "W9KWDNRwSVaEP+kmbG+L0A==",
+                                "subType": "04"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "from": [
+                        {
+                            "$binary": {
+                                "base64": "VMzv/kCdSqqaIxrXa9pNLg==",
+                                "subType": "04"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ref": [
+                        null
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "$lookup": {
+            "from": "likes",
+            "localField": "cnt",
+            "foreignField": "cnt",
+            "as": "allLikes"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$allLikes",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$group": {
+            "_id": "$cnt",
+            "likes": {
+                "$push": "$$ROOT"
+            }
+        }
+    }
+]

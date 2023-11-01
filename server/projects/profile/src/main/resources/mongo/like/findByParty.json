@@ -3,17 +3,18 @@
         "$match": {
             "$and": [
                 {
-                    "createdBy.$id": "?0"
-                },
-                {
-                    "from": {
-                        "$in": "?#{#likes.![from]}"
-                    }
-                },
-                {
-                    "to": {
-                        "$in": "?#{#likes.![to]}"
-                    }
+                    "$or": [
+                        {
+                            "from": {
+                                "$in": "?#{#likes.![from]}"
+                            }
+                        },
+                        {
+                            "to": {
+                                "$in": "?#{#likes.![to]}"
+                            }
+                        }
+                    ]
                 },
                 {
                     "ref": {

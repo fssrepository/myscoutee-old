@@ -193,28 +193,40 @@
                             }
                         },
                         "rateFrom": {
-                            "$first" : {
-                            "$cond": {
-                              "if": {
-                                "$and": [
-                                  {
-                                    "$eq": [
-                                      "$from.$id",
-                                      "?#{#param.id}"
-                                    ]
-                                  },
-                                  {
-                                    "$in": [
-                                      "$status",
-                                      ["A"]
-                                    ]
-                                  }
-                                ]
-                              },
-                              "then": "$rate",
-                              "else": null
+                            "$sum": {
+                                "$switch": {
+                                    "branches": [
+                                        {
+                                            "case": {
+                                                "$and": [
+                                                    {
+                                                        "$eq": [
+                                                            "$createdBy.$id",
+                                                            "?#{#param.id}"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$eq": [
+                                                            "$from.$id",
+                                                            "?#{#param.id}"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$in": [
+                                                            "$status",
+                                                            [
+                                                                "A"
+                                                            ]
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "then": "$rate"
+                                        }
+                                    ],
+                                    "default": 0
+                                }
                             }
-                        }
                         },
                         "rateAPG": {
                             "$sum": {

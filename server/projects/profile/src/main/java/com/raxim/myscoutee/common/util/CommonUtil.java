@@ -103,6 +103,13 @@ public class CommonUtil {
         return uuid.toString();
     }
 
+    public static String asUUIDv4(String base64) {
+        byte[] bytes = Base64.getDecoder().decode(base64);
+        UUID uuid = new BsonBinary(BsonBinarySubType.UUID_STANDARD, bytes)
+                .asUuid(UuidRepresentation.JAVA_LEGACY);
+        return uuid.toString();
+    }
+
     public static String asBase64(UUID uuid) {
         byte[] data = new BsonBinary(uuid, UuidRepresentation.JAVA_LEGACY).getData();
         return Base64.getEncoder().encodeToString(data);
