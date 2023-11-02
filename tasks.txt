@@ -26,6 +26,9 @@ cron job for random generator + chat (event) leave (disable friends only for the
 
 2) "group" variable of route should be different from "filter" variable
 
+3) datumhoz hozza lehessen rendelni egy lokaciot, es az alapjan lehessen szurni esemenyekre es profilokra
+   a lokacional beutunk egy varos nevet -> auto completeter, es egy tablaban taroljuk a koordinatait, amit a profilba mentunk
+
 Bugs:
 
 1) if nobody touches the chrome for awhile, the token will expire, and the /like call throws token expired errors
