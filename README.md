@@ -38,6 +38,10 @@ export declare class FacebookModule {
     static forRoot(): ModuleWithProviders<any>;
 }
 
-debugging mosquitto:
+Debugging mosquitto:
 
 1) settings.json -> "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+2) share the src folder from ubuntu to the docker and run mosquitto build on it
+3) the generated mosquitto executable should be attached by the gdbserver (can beoutside of the container seems also)
+   start.sh contains the command (the ubuntu is using libc, while alpine linux is using musl-libc which are not compatible)
+4) run the mosquitto debug -> backup/mosquitto-debug .vscode has the config
