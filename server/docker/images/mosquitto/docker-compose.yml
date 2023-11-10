@@ -18,9 +18,7 @@ services:
     ports:
       - "1883:1883" #default mqtt port
     volumes:
-      - /home/raxim/workspace/myscoutee/server/docker/conf/mosquitto:/mosquitto/config:rw
-      - ./tmp/data:/mosquitto/data:rw
-      - ./tmp/log:/mosquitto/log:rw
+      - ../../../docker/conf/mosquitto:/mosquitto/config:rw
       #- ./plugins:/mosquitto/plugins:rw
     networks:
       - mqtt

@@ -27,6 +27,7 @@ services:
       - 443:443
       - 27017-27019:27017-27019
       - 5005:5005
+      #- 1883:1883
     volumes:
       - ./docker/conf/nginx/conf/http:/etc/nginx/conf.d/
       - ./docker/conf/nginx/conf/stream:/etc/nginx/stream_conf.d/
@@ -63,6 +64,19 @@ services:
       - myscoutee
     #ports:
     #  - 27017-27019:27017-27019
+  mqtt:
+    image: ${MOSQUITTO_IMAGE_EXT_AUTH}
+    container_name: mqtt
+    ports:
+      - "1883:1883" #default mqtt port
+    volumes:
+      - ./docker/conf/mosquitto:/mosquitto/config
+      - ./data/mosquitto/data:/mosquitto/data:rw
+      - ./data/mosquitto/log:/mosquitto/log:rw
+    networks:
+      - myscoutee
+    depends_on:
+      - profilemanagement
   profilemanagement:
     image: ${MYSCOUTEE_IMAGE}
     build:
