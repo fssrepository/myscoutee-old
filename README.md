@@ -13,6 +13,8 @@ git config --global user.password {personal access token - Profile -> Settings -
 
 ./gradlew bootRun
 
+--refresh-dependencies
+
 gradle build -x test
 docker-compose build --no-cache (build context)
 docker-compose up

@@ -34,6 +34,11 @@ spring:
       username: ${MONGODB_USERNAME:guest}
       password: ${MONGODB_PASSWORD:guest}
       database: ${MONGODB_DATABASE:myscoutee_db}
+  mqtt:
+    client-id: spring
+    url: tcp://mqtt:1883
+    username: spring
+    default-topic: channels/+
 
 logging:
   level:

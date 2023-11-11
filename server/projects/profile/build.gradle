@@ -34,6 +34,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-integration'
+
+	implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
 
 	implementation 'com.itextpdf:itextpdf:5.5.13.2'
 	
