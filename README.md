@@ -48,6 +48,8 @@ Debugging mosquitto:
 3) set the target to mosquitto
 4) CMake Debug (debug menu) -> launch.json (there is a Make Debug also)
 5) settings.json shold contain "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools", (C/C++ intellisense fix)
+6) to bild export CC=gcc (even for nginx)
+7) gdb command line -> target extended-remote localhost:8888 (don't shutdown gdb server)
 
 Remote Debug:
 

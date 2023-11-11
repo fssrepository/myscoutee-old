@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Nginx",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/objs/nginx",
+        "args": [
+            "-g", "daemon off;", 
+            "-p", "${workspaceFolder}/nginx",  // Specify the path to your Nginx configuration files
+            "-c", "${workspaceFolder}/conf/nginx.conf",  // Specify the path to your custom Nginx configuration file
+          ],
+        "stopAtEntry": true,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": true,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ],
+        "preLaunchTask": "build"
+      }
+    ]
+  }

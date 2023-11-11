@@ -1,0 +1,40 @@
+{
+    "files.associations": {
+        "ngx_config.h": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/raxim/workspace/nginx/objs",
+            "binaryPath": "/home/raxim/workspace/nginx/objs/nginx",
+            "binaryArgs": [
+                "-g",
+                "daemon off;",
+                "-p",
+                "${workspaceFolder}/nginx",
+                "-c",
+                "${workspaceFolder}/conf/nginx.conf"
+            ]
+        },
+        {
+            "cwd": "/home/raxim/workspace/nginx/objs",
+            "binaryPath": "/home/raxim/workspace/nginx/objs/nginx",
+            "binaryArgs": []
+        }
+    ],
+    "makefile.configurations": [
+        {
+            "name": "build",
+            "preBuild": [
+                "make clean",
+                "make"
+            ]
+        },
+        {
+            "name": "clean",
+            "preBuild": [
+                "make clean"
+            ]
+        }
+    ],
+    "C_Cpp.errorSquiggles": "disabled"
+}

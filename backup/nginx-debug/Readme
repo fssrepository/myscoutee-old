@@ -1,0 +1,4 @@
+export CC=gcc
+make clean
+auto/configure --with-debug --without-select_module --without-poll_module
+make

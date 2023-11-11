@@ -33,3 +33,26 @@ Bugs:
 
 1) if nobody touches the chrome for awhile, the token will expire, and the /like call throws token expired errors
 2) like is not getting saved leaving the game page, just when you return back
+
+1) test notification on mobile, chrome browser can make port forward
+2) spring subscribe to mqtt, mqtt allow ip (localhost - auth_by_ip module integrate into external_auth) and no token
+3) subscribe all channels by wildchar, only locally allowed
+4) spring server subscribe for all channels and save it to mongodb
+5) check on desktop, how notification is being sent to laptop browser if any
+6) mosquitto subscribe multiple topics in command line, check how it behaves
+7) you need to scrap the shared link to show the real one, where you can attach affiliateID
+when pass booking url in chat scrap the details (show the image of the room) and add affiliate id to the link.
+8) does not call http, if no likes will be saved. (sync also)
+
+1) Firebase token validation in go (username, password)
+2a) if you open a chat room, than disable notification for that chat room
+2b) if you close chat room send notification, don't use mqtt (close browser also - heartbeat)
+2c) if main page open, the value of the notification should update the page
+2d) if someone starts typing mqtt should send the message.
+2e) messages sent, needs to be stored
+2f) message read needs to be shown on the screen and stored (server should subscribe to all messages) - server should send a message back that the message has been received and stored - tick sign
+
+bug:
+client token expired => refresh (firebase)
+
+jwt auth plugin in go and c does exist (check implementation)
