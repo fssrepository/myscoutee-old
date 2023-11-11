@@ -41,6 +41,7 @@ Contributors:
 #include <curl/curl.h>
 
 #define TOPIC "topic"
+#define ACTION "action"
 
 static mosquitto_plugin_id_t *plg_id = NULL;
 static char *auth_url = NULL;
@@ -50,16 +51,26 @@ static char *auth_header = NULL;
 
 char *string_concat(const char *str1, const char *str2, const char *delimiter)
 {
-    // Calculate the length needed for the concatenated string
     size_t len = strlen(str1) + strlen(delimiter) + strlen(str2) + 1;
 
-    // Allocate memory for the concatenated string
     char *result = (char *)malloc(len);
 
     if (result != NULL)
     {
-        // Use snprintf to concatenate strings with the delimiter
         snprintf(result, len, "%s%s%s", str1, delimiter, str2);
+    }
+
+    return result;
+}
+
+char *itoa(int num)
+{
+    int num_length = snprintf(NULL, 0, "%d", num);
+    char *result = (char *)malloc(num_length + 1);
+
+    if (result != NULL)
+    {
+        snprintf(result, num_length + 1, "%d", num);
     }
 
     return result;
@@ -70,7 +81,8 @@ static int external_auth_callback(int event, void *event_data, void *userdata)
     struct mosquitto_evt_basic_auth *ed = event_data;
     const char *username = ed->username;
 
-    if(username == NULL) {
+    if (username == NULL)
+    {
         mosquitto_log_printf(MOSQ_LOG_ERR, "username parameter is missing");
         return MOSQ_ERR_AUTH;
     }
@@ -85,7 +97,7 @@ static int external_auth_callback(int event, void *event_data, void *userdata)
     {
         // header
         struct curl_slist *chunk = NULL;
-        char *firebase = string_concat(auth_header, username, ": ");
+        const char *firebase = string_concat(auth_header, username, ": ");
         chunk = curl_slist_append(chunk, firebase);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
@@ -111,7 +123,6 @@ static int external_auth_callback(int event, void *event_data, void *userdata)
 
         // cleanup
         curl_easy_cleanup(curl);
-        free(firebase);
         curl_slist_free_all(chunk);
 
         if (res != CURLE_OK || response_code != 200)
@@ -127,7 +138,8 @@ static int external_disconnect_callback(int event, void *event_data, void *userd
     struct mosquitto_evt_disconnect *ed = event_data;
     const char *username = ed->client->id;
 
-    if(username == NULL) {
+    if (username == NULL)
+    {
         mosquitto_log_printf(MOSQ_LOG_ERR, "username parameter is missing");
         return MOSQ_ERR_AUTH;
     }
@@ -142,7 +154,7 @@ static int external_disconnect_callback(int event, void *event_data, void *userd
     {
         // header
         struct curl_slist *chunk = NULL;
-        char *firebase = string_concat(auth_header, username, ": ");
+        const char *firebase = string_concat(auth_header, username, ": ");
         chunk = curl_slist_append(chunk, firebase);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
@@ -168,7 +180,6 @@ static int external_disconnect_callback(int event, void *event_data, void *userd
 
         // cleanup
         curl_easy_cleanup(curl);
-        free(firebase);
         curl_slist_free_all(chunk);
 
         if (res != CURLE_OK || response_code != 200)
@@ -184,8 +195,10 @@ static int external_acl_callback(int event, void *event_data, void *userdata)
     struct mosquitto_evt_acl_check *ed = event_data;
     const char *username = ed->client->id;
     const char *topic = ed->topic;
+    const char *action = itoa(ed->access);
 
-    if(username == NULL) {
+    if (username == NULL)
+    {
         mosquitto_log_printf(MOSQ_LOG_ERR, "username parameter is missing");
         return MOSQ_ERR_AUTH;
     }
@@ -200,15 +213,17 @@ static int external_acl_callback(int event, void *event_data, void *userdata)
     {
         // header
         struct curl_slist *chunk = NULL;
-        char *firebase = string_concat(auth_header, username, ": ");
+        const char *firebase = string_concat(auth_header, username, ": ");
         chunk = curl_slist_append(chunk, firebase);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
         // url
         curl_easy_setopt(curl, CURLOPT_URL, acl_url);
 
-        char *topic_param = string_concat(TOPIC, topic, "=");
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, topic_param);
+        const char *topic_param = string_concat(TOPIC, topic, "=");
+        const char *action_param = string_concat(ACTION, action, "=");
+        const char *params = string_concat(topic_param, action_param, "&");
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params);
 
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
@@ -231,8 +246,6 @@ static int external_acl_callback(int event, void *event_data, void *userdata)
 
         // cleanup
         curl_easy_cleanup(curl);
-        free(firebase);
-        free(topic_param);
         curl_slist_free_all(chunk);
 
         if (res != CURLE_OK || response_code != 200)
