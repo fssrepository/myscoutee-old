@@ -53,6 +53,10 @@ angular cache:
 spring:
 1) upgrade to spring boot 3.2 (when it is released), and set spring to virtual threads (when it's released)
 
+ssl:
+1) dummy ssl for nginx on localhost -> check wss
+2) certbot
+
 done:
 3) set mqtt flag true on auth, false on disconnect for the profile, and on auth return back profileId for later validation on mqtt
 (disconnect hasn't got x-firebase-auth header)
