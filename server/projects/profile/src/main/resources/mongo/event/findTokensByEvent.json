@@ -26,7 +26,8 @@
                             "$expr": {
                                 "$and": [
                                     { "$eq": [ "$$p_id", "$_id" ] },
-                                    { "$eq": [ "$status", "A" ] }
+                                    { "$eq": [ "$status", "A" ] },
+                                    { "$ne": [ "$mqtt", true ] }
                                 ]
                             }
                         }

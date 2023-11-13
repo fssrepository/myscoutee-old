@@ -45,7 +45,8 @@ public class MqttMessageService {
 
         UUID eventId = UUID.fromString(CommonUtil.getLastPartOfUrl(topic));
 
-        //response mqtt or firebase based on profile
+        //mqtt false
+        //findTokensByEvent is not enough as you need to save the message to the db, and where to send with which type
         List<Token> tokens = this.eventRepository.findTokensByEvent(new UUID[] { eventId });
 
         if (!tokens.isEmpty()) {
