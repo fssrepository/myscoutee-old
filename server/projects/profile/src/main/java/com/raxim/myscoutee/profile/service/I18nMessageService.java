@@ -3,22 +3,22 @@ package com.raxim.myscoutee.profile.service;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.raxim.myscoutee.profile.data.document.mongo.Message;
-import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
+import com.raxim.myscoutee.profile.data.document.mongo.I18nMessage;
+import com.raxim.myscoutee.profile.repository.mongo.I18nMessageRepository;
 
 @Service
-public class MessageService {
+public class I18nMessageService {
 
-    private final MessageRepository messageRepository;
+    private final I18nMessageRepository messageRepository;
 
-    public MessageService(MessageRepository messageRepository) {
+    public I18nMessageService(I18nMessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
     @Cacheable(value = "messages", keyGenerator = "messageKeyGenerator")
-    public Message getMessageByLang(String locale) {
+    public I18nMessage getMessageByLang(String locale) {
         String lang = locale.split(",")[0].split("-")[0];
-        Message message = messageRepository.findByLang(lang);
+        I18nMessage message = messageRepository.findByLang(lang);
 
         // fallback
         if (message == null) {

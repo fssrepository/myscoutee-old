@@ -11,6 +11,7 @@ public class MqttProperties {
     private String username;
     private String defaultTopic;
     private long timeout;
+    private String serverIp;
 
     public String getClientId() {
         return clientId;
@@ -50,5 +51,13 @@ public class MqttProperties {
 
     public void setTimeout(long timeout) {
         this.timeout = timeout;
+    }
+
+    public String getServerIp() {
+        return serverIp;
+    }
+
+    public void setServerIp(String serverIp) {
+        this.serverIp = serverIp;
     }
 }

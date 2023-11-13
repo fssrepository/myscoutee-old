@@ -40,6 +40,7 @@ spring:
     username: spring
     default-topic: channels/+
     timeout: 20000
+    server-ip: 172.18.0.2
 
 logging:
   level:

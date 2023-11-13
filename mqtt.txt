@@ -1,0 +1,77 @@
+who sent the message, the spring server sends back /channels/profile/pofileId,
+that the message has been sent (either firebase or mqtt),
+
+when someone reads the message sends a type=control action=read with message id.
+the channel updates the item in the list on the current page based on the messageId
+and clears the last message item position of the profile image about read
+
+action=writing (on keyUp)
+
+
+Popup notification, if you are inside chat window for different chat channel.
+
+message table should contain, which member the message got (who was in the even status active at that time,
+and whether it sent by mqtt or firebase)
+
+message is being sent only to active event members
+
+--------
+while querying the messages to the chat window, make members anonymous, who left the chat before,
+but message being sent by them remains. event.members have to have a updatedTime, so it can be compared.
+ -> male or female should be different image and based on senderId a number should be added to defferentiate
+ the anonymous user from each other. members.idx? picture image big number in the middle??
+
+send notification and mqtt message if the currentProfile is not in the same group then the sender's profile.
+
+if the route has mqtt, the spring server shouldn't send push to mqtt. (message.type=mqtt, hence the server ignores)
+
+spring server:
+1) spring server, handle message -> save (ignore keyUp message, type=control)
+2) read by eventId to list channel
+5) check profile mqtt flag and based on that push the message to firebase notification or mqtt -> ui will handle the rest
+a) when message gets saved to the db, lookup for eventid to get the members deviceId to send the notification to the devices
+
+(on mqtt it needs to be pushed to channels/profiles/(profileId) independently -> 6 push in a row, deviceId lookup is not needed)
+----------------------
+b) event / car -> car changed, then send notification for the event to the members of the event
+6) => acl mqtt 4) => change mongo queries to make it without limit but passing an id in the where close.
+
+mqtt
+1) auth call -> username = profileId, password is token -> call into spring -> set mqtt on profile to true -> profileId returned from the server, verify that the sent username = profileId. (libjwt)
+2) on disconnect with param username -> call into spring -> set mqtt on profile false
+3) mqtt server sends username always in the payload (sprintf - add on message and forward)
+------
+4) no acl for the time being -> acl sends url as topic param also (chat window url param) -> spring server verifies that url is for the profile.
+(mongo query without limit, but with additional id param in the where close 
+-> change the queries for the page accordinly with additional optional parameter.)
+
+ui:
+1) on chat window route, flag mqtt: true
+it will subscribe for the channel being identified as the route name.
+2) on keyup send message
+3) after login create mqtt connection username=profileId, password=token
+4) channel list screen and chat window ui
+5) on disconnect sends message that user is offline
+6) userId sould be saved in the navigation service and sent with mqtt auth as username
+-----
+7) when ui receives a message from spring server for the individual channel, it should know which item should update and how. (inside the list based on url or badges etc.)
+
+angular cache:
+1) ngsw json version change, index.html cache-contol no-cache should be set
+2) Version your package.json file in your angular root folder
+“version": “3.0.5"
+3) Add output hashing every time you build your angular app.
+4) ng build --outputHashing=all
+
+spring:
+1) upgrade to spring boot 3.2 (when it is released), and set spring to virtual threads (when it's released)
+
+done:
+3) set mqtt flag true on auth, false on disconnect for the profile, and on auth return back profileId for later validation on mqtt
+(disconnect hasn't got x-firebase-auth header)
+the problem is token kept changing, don't want to reconnect
+4) acl, disconnect should get profileId param also => X-Authorization-User on FirebaseFilter
+acl should get url as topic param and action param (mqtt access flag - subscribe/unsubscribe/push/receive message)
+
+username is the userId, not the profileId??, as active mqtt connection can't be changed,
+and the server knows the current profileid for the user.

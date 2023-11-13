@@ -171,6 +171,9 @@ public class Profile implements Cloneable {
     @JsonIgnore
     private LocalDateTime lastActive;
 
+    @JsonIgnore
+    private Boolean mqtt;
+
     public Profile() {
     }
 
@@ -443,5 +446,13 @@ public class Profile implements Cloneable {
 
     public static Set<String> getActive() {
         return ACTIVE;
+    }
+
+    public Boolean getMqtt() {
+        return mqtt;
+    }
+
+    public void setMqtt(Boolean mqtt) {
+        this.mqtt = mqtt;
     }
 }

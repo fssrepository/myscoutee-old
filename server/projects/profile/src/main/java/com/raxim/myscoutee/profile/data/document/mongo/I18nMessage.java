@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "messages")
-public class Message {
+public class I18nMessage {
     @Id
     @JsonIgnore
     private UUID id;

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.firebase.dto.FirebasePrincipal;
 import com.raxim.myscoutee.common.config.properties.ConfigProperties;
+import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Link;
@@ -47,6 +48,18 @@ public class FirebaseService {
         this.config = config;
         this.linkRepository = linkRepository;
         this.objectMapper = objectMapper;
+    }
+
+    public UserDetails loadUserById(String userid) {
+        Optional<User> userOpt = this.userRepository.findById(UUID.fromString(CommonUtil.asUUID(userid)));
+        if(userOpt.isPresent()) {
+            User user = userOpt.get();
+            String role = (user.getProfile() != null
+                && user.getProfile().getRole() != null) ? user.getProfile().getRole()
+                        : "U";
+            return new FirebasePrincipal(user, role);
+        }
+        return null;
     }
 
     public UserDetails loadUserByUsername(String username, String xLink) {
@@ -82,6 +95,16 @@ public class FirebaseService {
         user.getProfile().setLastActive(LocalDateTime.now());
         this.profileRepository.save(user.getProfile());
 
+        handleLink(username, xLink, user);
+
+        String role = (user.getProfile() != null
+                && user.getProfile().getRole() != null) ? user.getProfile().getRole()
+                        : "U";
+
+        return new FirebasePrincipal(user, role);
+    }
+
+    private void handleLink(String username, String xLink, User user) {
         if (xLink != null) {
             Link link = this.linkRepository.findByKey(UUID.fromString(xLink));
             if (link != null) {
@@ -113,11 +136,5 @@ public class FirebaseService {
                 }
             }
         }
-
-        String role = (user.getProfile() != null
-                && user.getProfile().getRole() != null) ? user.getProfile().getRole()
-                        : "U";
-
-        return new FirebasePrincipal(user, role);
     }
 }
