@@ -27,6 +27,8 @@ shift + fn + f5 (refresh page without cache)
 ng serve --ssl (dummy https) -> service-worker only works on http, as ssl certificate error on localhost
 service-worker error kept refreshing the browser -> ctrl + fn + F5 (hard refresh on the browser)
 
+Java: Clean Java Language Server Workspace (gradle problem)
+
 update angular:
 
 npm i (install)
