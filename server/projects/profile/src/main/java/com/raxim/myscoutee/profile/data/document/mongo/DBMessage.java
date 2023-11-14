@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "messages")
-public class Message {
+public class DBMessage {
     @Id
     @JsonProperty(value = "key")
     private UUID id;
@@ -20,17 +20,17 @@ public class Message {
     private UUID from;
 
     @JsonProperty(value = "tos")
-    private List<DeliveryInfo> tos;
+    private List<Token> tos;
 
     // control, mqtt=if profile.mqtt is true, and the topic is the current page url
     // of the profile then does not send as mosquitto handles
     @JsonProperty(value = "type")
     private String type;
 
-    // writing, received, sent (last received date by user in the query for which
+    // received, sent (last received date by user in the query for which
     // message should put the icon on the ui)
-    @JsonProperty(value = "action")
-    private String action;
+    @JsonProperty(value = "value")
+    private String value;
 
     @JsonIgnore
     private LocalDateTime createdDate;
@@ -51,11 +51,11 @@ public class Message {
         this.from = from;
     }
 
-    public List<DeliveryInfo> getTos() {
+    public List<Token> getTos() {
         return tos;
     }
 
-    public void setTos(List<DeliveryInfo> tos) {
+    public void setTos(List<Token> tos) {
         this.tos = tos;
     }
 
@@ -65,14 +65,6 @@ public class Message {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
     }
 
     public LocalDateTime getCreatedDate() {

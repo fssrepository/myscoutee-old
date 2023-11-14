@@ -187,11 +187,18 @@ public class CommonUtil {
         return lastGroup;
     }
 
-    public static String getLastPartOfUrl(String url) {
-        String[] parts = url.split("/");
+    public static String getPart(String url, String delimiter, int idx) {
+        String[] parts = url.split(delimiter);
 
         if (parts.length > 0) {
-            return parts[parts.length - 1];
+            int lIdx = 0;
+            if (idx < 0 || idx == Integer.MAX_VALUE) {
+                lIdx = parts.length - 1;
+            }
+            if (idx != Integer.MAX_VALUE) {
+                lIdx += idx;
+            }
+            return parts[lIdx];
         } else {
             return "";
         }

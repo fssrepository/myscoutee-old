@@ -1,15 +1,8 @@
 spring server:
-1) spring server, handle message -> save (ignore keyUp message - action=writing (on keyUp), type=control)
 2) read by eventId to list channel
 
-3) who sent the message, the spring server sends back /channels/profile/pofileId, that the message has been sent (either firebase or mqtt)
-
-5) check profile mqtt flag and based on that push the message to firebase notification or mqtt -> ui will handle the rest
-a) when message gets saved to the db, lookup for eventid to get the members deviceId to send the notification to the devices
-
-(on mqtt it needs to be pushed to channels/profiles/(profileId) independently -> 6 push in a row, deviceId lookup is not needed)
 ----------------------
-b) event / car -> car changed, then send notification for the event to the members of the event
+5) b) event / car -> car changed, then send notification for the event to the members of the event
 6) => acl mqtt 4) => change mongo queries to make it without limit but passing an id in the where close.
 7) while querying the messages to the chat window, make members anonymous, who left the chat before,
 but message being sent by them remains. event.members have to have a updatedTime, so it can be compared.
@@ -65,3 +58,11 @@ acl should get url as topic param and action param (mqtt access flag - subscribe
 5) username is the userId, not the profileId??, as active mqtt connection can't be changed,
 and the server knows the current profileid for the user.
 6) message table should contain, which member the message has been sent (type is mqtt or firebase)
+
+1) spring server, handle message -> save (ignore keyUp message - action=writing (on keyUp), type=control)
+3) who sent the message, the spring server sends back /channels/profile/pofileId, that the message has been sent (either firebase or mqtt)
+
+5) check profile mqtt flag and based on that push the message to firebase notification or mqtt -> ui will handle the rest
+a) when message gets saved to the db, lookup for eventid to get the members deviceId to send the notification to the devices
+
+(on mqtt it needs to be pushed to channels/profiles/(profileId) independently -> 6 push in a row, deviceId lookup is not needed)

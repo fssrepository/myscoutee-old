@@ -1,8 +1,9 @@
 package com.raxim.myscoutee.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import com.raxim.myscoutee.common.AppTestConstants;
 import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
-import com.raxim.myscoutee.profile.data.document.mongo.Token;
+import com.raxim.myscoutee.profile.data.document.mongo.EventWithToken;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
@@ -36,17 +37,22 @@ public class EventRepositoryTokenTest {
         @Test
         public void shouldGetTokensForEvent() {
 
-                List<Token> evTokens = this.eventRepository.findTokensByEvent(AppTestConstants.UUID_EVENT_32);
-                assertEquals(3, evTokens.size());
+                Optional<EventWithToken> optEventToken = this.eventRepository
+                                .findTokensByEvent(AppTestConstants.UUID_EVENT_32);
+                assertTrue(optEventToken.isPresent());
 
-                assertEquals(AppTestConstants.DEVICE_OLIVER, evTokens.get(0).getDeviceKey());
-                assertEquals(AppConstants.MQTT, evTokens.get(0).getType());
+                EventWithToken eventWithToken = optEventToken.get();
 
-                assertEquals(AppTestConstants.DEVICE_MASON, evTokens.get(1).getDeviceKey());
-                assertEquals(AppConstants.FIREBASE, evTokens.get(1).getType());
+                assertEquals(3, eventWithToken.getTokens().size());
 
-                assertEquals(AppTestConstants.DEVICE_LUCAS, evTokens.get(2).getDeviceKey());
-                assertEquals(AppConstants.FIREBASE, evTokens.get(2).getType());
+                assertEquals(AppTestConstants.DEVICE_OLIVER, eventWithToken.getTokens().get(0).getDeviceKey());
+                assertEquals(AppConstants.MQTT, eventWithToken.getTokens().get(0).getType());
+
+                assertEquals(AppTestConstants.DEVICE_MASON, eventWithToken.getTokens().get(1).getDeviceKey());
+                assertEquals(AppConstants.FIREBASE, eventWithToken.getTokens().get(1).getType());
+
+                assertEquals(AppTestConstants.DEVICE_LUCAS, eventWithToken.getTokens().get(2).getDeviceKey());
+                assertEquals(AppConstants.FIREBASE, eventWithToken.getTokens().get(2).getType());
         }
 
 }

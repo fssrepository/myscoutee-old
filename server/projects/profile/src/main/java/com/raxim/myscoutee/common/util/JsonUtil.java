@@ -56,6 +56,16 @@ public class JsonUtil {
         }
     }
 
+    public static String toJson(Object t, ObjectMapper objectMapper) {
+        try {
+            return objectMapper.writeValueAsString(t);
+        } catch (IOException e) {
+            // Handle the exception appropriately
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static String toMongoJson(Object t, ObjectMapper objectMapper) {
         try {
             String jsonString = objectMapper.writeValueAsString(t);

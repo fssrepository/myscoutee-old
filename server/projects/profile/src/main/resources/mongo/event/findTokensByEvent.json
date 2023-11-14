@@ -56,12 +56,32 @@
   {
     "$lookup": {
       "from": "tokens",
-      "let": { "u_id": "$users._id" },
+      "let": { "profiles": "$profiles", "users": "$users" },
       "pipeline": [
         {
           "$match": {
             "$expr": {
-              "$eq": ["$$u_id", "$uuid"]
+              "$eq": ["$$users._id", "$uuid"]
+            }
+          }
+        },
+        {
+          "$set": {
+            "type": {
+              "$cond": [
+                {
+                  "$and": [
+                    {
+                      "$eq": ["$$profiles.mqtt", true]
+                    },
+                    {
+                      "$eq": ["$$profiles._id", "$$users.profile.$id"]
+                    }
+                  ]
+                },
+                "mqtt",
+                "firebase"
+              ]
             }
           }
         }
@@ -73,28 +93,10 @@
     "$unwind": "$tokens"
   },
   {
-    "$set": {
-      "tokens.type": {
-        "$cond": [
-          {
-            "$and": [
-              {
-                "$eq": ["$profiles.mqtt", true]
-              },
-              {
-                "$eq": ["$profiles._id", "$users.profile.$id"]
-              }
-            ]
-          },
-          "mqtt",
-          "firebase"
-        ]
-      }
-    }
-  },
-  {
-    "$replaceRoot": {
-      "newRoot": "$tokens"
+    "$group": {
+      "_id": "$_id",
+      "name": { "$first": "$name" },
+      "tokens": { "$push": "$tokens" }
     }
   }
 ]

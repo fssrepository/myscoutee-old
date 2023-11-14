@@ -63,4 +63,10 @@ public class AppConstants {
         public static final String FIREBASE = "firebase";
         public static final String MQTT = "mqtt";
 
+        public static final String MQTT_SENT = "s";
+        public static final String MQTT_RECEIVED = "r";
+        public static final String MQTT_WRITING = "w";
+
+        public static final String MQTT_CONTROL = "c";
+        public static final String MQTT_PAYLOAD = "p";
 }

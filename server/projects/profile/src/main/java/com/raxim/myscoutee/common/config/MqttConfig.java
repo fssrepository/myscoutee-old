@@ -17,6 +17,7 @@ import org.springframework.messaging.handler.annotation.Header;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.common.config.properties.MqttProperties;
+import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.converter.MqttMessageConverter;
 import com.raxim.myscoutee.profile.handler.MqttMessageHandler;
 import com.raxim.myscoutee.profile.service.MqttMessageService;
@@ -84,6 +85,12 @@ public class MqttConfig {
 
     @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
     public interface MqttGateway {
+
+        ObjectMapper objectMapper = null;
+
+        @Autowired
+        void setObjectMapper(ObjectMapper objectMapper);
+
         void sendToMqtt(String data);
 
         void sendToMqtt(@Header("mqtt_topic") String topic, String data);
