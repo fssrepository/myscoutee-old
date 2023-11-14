@@ -35,10 +35,9 @@ it will subscribe for the channel being identified as the route name.
 2) on keyup send message
 3) after login create mqtt connection username=profileId, password=token
 4) channel list screen and chat window ui
-5) on disconnect sends message that user is offline
-6) userId sould be saved in the navigation service and sent with mqtt auth as username
+5) userId sould be saved in the navigation service and sent with mqtt auth as username
 -----
-7) when ui receives a message from spring server for the individual channel, it should know which item should update and how. (inside the list based on url or badges etc.)
+6) when ui receives a message from spring server for the individual channel, it should know which item should update and how. (inside the list based on url or badges etc.)
 (when someone reads the message sends a type=control action=read with message id.
 the channel updates the item in the list on the current page based on the messageId
 and clears the last message item position of the profile image about read)
