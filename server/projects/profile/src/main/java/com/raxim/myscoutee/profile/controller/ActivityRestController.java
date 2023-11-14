@@ -264,4 +264,24 @@ public class ActivityRestController {
             return ResponseEntity.badRequest().body(new ErrorDTO(450, "err.no_profile"));
         }
     }
+
+    @GetMapping("channels")
+    @Transactional
+    public ResponseEntity<?> getChannels(PageParam pageParam, Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+        // query messages the profile is in + where group by eventId and get the last
+        // createdDate, pagination, order by lastCreatedDate also after grouging
+        // get the current member status of the eventIds -> hence it can color the panel
+        return null;
+    }
+
+    @GetMapping("channels/{channelId}/items")
+    @Transactional
+    public ResponseEntity<?> getChannels(@PathVariable String channelId,
+            PageParam pageParam, Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+        //query latest reads also by current profile of user
+        return null;
+    }
+
 }

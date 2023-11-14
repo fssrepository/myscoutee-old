@@ -25,36 +25,36 @@ const routes: Routes = [
       icon: 'notifications',
     },
     children: [
-      { path: '', redirectTo: 'chats', pathMatch: 'full' },
+      { path: '', redirectTo: 'channels', pathMatch: 'full' },
       {
-        path: 'chats',
+        path: 'channels',
         component: MsList,
         data: {
           reuse: true,
-          //icon: 'chat',
           actions: [
-            /*{
-              component: EventFormComponent,
-              type: 'add',
-              icon: 'add',
-            },
-            {
-              component: QrcodeComponent,
-              type: 'verify',
-            },
-            {
-              component: QrcodeComponent,
-              type: 'code',
-            },
-            {
-              component: EventFormComponent,
-              type: 'edit',
-            },*/
           ],
-          multiple: true,
           event: true, //temporary
           animation: 'One'
         },
+      },
+      {
+        path: 'channels/:id',
+        data: {
+          dialog: true,
+        },
+        children: [
+          { path: '', redirectTo: 'items', pathMatch: 'full' },
+          {
+            path: 'items',
+            component: MsList,
+            data: {
+              reuse: true,
+              actions: [
+              ],
+              animation: 'One1',
+            },
+          }
+        ]
       },
       /*{
         path: 'events',
