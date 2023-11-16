@@ -1,7 +1,7 @@
 [
   {
     "$match": {
-      "type": "p",
+      "type": "msg",
       "eventUuid": ":#{#eventId}"
     }
   },
@@ -54,7 +54,53 @@
                   "$in": ["$_id", "$$msg.tos"]
                 }
               ]
-              
+            }
+          }
+        },
+        {
+          "$lookup": {
+            "from": "messages",
+            "let": {
+              "profileId": "$_id"
+            },
+            "pipeline": [
+              {
+                "$match": {
+                  "$expr": {
+                    "$and": [
+                      {
+                        "$eq": ["$from", "$$profileId"]
+                      },
+                      {
+                        "$eq": ["$type", "read"]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "$sort": {
+                  "createdDate": -1
+                }
+              },
+              {
+                "$limit": 1
+              }
+            ],
+            "as": "lastRead"
+          }
+        },
+        {
+          "$match": {
+            "$expr": {
+              "$and": [
+                {
+                  "$gt": [{ "$size": "$lastRead" }, 0]
+                },
+                {
+                  "$ne": [{ "$arrayElemAt": ["$lastRead.ref", 0] }, "$$msg._id"]
+                }
+              ]
             }
           }
         },

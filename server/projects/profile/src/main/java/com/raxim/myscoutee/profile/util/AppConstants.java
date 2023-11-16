@@ -2,7 +2,9 @@ package com.raxim.myscoutee.profile.util;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bson.BsonType;
@@ -67,6 +69,13 @@ public class AppConstants {
         public static final String MQTT_RECEIVED = "r";
         public static final String MQTT_WRITING = "w";
 
-        public static final String MQTT_CONTROL = "c";
-        public static final String MQTT_PAYLOAD = "p";
+        public static final Set<String> MQTT_CONTROL = new HashSet<>();
+
+        static {
+                MQTT_CONTROL.add(MQTT_SENT);
+                MQTT_CONTROL.add(MQTT_RECEIVED);
+                MQTT_CONTROL.add(MQTT_WRITING);
+        }
+
+        public static final String MQTT_PAYLOAD = "msg";
 }

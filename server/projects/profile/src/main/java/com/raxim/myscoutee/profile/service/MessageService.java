@@ -52,7 +52,7 @@ public class MessageService {
     }
 
     public List<MessageDTO> getMessagesByChannel(UUID eventId, PageParam pageParam) {
-        return this.messageRepository.findLastMessageByChannels(pageParam);
+        return this.messageRepository.findMessagesByChannel(eventId, pageParam);
     }
 
     public void handleMessage(Message<?> message) throws MessagingException {
@@ -62,7 +62,7 @@ public class MessageService {
         MessageDTO messageDTO = (MessageDTO) message.getPayload();
         System.out.println("Received message: " + messageDTO);
 
-        if (AppConstants.MQTT_WRITING.equals(messageDTO.getMessage().getValue())) {
+        if (AppConstants.MQTT_WRITING.equals(messageDTO.getMessage().getType())) {
             System.out.println("Writing is handled by mosquitto!" + messageDTO.getMessage().getValue());
             return;
         }
@@ -73,45 +73,43 @@ public class MessageService {
                 messageDTO.getMessage().getFrom());
 
         // save message to the message table
-        saveMessage(optEventWithToken, messageDTO);
+        DBMessage dbMessage = saveMessage(optEventWithToken, messageDTO);
 
         // send message to participants
         // if it fails, it might need to check the db again and retry -> DBMessage has
         // no flag for it yet
-        //filter out control messages
-        if (!AppConstants.MQTT_CONTROL.equals(messageDTO.getMessage().getType())) {
+        // filter out control messages
+        if (!AppConstants.MQTT_CONTROL.contains(messageDTO.getMessage().getType())) {
             sendToMembers(optEventWithToken, messageDTO);
 
             // it might need UUID to Base64 serialization
             MessageDTO respMsgDTO = new MessageDTO();
-
-            DBMessage dbMessage = new DBMessage();
-            dbMessage.setId(messageDTO.getMessage().getId());
-            dbMessage.setValue(AppConstants.MQTT_SENT);
-            dbMessage.setType(AppConstants.MQTT_CONTROL);
+            dbMessage.setType(AppConstants.MQTT_SENT);
             respMsgDTO.setMessage(dbMessage);
 
             sendToMqtt("channels/users/" + messageDTO.getFrom(), respMsgDTO);
         }
     }
 
-    private void saveMessage(Optional<EventWithToken> optEventWithToken, MessageDTO messageDTO) {
+    private DBMessage saveMessage(Optional<EventWithToken> optEventWithToken, MessageDTO messageDTO) {
 
         if (!optEventWithToken.isPresent()) {
             EventWithToken eventWithToken = optEventWithToken.get();
 
             DBMessage dbMessage = new DBMessage();
-            dbMessage.setId(messageDTO.getMessage().getId());
+            dbMessage.setId(UUID.randomUUID());
             dbMessage.setEventUuid(eventWithToken.getId());
             dbMessage.setType(messageDTO.getMessage().getType());
             dbMessage.setFrom(messageDTO.getMessage().getFrom());
+            dbMessage.setRef(messageDTO.getMessage().getRef());
             dbMessage.setCreatedDate(LocalDateTime.now());
 
             List<UUID> profileIds = eventWithToken.getProfiles().stream().map(profile -> profile.getId()).toList();
             dbMessage.setTos(profileIds);
 
-            this.messageRepository.save(dbMessage);
+            return this.messageRepository.save(dbMessage);
         }
+        return null;
     }
 
     private void sendToMembers(Optional<EventWithToken> optEventWithToken, MessageDTO messageDTO) {

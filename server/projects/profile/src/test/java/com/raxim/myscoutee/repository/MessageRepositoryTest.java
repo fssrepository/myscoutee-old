@@ -77,6 +77,9 @@ public class MessageRepositoryTest {
                 assertEquals(AppTestConstants.MSG_2, messageDTOs.get(1).getMessage().getValue());
 
                 List<ImageDTO> images = messageDTOs.get(0).getReads();
+                assertEquals(0, images.size());
+
+                images = messageDTOs.get(1).getReads();
                 assertEquals(1, images.size());
 
                 assertTrue(images.get(0).getName().contains(AppTestConstants.NAME_PROFILE_OLIVER));

@@ -22,7 +22,7 @@
       "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
       "$type": "03"
     },
-    "type": "p",
+    "type": "msg",
     "createdDate": {
       "$date": "2022-11-25T00:00:00Z"
     },
@@ -51,9 +51,9 @@
       "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
       "$type": "03"
     },
-    "type": "p",
+    "type": "msg",
     "createdDate": {
-      "$date": "2023-10-25T00:00:00Z"
+      "$date": "2023-10-23T00:00:00Z"
     },
     "value": "msg_2"
   },
@@ -80,7 +80,7 @@
       "$binary": "jEzsC2l500NzJTdJoWk7ow==",
       "$type": "03"
     },
-    "type": "p",
+    "type": "msg",
     "createdDate": {
       "$date": "2022-10-25T00:00:00Z"
     },
@@ -92,12 +92,12 @@
       "$type": "03"
     },
     "from": {
-      "$binary": "vldSpDImQDm8GnsRzFMYJQ==",
+      "$binary": "8EtHJWvMTFOkPpQ5p9yRrQ==",
       "$type": "03"
     },
     "tos": [
       {
-        "$binary": "8EtHJWvMTFOkPpQ5p9yRrQ==",
+        "$binary": "vldSpDImQDm8GnsRzFMYJQ==",
         "$type": "03"
       },
       {
@@ -109,10 +109,13 @@
       "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
       "$type": "03"
     },
-    "type": "c",
-    "createdDate": {
-      "$date": "2023-11-25T00:00:00Z"
+    "type": "read",
+    "ref" : {
+      "$binary": "WkxRhS39n2DLYC9a2C/Png==",
+      "$type": "03"
     },
-    "value": "read"
+    "createdDate": {
+      "$date": "2023-11-01T00:00:00Z"
+    }
   }
 ]

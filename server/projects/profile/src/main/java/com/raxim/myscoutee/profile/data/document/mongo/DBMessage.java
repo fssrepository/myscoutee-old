@@ -38,6 +38,9 @@ public class DBMessage {
     @JsonProperty(value = "createdDate")
     private LocalDateTime createdDate;
 
+    @JsonProperty(value = "ref")
+    private UUID ref;
+
     public UUID getId() {
         return id;
     }
@@ -92,5 +95,13 @@ public class DBMessage {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public UUID getRef() {
+        return ref;
+    }
+
+    public void setRef(UUID ref) {
+        this.ref = ref;
     }
 }
