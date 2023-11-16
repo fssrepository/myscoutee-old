@@ -24,6 +24,7 @@ import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.DBMessage;
 import com.raxim.myscoutee.profile.data.document.mongo.EventWithToken;
 import com.raxim.myscoutee.profile.data.document.mongo.Token;
+import com.raxim.myscoutee.profile.data.document.mongo.User;
 import com.raxim.myscoutee.profile.data.dto.rest.MessageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
@@ -37,6 +38,7 @@ public class MessageService {
     private final EventRepository eventRepository;
     private final ObjectMapper objectMapper;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
     public MessageService(MqttGateway mqttGateway,
             EventRepository eventRepository, ObjectMapper objectMapper, MessageRepository messageRepository,
@@ -45,6 +47,7 @@ public class MessageService {
         this.eventRepository = eventRepository;
         this.objectMapper = objectMapper;
         this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
     }
 
     public List<MessageDTO> getLastMessagesByChannels(PageParam pageParam) {
@@ -67,31 +70,45 @@ public class MessageService {
             return;
         }
 
-        UUID eventId = UUID.fromString(CommonUtil.getPart(topic, "/", Integer.MAX_VALUE));
+        if (messageDTO.getMessage().getFrom() == null) {
+            System.out.println("Server messages are ignored!");
+            return;
+        }
 
-        Optional<EventWithToken> optEventWithToken = this.eventRepository.findTokensByEvent(eventId,
-                messageDTO.getMessage().getFrom());
+        Optional<User> fromUser = this.userRepository.findById(messageDTO.getMessage().getFrom());
 
-        // save message to the message table
-        DBMessage dbMessage = saveMessage(optEventWithToken, messageDTO);
+        if (fromUser.isPresent()) {
 
-        // send message to participants
-        // if it fails, it might need to check the db again and retry -> DBMessage has
-        // no flag for it yet
-        // filter out control messages
-        if (!AppConstants.MQTT_CONTROL.contains(messageDTO.getMessage().getType())) {
-            sendToMembers(optEventWithToken, messageDTO);
+            UUID profileFromId = fromUser.get().getProfile().getId();
 
-            // it might need UUID to Base64 serialization
-            MessageDTO respMsgDTO = new MessageDTO();
-            dbMessage.setType(AppConstants.MQTT_SENT);
-            respMsgDTO.setMessage(dbMessage);
+            UUID eventId = UUID.fromString(CommonUtil.getPart(topic, "/", Integer.MAX_VALUE));
 
-            sendToMqtt("channels/users/" + messageDTO.getFrom(), respMsgDTO);
+            Optional<EventWithToken> optEventWithToken = this.eventRepository.findTokensByEvent(eventId,
+                    messageDTO.getMessage().getFrom());
+
+            // save message to the message table
+            DBMessage dbMessage = saveMessage(optEventWithToken, messageDTO, profileFromId);
+
+            // send message to participants
+            // if it fails, it might need to check the db again and retry -> DBMessage has
+            // no flag for it yet
+            // filter out control messages
+            if (!AppConstants.MQTT_CONTROL.contains(messageDTO.getMessage().getType())) {
+                sendToMembers(optEventWithToken, messageDTO);
+
+                // it might need UUID to Base64 serialization
+                MessageDTO respMsgDTO = new MessageDTO();
+                dbMessage.setType(AppConstants.MQTT_SENT);
+                respMsgDTO.setMessage(dbMessage);
+
+                sendToMqtt("channels/users/" + messageDTO.getMessage().getFrom(), respMsgDTO);
+            }
+
         }
     }
 
-    private DBMessage saveMessage(Optional<EventWithToken> optEventWithToken, MessageDTO messageDTO) {
+    private DBMessage saveMessage(Optional<EventWithToken> optEventWithToken, MessageDTO messageDTO,
+            UUID profileFromId) {
 
         if (!optEventWithToken.isPresent()) {
             EventWithToken eventWithToken = optEventWithToken.get();
@@ -100,7 +117,7 @@ public class MessageService {
             dbMessage.setId(UUID.randomUUID());
             dbMessage.setEventUuid(eventWithToken.getId());
             dbMessage.setType(messageDTO.getMessage().getType());
-            dbMessage.setFrom(messageDTO.getMessage().getFrom());
+            dbMessage.setFrom(profileFromId);
             dbMessage.setRef(messageDTO.getMessage().getRef());
             dbMessage.setCreatedDate(LocalDateTime.now());
 
