@@ -1,5 +1,4 @@
 spring server:
-1) create first message for event, hence it can be listed on channels page (generating random events)
 ----------------------
 5) b) event / car -> car changed, then send notification for the event to the members of the event
 6) => acl mqtt 4) => change mongo queries to make it without limit but passing an id in the where close.
@@ -67,3 +66,5 @@ and the server knows the current profileid for the user.
 a) when message gets saved to the db, lookup for eventid to get the members deviceId to send the notification to the devices
 
 (on mqtt it needs to be pushed to channels/profiles/(profileId) independently -> 6 push in a row, deviceId lookup is not needed)
+
+1) create first message for event, hence it can be listed on channels page (generating random events)
