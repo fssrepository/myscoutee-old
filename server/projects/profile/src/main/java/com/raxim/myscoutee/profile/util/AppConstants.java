@@ -77,5 +77,5 @@ public class AppConstants {
                 MQTT_CONTROL.add(MQTT_WRITING);
         }
 
-        public static final String MQTT_PAYLOAD = "msg";
+        public static final String MQTT_MSG = "msg";
 }

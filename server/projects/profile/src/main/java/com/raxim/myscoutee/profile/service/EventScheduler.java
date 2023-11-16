@@ -1,8 +1,10 @@
 package com.raxim.myscoutee.profile.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -13,9 +15,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Notification;
 import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
+import com.raxim.myscoutee.profile.data.document.mongo.DBMessage;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
 import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
 import com.raxim.myscoutee.profile.util.AppConstants;
@@ -29,23 +33,26 @@ public class EventScheduler {
     private final EventGeneratorByScoreService eventGeneratorByScoreService;
     private final LikeService likeService;
     private final ScheduleRepository scheduleRepository;
+    private final MessageRepository messageRepository;
 
     public EventScheduler(
             UserRepository userRepository,
             EventGeneratorRandomService eventGeneratorService,
             EventGeneratorByPriorityService eventGeneratorByPriorityService,
             EventGeneratorByScoreService eventGeneratorByScoreService,
-            LikeService likeService, ScheduleRepository scheduleRepository) {
+            LikeService likeService, ScheduleRepository scheduleRepository,
+            MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.eventGeneratorRandomService = eventGeneratorService;
         this.eventGeneratorByPriorityService = eventGeneratorByPriorityService;
         this.eventGeneratorByScoreService = eventGeneratorByScoreService;
         this.likeService = likeService;
         this.scheduleRepository = scheduleRepository;
+        this.messageRepository = messageRepository;
     }
 
     @Scheduled(cron = "0 0 3 * * MON")
-    //@Scheduled(cron = "*/10 * * * * *")
+    // @Scheduled(cron = "*/10 * * * * *")
     public void autoGenerateRooms() {
         try {
             generateRandomEvents();
@@ -139,9 +146,22 @@ public class EventScheduler {
 
         FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
 
-        List<Event> genEvents =  eventGeneratorRandomService.generate(filteredEdges, flags);
+        List<Event> genEvents = eventGeneratorRandomService.generate(filteredEdges, flags);
 
-        //generate messages and save with system, hence the user can see the channels!
+        // generate messages and save with system, hence the user can see the channels!
+        List<DBMessage> dbMessages = genEvents.stream().map(event -> {
+            DBMessage dbMessage = new DBMessage();
+            dbMessage.setId(UUID.randomUUID());
+            dbMessage.setEventUuid(event.getId());
+            dbMessage.setType(AppConstants.MQTT_MSG);
+
+            List<UUID> profileIds = event.getMembers().stream().map(member -> member.getProfile().getId()).toList();
+            dbMessage.setTos(profileIds);
+            dbMessage.setCreatedDate(LocalDateTime.now());
+            return dbMessage;
+        }).toList();
+
+        this.messageRepository.saveAll(dbMessages);
 
         sendRandomEventNotification();
 
