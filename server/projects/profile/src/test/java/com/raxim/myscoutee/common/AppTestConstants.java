@@ -20,6 +20,9 @@ public class AppTestConstants {
     public final static UUID UUID_PROFILE_LILY = UUID.fromString("ed49d5e2-2227-681a-4017-2c21cb1c68bc");
     public final static UUID UUID_PROFILE_EVELYIN = UUID.fromString("428c6c68-23b9-07c7-71e7-720b001abdb7");
 
+    public final static String NAME_PROFILE_OLIVER = "Oliver";
+    public final static String NAME_PROFILE_AVA = "Ava";
+
     public final static UUID UUID_PROFILE_MASON_2 = UUID.fromString("eb494fba-6c56-752f-5123-c414c8c86599");
 
     public static final UUID UUID_EVENT_32 = UUID.fromString("15ad960f-b104-45ee-8510-ebf6ac78d3d8");

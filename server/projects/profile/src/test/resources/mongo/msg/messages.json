@@ -85,5 +85,34 @@
       "$date": "2022-10-25T00:00:00Z"
     },
     "value": "msg_3"
+  },
+  {
+    "_id": {
+      "$binary": "7ZczdySDQSuomlg9Hr0wZw==",
+      "$type": "03"
+    },
+    "from": {
+      "$binary": "vldSpDImQDm8GnsRzFMYJQ==",
+      "$type": "03"
+    },
+    "tos": [
+      {
+        "$binary": "8EtHJWvMTFOkPpQ5p9yRrQ==",
+        "$type": "03"
+      },
+      {
+        "$binary": "L3VWbLpPSeuZZcjIFMQjUQ==",
+        "$type": "03"
+      }
+    ],
+    "eventUuid": {
+      "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
+      "$type": "03"
+    },
+    "type": "c",
+    "createdDate": {
+      "$date": "2023-11-25T00:00:00Z"
+    },
+    "value": "read"
   }
 ]

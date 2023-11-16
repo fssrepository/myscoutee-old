@@ -1,0 +1,125 @@
+[
+  {
+    "$match": {
+      "type": "p",
+      "eventUuid": ":#{#eventId}"
+    }
+  },
+  {
+    "$match": {
+      "$expr": {
+        "$gt": [
+          "$createdDate",
+          {
+            "$toDate": "?#{#param.offset[0]}"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$sort": {
+      "createdDate": 1
+    }
+  },
+  {
+    "$limit": "?#{#param.limit}"
+  },
+  {
+    "$lookup": {
+      "from": "profiles",
+      "localField": "from",
+      "foreignField": "_id",
+      "as": "profileFrom"
+    }
+  },
+  {
+    "$unwind": "$profileFrom"
+  },
+  {
+    "$lookup": {
+      "from": "profiles",
+      "let": {
+        "msg": "$$ROOT"
+      },
+      "pipeline": [
+        {
+          "$match": {
+            "$expr": {
+              "$and": [
+                {
+                  "$ne": ["$_id", "?#{#param.id}"]
+                },
+                {
+                  "$in": ["$_id", "$$msg.tos"]
+                }
+              ]
+              
+            }
+          }
+        },
+        {
+          "$addFields": {
+            "image": {
+              "$cond": {
+                "if": {
+                  "$and": [
+                    { "$isArray": "$images" },
+                    { "$gt": [{ "$size": "$images" }, 0] }
+                  ]
+                },
+                "then": {
+                  "$ifNull": [{ "$arrayElemAt": ["$images.name", 0] }, null]
+                },
+                "else": null
+              }
+            }
+          }
+        },
+        {
+          "$project": {
+            "_id": 0,
+            "image": 1
+          }
+        }
+      ],
+      "as": "reads"
+    }
+  },
+  {
+    "$replaceRoot": {
+      "newRoot": {
+        "$mergeObjects": [
+          {
+            "message": "$$ROOT"
+          },
+          {
+            "reads": "$reads.image"
+          },
+          {
+            "from": {
+              "$cond": {
+                "if": {
+                  "$and": [
+                    { "$isArray": "$profileFrom.images" },
+                    { "$gt": [{ "$size": "$profileFrom.images" }, 0] }
+                  ]
+                },
+                "then": {
+                  "$ifNull": [
+                    { "$arrayElemAt": ["$profileFrom.images.name", 0] },
+                    null
+                  ]
+                },
+                "else": null
+              }
+            }
+          },
+          {
+            "offset": ["$createdDate"]
+          }
+        ]
+      }
+    }
+  }
+]

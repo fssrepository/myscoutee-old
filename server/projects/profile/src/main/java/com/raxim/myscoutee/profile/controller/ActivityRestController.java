@@ -284,13 +284,18 @@ public class ActivityRestController {
         return ResponseEntity.ok(new PageDTO<>(messageDTOs, lOffset));
     }
 
-    @GetMapping("channels/{channelId}/items")
+    @GetMapping("channels/{eventId}/items")
     @Transactional
-    public ResponseEntity<?> getChannels(@PathVariable String channelId,
+    public ResponseEntity<?> getChannels(@PathVariable String eventId,
             PageParam pageParam, Authentication auth) {
         Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
-        // query latest reads also by current profile of user
-        return null;
+
+        pageParam = paramHandlers.handle(profile, pageParam, MessageParamHandler.TYPE);
+
+        List<MessageDTO> messageDTOs = this.messageService.getMessagesByChannel(UUID.fromString(eventId), pageParam);
+
+        List<Object> lOffset = CommonUtil.offset(messageDTOs, pageParam.getOffset());
+        return ResponseEntity.ok(new PageDTO<>(messageDTOs, lOffset));
     }
 
 }

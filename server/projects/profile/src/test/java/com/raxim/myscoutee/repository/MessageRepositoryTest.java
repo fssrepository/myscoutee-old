@@ -20,6 +20,7 @@ import com.raxim.myscoutee.common.AppTestConstants;
 import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
+import com.raxim.myscoutee.profile.data.dto.rest.ImageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.MessageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
@@ -57,4 +58,27 @@ public class MessageRepositoryTest {
                 assertTrue(!messageDTOs.get(1).getFrom().getName().isBlank());
         }
 
+        @Test
+        public void shouldMessagesByChannel() {
+                LocalDate createdDate = LocalDate.of(1901, 1, 1);
+                String createdDateF = createdDate.atStartOfDay(ZoneId.systemDefault())
+                                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+                String[] tOffset = new String[] { createdDateF };
+
+                PageParam pageParam = new PageParam(tOffset);
+                pageParam.setId(AppTestConstants.UUID_PROFILE_AVA);
+
+                List<MessageDTO> messageDTOs = this.messageRepository
+                                .findMessagesByChannel(AppTestConstants.UUID_EVENT_1, pageParam);
+
+                assertEquals(2, messageDTOs.size());
+                assertEquals(AppTestConstants.MSG_1, messageDTOs.get(0).getMessage().getValue());
+                assertEquals(AppTestConstants.MSG_2, messageDTOs.get(1).getMessage().getValue());
+
+                List<ImageDTO> images = messageDTOs.get(0).getReads();
+                assertEquals(1, images.size());
+
+                assertTrue(images.get(0).getName().contains(AppTestConstants.NAME_PROFILE_OLIVER));
+        }
 }

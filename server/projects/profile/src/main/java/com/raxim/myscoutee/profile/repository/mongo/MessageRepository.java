@@ -15,4 +15,7 @@ public interface MessageRepository extends MongoRepository<DBMessage, UUID> {
 
     @Aggregation(pipeline = "findLastMessageByChannels")
     public List<MessageDTO> findLastMessageByChannels(@Param("param") PageParam param);
+
+    @Aggregation(pipeline = "findMessagesByChannel")
+    public List<MessageDTO> findMessagesByChannel(@Param("eventId") UUID eventId, @Param("param") PageParam param);
 }

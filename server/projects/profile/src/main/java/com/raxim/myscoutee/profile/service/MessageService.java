@@ -51,6 +51,10 @@ public class MessageService {
         return this.messageRepository.findLastMessageByChannels(pageParam);
     }
 
+    public List<MessageDTO> getMessagesByChannel(UUID eventId, PageParam pageParam) {
+        return this.messageRepository.findLastMessageByChannels(pageParam);
+    }
+
     public void handleMessage(Message<?> message) throws MessagingException {
         String topic = (String) message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC);
         System.out.println("Received message from topic: " + topic);
@@ -73,18 +77,21 @@ public class MessageService {
         // send message to participants
         // if it fails, it might need to check the db again and retry -> DBMessage has
         // no flag for it yet
-        sendToMembers(optEventWithToken, messageDTO);
+        //filter out control messages
+        if (!AppConstants.MQTT_CONTROL.equals(messageDTO.getMessage().getType())) {
+            sendToMembers(optEventWithToken, messageDTO);
 
-        // it might need UUID to Base64 serialization
-        MessageDTO respMsgDTO = new MessageDTO();
+            // it might need UUID to Base64 serialization
+            MessageDTO respMsgDTO = new MessageDTO();
 
-        DBMessage dbMessage = new DBMessage();
-        dbMessage.setId(messageDTO.getMessage().getId());
-        dbMessage.setValue(AppConstants.MQTT_SENT);
-        dbMessage.setType(AppConstants.MQTT_CONTROL);
-        respMsgDTO.setMessage(dbMessage);
+            DBMessage dbMessage = new DBMessage();
+            dbMessage.setId(messageDTO.getMessage().getId());
+            dbMessage.setValue(AppConstants.MQTT_SENT);
+            dbMessage.setType(AppConstants.MQTT_CONTROL);
+            respMsgDTO.setMessage(dbMessage);
 
-        sendToMqtt("channels/users/" + messageDTO.getFrom(), respMsgDTO);
+            sendToMqtt("channels/users/" + messageDTO.getFrom(), respMsgDTO);
+        }
     }
 
     private void saveMessage(Optional<EventWithToken> optEventWithToken, MessageDTO messageDTO) {
@@ -139,15 +146,18 @@ public class MessageService {
                 }
             }, MoreExecutors.directExecutor());
 
-            //mqtt will be handled by mosquitto
-            /*List<Token> mqttTokens = eventWithToken.getTokens().stream()
-                    .filter(token -> AppConstants.MQTT.equals(token.getType())).toList();
-
-            List<String> mqttKeys = mqttTokens.stream().map(token -> token.getUuid().toString()).toList();
-
-            for (String mqttKey : mqttKeys) {
-                sendToMqtt("channels/users/" + mqttKey, messageDTO);
-            }*/
+            // mqtt will be handled by mosquitto
+            /*
+             * List<Token> mqttTokens = eventWithToken.getTokens().stream()
+             * .filter(token -> AppConstants.MQTT.equals(token.getType())).toList();
+             * 
+             * List<String> mqttKeys = mqttTokens.stream().map(token ->
+             * token.getUuid().toString()).toList();
+             * 
+             * for (String mqttKey : mqttKeys) {
+             * sendToMqtt("channels/users/" + mqttKey, messageDTO);
+             * }
+             */
         }
     }
 
