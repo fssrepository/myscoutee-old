@@ -29,7 +29,7 @@
   },
   {
     "$group": {
-      "_id": "$eventUuid",
+      "_id": "$eventId",
       "lastMessage": {
         "$first": "$$ROOT"
       }

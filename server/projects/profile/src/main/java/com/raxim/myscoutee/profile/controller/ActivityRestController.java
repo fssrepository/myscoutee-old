@@ -295,7 +295,7 @@ public class ActivityRestController {
         List<MessageDTO> messageDTOs = this.messageService.getMessagesByChannel(UUID.fromString(eventId), pageParam);
 
         List<Object> lOffset = CommonUtil.offset(messageDTOs, pageParam.getOffset());
-        return ResponseEntity.ok(new PageDTO<>(messageDTOs, lOffset));
+        return ResponseEntity.ok(new PageDTO<>(messageDTOs, lOffset, 1));
     }
 
 }

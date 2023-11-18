@@ -1,0 +1,9 @@
+.chat {
+    overflow: hidden;
+}
+
+.chat {
+    &.chat_right {
+        float: right;
+    }
+}

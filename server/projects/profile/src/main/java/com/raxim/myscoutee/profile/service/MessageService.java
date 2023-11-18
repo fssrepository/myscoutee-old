@@ -115,7 +115,7 @@ public class MessageService {
 
             DBMessage dbMessage = new DBMessage();
             dbMessage.setId(UUID.randomUUID());
-            dbMessage.setEventUuid(eventWithToken.getId());
+            dbMessage.setEventId(eventWithToken.getId());
             dbMessage.setType(messageDTO.getMessage().getType());
             dbMessage.setFrom(profileFromId);
             dbMessage.setRef(messageDTO.getMessage().getRef());

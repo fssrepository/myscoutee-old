@@ -1,0 +1,5 @@
+<div class="chat" [id]="alias" [ngClass]="{'chat_right' : data.isOwn}">
+  <mat-card (click)="content()" matRipple>
+    {{data.desc}}
+  </mat-card>
+</div>

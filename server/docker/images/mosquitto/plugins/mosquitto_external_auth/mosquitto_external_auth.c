@@ -151,8 +151,9 @@ static int external_auth_callback(int event, void *event_data, void *userdata)
     UNUSED(event);
     UNUSED(userdata);
 
-    mosquitto_log_printf(MOSQ_LOG_INFO, "client: %s\n;", username);
+    mosquitto_log_printf(MOSQ_LOG_INFO, "client: %s\n;%s\n", username, password);
 
+    /*
     // allow athentication on localhost for 'spring' server
     const char *ip_address = mosquitto_client_address(ed->client);
     mosquitto_log_printf(MOSQ_LOG_INFO, "ip_address: %s\n;", ip_address);
@@ -206,7 +207,7 @@ static int external_auth_callback(int event, void *event_data, void *userdata)
         {
             return MOSQ_ERR_AUTH;
         }
-    }
+    }*/
     return MOSQ_ERR_SUCCESS;
 }
 
@@ -226,6 +227,7 @@ static int external_disconnect_callback(int event, void *event_data, void *userd
 
     mosquitto_log_printf(MOSQ_LOG_DEBUG, "client: %s\n;", username);
 
+    /*
     // allow disconnect on localhost for 'spring' server
     const char *ip_address = mosquitto_client_address(ed->client);
     if (!strcmp(ip_address, allowed_ip) && !strcmp(username, allowed_user))
@@ -270,7 +272,7 @@ static int external_disconnect_callback(int event, void *event_data, void *userd
         {
             return MOSQ_ERR_NO_CONN;
         }
-    }
+    }*/
     return MOSQ_ERR_SUCCESS;
 }
 

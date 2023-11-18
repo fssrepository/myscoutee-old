@@ -6,7 +6,7 @@ const physiques = { s: 'Slim', a: 'Average', sp: 'Sum plus', m: 'Muscular' };
   providedIn: 'any',
 })
 export class TransformService {
-  constructor(private datePipe: DatePipe) {}
+  constructor(private datePipe: DatePipe) { }
 
   transform(value, url?, inList = false, refresh = false, table = false): any {
     // for mixed type of list, we need to identify profile
@@ -24,7 +24,15 @@ export class TransformService {
     let data;
 
     if (value !== undefined) {
-      if (value['profile'] !== undefined) {
+      if (value['message'] != undefined) {
+        this.alignItemZone(value['message']);
+
+        data = this.transformMessage(value['message'].key,
+          value['message'],
+          url,
+          inList,
+          value);
+      } else if (value['profile'] !== undefined) {
         this.alignItemZone(value['profile']);
 
         value['profile'].role = value['role'];
@@ -184,6 +192,28 @@ export class TransformService {
     }
   }
 
+  transformMessage(id, value, url, inList, item): any {
+    let isChild = url.indexOf('items') !== -1
+    let lId = isChild ? id : value["eventId"];
+
+    let image = location.origin
+      + '/backend/user/profile/images/'
+      + item["from"].name;
+
+    const data = {
+      id: lId,
+      type: 'msg',
+      header: { main: "Event 1", image: image },
+      desc: value['value'],
+      url: url + '/' + lId,
+      children: !isChild,
+      value,
+      isOwn: true
+    };
+
+    return data;
+  }
+
   transformGroup(id, value, url, inList): any {
     let actions = ['E', 'S']; // edit
 
@@ -263,8 +293,8 @@ export class TransformService {
         value['rate'] < 3
           ? 'red'
           : value['rate'] > 7
-          ? 'yellowgreen'
-          : 'bisque',
+            ? 'yellowgreen'
+            : 'bisque',
       desc: value['desc'],
       value,
       url: url + '/' + id,
@@ -349,10 +379,10 @@ export class TransformService {
       value['positions'] && value['positions']
         ? value['positions']
         : param && param['positions']
-        ? param['positions']
-        : value['position']
-        ? [value['position']]
-        : undefined;
+          ? param['positions']
+          : value['position']
+            ? [value['position']]
+            : undefined;
 
     if (positions !== undefined) {
       actions.push('M');
@@ -459,10 +489,10 @@ export class TransformService {
       value['positions'] && value['positions']
         ? value['positions']
         : param && param['positions']
-        ? param['positions']
-        : value['position']
-        ? [value['position']]
-        : undefined;
+          ? param['positions']
+          : value['position']
+            ? [value['position']]
+            : undefined;
 
     if (positions !== undefined) {
       actions.push('M');
@@ -599,7 +629,7 @@ export class TransformService {
 
     const age = Math.floor(
       (new Date().getTime() - new Date(value['birthday']).getTime()) /
-        (1000 * 3600 * 24 * 365)
+      (1000 * 3600 * 24 * 365)
     );
 
     let color;
@@ -673,13 +703,13 @@ export class TransformService {
 
   transformProfile(id, value, url, inList, refresh, param?): any {
     value['type'] = "P";
-    
+
     const age =
       value['birthday'] !== undefined
         ? Math.floor(
-            (new Date().getTime() - new Date(value['birthday']).getTime()) /
-              (1000 * 3600 * 24 * 365)
-          )
+          (new Date().getTime() - new Date(value['birthday']).getTime()) /
+          (1000 * 3600 * 24 * 365)
+        )
         : undefined;
 
     let actions;

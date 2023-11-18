@@ -1,6 +1,7 @@
 export * from './ms-action';
 export * from './ms-calendar';
 export * from './ms-panel';
+export * from './ms-chat';
 
 const months = [
   'Jan',
@@ -45,10 +46,11 @@ import { NavigationService } from 'src/app/navigation.service';
 import { HttpService } from 'src/app/services/http.service';
 import { ListService } from 'src/app/services/list.service';
 import { TransformService } from 'src/app/services/transform.service';
-import { MsDialog } from '../ms-dialog';
 import { getUrl } from '../../app/app-routing.strategy';
+import { MsDialog } from '../ms-dialog';
 import { ILazy } from './interface';
 import { MsPanel } from './ms-panel';
+import { MsChat } from './ms-chat';
 
 //import("./ms-panel").then(({MsPanel}) => {}
 
@@ -62,8 +64,12 @@ import { MsPanel } from './ms-panel';
 
 const MAX_INT = 2147483647;
 
-const injector = Injector.create({
+const panelInjector = Injector.create({
   providers: [{ provide: MsPanel, deps: [] }, { provide: DatePipe }],
+});
+
+const chatInjector = Injector.create({
+  providers: [{ provide: MsChat, deps: [] }],
 });
 
 const pairRate = {
@@ -152,6 +158,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
   isEvent = false; //temporary
   group = undefined;
   filter = undefined;
+  type = undefined;
 
   range: { from: Date; to: Date } = { from: new Date(), to: new Date() };
 
@@ -228,8 +235,8 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           next: (result) => {
             this._snackBar.open(
               'You successfully joined to "' +
-                this.items[evt.alias].info.header.main +
-                '"!',
+              this.items[evt.alias].info.header.main +
+              '"!',
               undefined,
               { duration: 1500 }
             );
@@ -255,8 +262,8 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           next: (result) => {
             this._snackBar.open(
               '"' +
-                this.items[evt.alias].info.header.main +
-                '" has been sucessfully deleted!',
+              this.items[evt.alias].info.header.main +
+              '" has been sucessfully deleted!',
               undefined,
               { duration: 1500 }
             );
@@ -289,8 +296,8 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           next: (result) => {
             this._snackBar.open(
               'The "' +
-                this.items[evt.alias].info.header.main +
-                '" has been successfully recommended!',
+              this.items[evt.alias].info.header.main +
+              '" has been successfully recommended!',
               undefined,
               { duration: 1500 }
             );
@@ -609,7 +616,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
 
     if (
       Math.floor(inbox.scrollTop + inbox.offsetHeight + 20) >=
-        inbox.scrollHeight &&
+      inbox.scrollHeight &&
       this.direction === 1 &&
       !this.isRefreshing
     ) {
@@ -830,6 +837,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
       this.isEvent = v.event;
       this.group = v.group;
       this.filter = v.filter;
+      this.type = v.type;
     });
 
     // subscribe for DATA channel
@@ -903,7 +911,13 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
       });
     });
 
-    this.itemFactory = this.resolver.resolveComponentFactory(MsPanel);
+    let cmp;
+    if(this.type === "chat") {
+      cmp = MsChat;
+    } else {
+      cmp = MsPanel;
+    }
+    this.itemFactory = this.resolver.resolveComponentFactory(cmp);
 
     this.direction = 1;
 
@@ -1100,10 +1114,15 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    const component = this.itemFactory.create(injector);
-    (component.instance as MsPanel).selectable = this.selectable;
+    let component;
+    if (this.type === "chat") {
+      component = this.itemFactory.create(chatInjector);
+    } else {
+      component = this.itemFactory.create(panelInjector);
+      (component.instance as MsPanel).selectable = this.selectable;
 
-    this.createItemFunction(component);
+      this.createItemFunction(component);
+    }
 
     let viewRef;
 

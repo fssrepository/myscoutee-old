@@ -3,6 +3,7 @@
 @import './fonts';
 @import './form';
 @import './panel';
+@import './chat';
 @import './list';
 @import './frame';
 @import './editor';
@@ -455,7 +456,9 @@ mat-card[default] {
   width: 100%;
 }
 
+//deprecated
 .mat-item {
+  z-index: 2 !important;
   position: absolute !important;
   line-height: 40px !important;
   height: 40px !important;

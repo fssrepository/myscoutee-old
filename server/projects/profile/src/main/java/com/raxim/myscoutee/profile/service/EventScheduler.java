@@ -152,7 +152,7 @@ public class EventScheduler {
         List<DBMessage> dbMessages = genEvents.stream().map(event -> {
             DBMessage dbMessage = new DBMessage();
             dbMessage.setId(UUID.randomUUID());
-            dbMessage.setEventUuid(event.getId());
+            dbMessage.setEventId(event.getId());
             dbMessage.setType(AppConstants.MQTT_MSG);
 
             List<UUID> profileIds = event.getMembers().stream().map(member -> member.getProfile().getId()).toList();

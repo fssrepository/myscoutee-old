@@ -22,8 +22,8 @@ public class DBMessage {
     @JsonIgnore
     private List<UUID> tos;
 
-    @JsonIgnore
-    private UUID eventUuid;
+    @JsonProperty(value = "eventId")
+    private UUID eventId;
 
     // control, mqtt=if profile.mqtt is true, and the topic is the current page url
     // of the profile then does not send as mosquitto handles
@@ -81,12 +81,12 @@ public class DBMessage {
         this.createdDate = createdDate;
     }
 
-    public UUID getEventUuid() {
-        return eventUuid;
+    public UUID getEventId() {
+        return eventId;
     }
 
-    public void setEventUuid(UUID eventUuid) {
-        this.eventUuid = eventUuid;
+    public void setEventId(UUID eventId) {
+        this.eventId = eventId;
     }
 
     public String getValue() {

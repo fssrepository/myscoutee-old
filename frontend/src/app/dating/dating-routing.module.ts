@@ -34,7 +34,8 @@ const routes: Routes = [
           actions: [
           ],
           event: true, //temporary
-          animation: 'One'
+          animation: 'One',
+          type: 'chat'
         },
       },
       {
@@ -52,6 +53,7 @@ const routes: Routes = [
               actions: [
               ],
               animation: 'One1',
+              type: 'chat'
             },
           }
         ]

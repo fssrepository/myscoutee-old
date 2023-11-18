@@ -2,13 +2,13 @@
   {
     "$match": {
       "type": "msg",
-      "eventUuid": ":#{#eventId}"
+      "eventId": ":#{#eventId}"
     }
   },
   {
     "$match": {
       "$expr": {
-        "$gt": [
+        "$lt": [
           "$createdDate",
           {
             "$toDate": "?#{#param.offset[0]}"
@@ -19,11 +19,16 @@
   },
   {
     "$sort": {
-      "createdDate": 1
+      "createdDate": -1
     }
   },
   {
     "$limit": "?#{#param.limit}"
+  },
+  {
+    "$sort": {
+      "createdDate": 1
+    }
   },
   {
     "$lookup": {
