@@ -20,8 +20,7 @@ mqtt
 5) Popup notification, if you are inside chat window for different chat channel.
 
 ui:
-1) on chat window route, flag mqtt: true
-it will subscribe for the channel being identified as the route name.
+1) on chat window route, flag mqtt: true, it will subscribe for the channel being identified as the route name.
 2) on keyup send message
 4) channel list screen and chat window ui
 -----
