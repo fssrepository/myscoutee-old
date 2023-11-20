@@ -1211,9 +1211,11 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (isUpdate) {
-      const scrollView = this.itemsRef.element.nativeElement.parentElement;
-      const inbox = scrollView.parentElement;
-      inbox.scrollTo({ top: inbox.scrollHeight });
+      setTimeout(() => {
+        const scrollView = this.itemsRef.element.nativeElement.parentElement;
+        const inbox = scrollView.parentElement;
+        inbox.scrollTo({ top: inbox.scrollHeight });
+      });
     }
 
     this.observer.observe(viewRef.rootNodes[0]);
