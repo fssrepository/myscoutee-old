@@ -99,7 +99,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
   @Output() msSelect = new EventEmitter<any>();
   @Output() msDelete = new EventEmitter<any>();
 
-  progress: any = { mode: 'determine', value: 0, color: 'primary' };
+  progress: any = { mode: 'determine', value: 0, bufferValue: 0, color: 'primary' };
 
   private sub: Subscription;
 
@@ -1166,6 +1166,17 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
         const scrollView = this.itemsRef.element.nativeElement.parentElement;
         const inbox = scrollView.parentElement;
         inbox.scrollTo({ top: inbox.scrollHeight });
+      } else {
+        if (item.value.value === true) {
+          this.progress.mode = 'buffer';
+          this.progress.bufferValue = 0;
+          this.progress.value = 0;
+        } else {
+          this.progress.mode = 'determine';
+          this.progress.bufferValue = 100;
+          this.progress.value = 100;
+        }
+        console.log("someone is active - writing");
       }
 
       return;

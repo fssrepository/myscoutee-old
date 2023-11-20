@@ -6,7 +6,7 @@ import { NavigationService } from 'src/app/navigation.service';
 import { MqttService } from 'src/app/services/mqtt.service';
 import * as uuid from 'uuid';
 
-const DIFF_TYPING = 10000;
+const DIFF_TYPING = 3000;
 
 const PREFIX = "channels/pages"
 
@@ -44,7 +44,7 @@ export class MsBar implements OnInit, OnDestroy {
 
         setInterval(() => {
             let now = new Date().getTime();
-            if (this.lastTyping && (now - this.lastTyping) >= 10000) {
+            if (this.lastTyping && (now - this.lastTyping) >= DIFF_TYPING) {
                 this.lastTyping = undefined;
                 this.typing(false);
             }
@@ -111,7 +111,7 @@ export class MsBar implements OnInit, OnDestroy {
 
     typing(isTyping) {
         let fromImage = this.navService.user["profile"]["images"][0];
-        let payload = { from: fromImage, message: { type: "w", value: isTyping } };
+        let payload = { from: fromImage, message: { type: "w", value: isTyping, from: this.navService.user["profile"].key } };
 
         this.mqttService.publish(this.url, JSON.stringify(payload));
     }
