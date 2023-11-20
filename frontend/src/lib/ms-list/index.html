@@ -54,7 +54,7 @@
     </div>
   </div>
 </div>
-<ms-bar *ngIf="mqtt !== undefined" (add)="addToList(1, $event);"></ms-bar>
+<ms-bar *ngIf="mqtt !== undefined" (add)="addToList(1, $event, true);"></ms-bar>
 <ng-template #divider let-title="title">
   <div class="mat-divider">&nbsp;&nbsp;{{title}}</div>
 </ng-template>

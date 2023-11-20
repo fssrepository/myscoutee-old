@@ -1,8 +1,8 @@
 export * from './ms-action';
-export * from './ms-calendar';
-export * from './ms-panel';
-export * from './ms-chat';
 export * from './ms-bar';
+export * from './ms-calendar';
+export * from './ms-chat';
+export * from './ms-panel';
 
 const months = [
   'Jan',
@@ -46,13 +46,13 @@ import { GroupFilterComponent } from 'src/app/dating/components/forms/group-filt
 import { NavigationService } from 'src/app/navigation.service';
 import { HttpService } from 'src/app/services/http.service';
 import { ListService } from 'src/app/services/list.service';
+import { MqttService } from 'src/app/services/mqtt.service';
 import { TransformService } from 'src/app/services/transform.service';
 import { getUrl } from '../../app/app-routing.strategy';
 import { MsDialog } from '../ms-dialog';
 import { ILazy } from './interface';
-import { MsPanel } from './ms-panel';
 import { MsChat } from './ms-chat';
-import { MqttService } from 'src/app/services/mqtt.service';
+import { MsPanel } from './ms-panel';
 
 //import("./ms-panel").then(({MsPanel}) => {}
 
@@ -145,6 +145,9 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
   @Input() selectable: any;
 
   private items: Array<{ component; info }> = new Array();
+  private refs: Array<string> = new Array();
+  private lReads: Array<string> = new Array();
+
   private extra: any;
   private selectedItems: Array<{ component; info }> = new Array();
 
@@ -1122,8 +1125,50 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  public addToList(direction: number, data?) {
+  public addToList(direction: number, data?, isUpdate?) {
     const item = this.transformService.transform(data, this.itemUrl, true);
+
+    let ref = this.refs[item.value.ref];
+    if (ref !== undefined) {
+      if (item.value.type === "r") {
+        for(let read of item.reads) {
+          let lRead = this.lReads[read];
+          if(lRead !== undefined) {
+            this.items[lRead].info.reads = this.items[lRead].info.reads.filter((r) => r !== read);
+            (this.items[lRead].component.instance as MsChat).onEnter(ref, this.items[lRead].info);    
+          }
+          this.lReads[read] = ref;
+        }
+
+        this.items[ref].info.reads = this.items[ref].info.reads.concat(item.reads);
+        (this.items[ref].component.instance as MsChat).onEnter(ref, this.items[ref].info);
+        
+      }
+      return;
+    }
+
+    if (item.value.type === "w") {
+      console.log("writing");
+      return;
+    }
+
+    /*if (isUpdate) {
+      if (item.value.type !== "p") {
+        for (let oldItem in this.items) {
+          if (this.items[oldItem].info.value.ref === item.value.ref) {
+            this.items[oldItem].info.reads.concat(item.reads);
+            (this.items[oldItem].component.instance as MsChat).onEnter(oldItem, this.items[oldItem].info);
+          }
+        }
+        return;
+      } else {
+        for (let oldItem in this.items) {
+          if (this.items[oldItem].info.value.ref === item.value.ref) {
+            return;
+          }
+        }
+      }
+    }*/
 
     if (this.items.length === 0) {
       this.extra = item.extra;
@@ -1163,6 +1208,16 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
 
     (component.instance as ILazy).onEnter(item.id, item);
     this.items[item.id] = { component, info: item };
+
+    if (item.value.ref !== undefined) {
+      this.refs[item.value.ref] = item.id;
+    }
+
+    if(item.reads !== undefined) {
+      for(let read of item.reads) {
+        this.lReads[read] = item.id;
+      }
+    }
 
     this.observer.observe(viewRef.rootNodes[0]);
   }

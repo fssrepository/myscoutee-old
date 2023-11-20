@@ -3,7 +3,6 @@ serviceWorker = true in angular json in dev section missing!!!
 spring server:
 1) the mongo query for chat should contain the event name also!!!
 2) bagde notification if it's in a different page
-3) when load the page, the last message should be sent as last read
 ----------------------
 5) b) event / car -> car changed, then send notification for the event to the members of the event
 6) => acl mqtt 4) => change mongo queries to make it without limit but passing an id in the where close.

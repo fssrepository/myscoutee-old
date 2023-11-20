@@ -58,26 +58,33 @@ export class MsBar implements OnInit, OnDestroy {
     }
 
     handleMsg(msg) {
-        console.log("msg arrived: " + msg);
+        //console.log("msg arrived: " + msg);
 
         msg = msg.substring(0, msg.length - 1);
 
         let msgObj = JSON.parse(msg);
         if (msgObj.message.type === "p") {
-            this.add.emit(msgObj);
+            if(msgObj.message.from === this.navService.user["profile"].key) {
+                return;
+            }
 
-            msgObj.message.type = "r";
+            let msgReadObj = JSON.parse(msg);
+            msgReadObj.message.type = "r";
+            msgReadObj.reads = new Array<string>();
+            msgReadObj.reads.push(this.navService.user["profile"]["images"][0]);
 
-            this.mqttService.publish(this.url, JSON.stringify(msgObj));
+            this.mqttService.publish(this.url, JSON.stringify(msgReadObj));
         } else if (msgObj.message.type === "r") {
             console.log("read");
             console.log(msgObj);
         }
+        this.add.emit(msgObj);
     }
 
     send() {
         let fromImage = this.navService.user["profile"]["images"][0];
-        let payload = { from: fromImage, message: { type: "p", value: this.message, ref: uuid.v4() } };
+        let payload = { from: fromImage, message: { type: "p", value: this.message, ref: uuid.v4(), key: uuid.v4(), from: this.navService.user["profile"].key } };
+        this.add.emit(payload);
 
         this.mqttService.publish(this.url, JSON.stringify(payload));
         this.message = "";
