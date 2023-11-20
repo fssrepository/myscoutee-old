@@ -4,6 +4,9 @@
   [color]="progress.color"
   [bufferValue]="progress.bufferValue"
 ></mat-progress-bar>
+<div class="avatar_bottom_bar" *ngIf="lWrites !== undefined">
+  <img *ngFor="let item of lWrites | keyvalue" class="avatar_bottom" [src]="item.value">
+</div>
 <div
   class="int_scroll"
   [ngClass]="{'snap' : !isLoading && !isRefreshed && isSelected}" [style]="mqtt !== undefined ? 'height: calc(100% - 48px);' : ''"

@@ -147,6 +147,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
   private items: Array<{ component; info }> = new Array();
   private refs: Array<string> = new Array();
   private lReads: Array<string> = new Array();
+  lWrites: Array<string>;
 
   private extra: any;
   private selectedItems: Array<{ component; info }> = new Array();
@@ -1171,10 +1172,18 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           this.progress.mode = 'buffer';
           this.progress.bufferValue = 0;
           this.progress.value = 0;
+          if(this.lWrites === undefined) {
+            this.lWrites = new Array();
+          }
+          this.lWrites[item.value.from] = item.header.image;
         } else {
           this.progress.mode = 'determine';
           this.progress.bufferValue = 100;
           this.progress.value = 100;
+          delete this.lWrites[item.value.from];
+          if(this.lWrites.length === 0) {
+            this.lWrites = undefined;
+          }
         }
         console.log("someone is active - writing");
       }
