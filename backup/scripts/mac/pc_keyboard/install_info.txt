@@ -1,4 +1,0 @@
-1, Keyboard Preferences - Keyboard Tab - Modifier Keys - swap command with control
-2, Copy EclipseWindows.idekeybindings to ~/Library/Developer/Xcode/UserData/KeyBindings/
-3, Install HungarianWin.dmg (you should logout and login again to make it updated)
-4, HungarianWin.bundle is created by Ukelele. (installer is Ukelele_3.2.6.dmg)
