@@ -1,0 +1,70 @@
+use('myscoutee_db');
+
+var param = "aaaa";
+
+//"members" : { $elemMatch: { "profile.$id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ=="), "status": "A" } }
+//$eq: ["$members.profile.$id", BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ==")]
+
+db.events.aggregate([
+    {
+        $match: {
+            "_id": BinData(3,"MUC2H5/ohluWIaSx1BgDkQ==")
+        }
+    },
+    {
+        $match: {
+            "members" : { $elemMatch: { "code": param } }
+        }
+    },
+    {
+        $unwind: "$members"
+    },
+    {
+        $match: {
+            $expr: {
+                $eq: ["$members.code", param]
+            }
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "profiles",
+            let: { "p_id": "$members.profile.$id", "p_members" : "$members" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$$p_id", "$_id"]
+                        }
+                    },
+                },
+                {
+                    $project: {
+                        "_id" : "$$p_members._id",
+                        "profile": "$$ROOT",
+                        "createdDate": "$$p_members.createdDate",
+                        "status": "$$p_members.status"
+                    }
+                }
+            ],
+            as: "profiles",
+        }
+    },
+    {
+        $unwind: "$profiles"
+    },
+    {
+        $group: {
+            '_id': "$profiles._id",
+            data: {
+                $first: "$profiles"
+            }
+        }
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": {"member": "$data"}
+        }
+    }
+]);

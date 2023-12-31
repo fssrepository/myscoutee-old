@@ -1,0 +1,114 @@
+use('myscoutee_db');
+
+var email = 'raxim.uk@gmail.com';
+
+db.users.aggregate([
+                { 
+                            $match: { 
+                                $expr: { $eq: ['$email', email] } 
+                            } 
+                        },
+
+                        { 
+                            $unwind: '$profiles' 
+                        },
+
+            { 
+                            $lookup: 
+                            { 
+                                from: 'profiles', 
+                                let: { 'p_id': '$profiles.$id' }, 
+                                pipeline: [ 
+                                    { 
+                                        $match: { 
+                                            $expr: { 
+                                                $and: [ 
+                                                    { $eq: ['$$p_id', '$_id'] }, 
+                                                    { $ne: ['$status', 'D'] }
+                                                    { $ne: ['$status', 'P'] } 
+                                                ] 
+                                            } 
+                                        }, 
+                                    }, 
+                                ], 
+                                as: 'profile' 
+                            } 
+                        },
+
+            { 
+                            $unwind: '$profile' 
+                        },
+
+            { 
+                            $replaceRoot: {  
+                                newRoot: '$profile' 
+                            } 
+                        },
+
+            {  
+                            $lookup:  
+                            {  
+                                from: 'roles',  
+                                let: { 'p_id': '$_id' },  
+                                pipeline: [  
+                                    {  
+                                        $match: {  
+                                            $expr: { $eq: ['$$p_id', '$profileId'] }  
+                                        },  
+                                    },  
+                                ],  
+                                as: 'role'  
+                            }  
+                        },
+
+            {  
+                            $unwind: '$role'  
+                        },
+
+            { 
+                            $lookup: 
+                            { 
+                                from: 'groups', 
+                                let: { 'g_id': '$group'}, 
+                                pipeline: [ 
+                                    { 
+                                        $match: { 
+                                            $expr: {$eq: ['$$g_id', '$_id']}, 
+                                             
+                                        }, 
+                                    }, 
+                                ], 
+                                as: 'group' 
+                            } 
+                        },
+
+            { 
+                            $unwind: '$group' 
+                        },
+
+            { 
+                            $group: { 
+                                '_id': '$_id', 
+                                'role': { 
+                                    $first: '$role.role' 
+                                }, 
+                                'data': { 
+                                    $first: '$group' 
+                                }, 
+                            } 
+                        },
+
+            { 
+                            $sort: { 
+                                'group.createdDate': 1 
+                            } 
+                        },
+
+            { 
+                            $replaceRoot: {  
+                                newRoot: {  
+                                    $mergeObjects: [{'group': '$data'}, { 'role': '$role' , offset: [] } ] 
+                                } 
+                            } 
+                        }
+])

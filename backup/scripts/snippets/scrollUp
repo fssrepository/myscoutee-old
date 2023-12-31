@@ -1,0 +1,4 @@
+localView = document.getElementsByClassName("local-view");
+msgRow = document.getElementsByClassName("msg-row");
+h = msgRow[3].clientHeight;
+localView[0].scrollBy(0,-h);

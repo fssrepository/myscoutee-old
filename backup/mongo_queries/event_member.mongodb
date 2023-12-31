@@ -1,0 +1,99 @@
+use('myscoutee_db');
+
+var offset = [
+    'A',
+    '1900-01-01'
+];
+
+var profileId = new BinData(3,'pkJXa7/pJg1B7Yke3mRnvQ==')
+
+db.events.aggregate([
+    {
+        $match: {
+            '_id': BinData(3,'q09by9pJwBplA42F70ZSiA==')
+        }
+    },
+    { 
+        $addFields: { 
+            'user': { $first : { 
+                        $filter: { 
+                            input: '$info.members', 
+                            as: 'member', 
+                            cond: { $and: [ 
+                                        {$eq: [ '$$member.profile.$id', profileId ] }, 
+                                        {$eq: [ '$$member.status', 'A' ] } 
+                                    ]
+                            }
+                        } 
+                } 
+            }, 
+        } 
+    },
+    {
+        $unwind: '$info.members'
+    },
+    {
+        $lookup:
+        {
+            from: 'profiles',
+            let: { 'p_members' : '$info.members' },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ['$$p_members.profile.$id', '$_id']
+                        }
+                    },
+                },
+                {
+                    $project: {
+                        '_id' : '$$p_members.profile.$id',
+                        'profile': '$$ROOT',
+                        'createdDate': '$$p_members.createdDate',
+                        'status': '$$p_members.status'
+                    }
+                }
+            ],
+            as: 'profiles',
+        }
+    },
+    {
+        $unwind: '$profiles'
+    },
+    {
+        $group: {
+            '_id': '$profiles._id',
+            data: {
+                $first: '$profiles'
+            },
+            user: {
+                $first: '$user'
+            }
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ {$ifNull: [ '$data.createdDate', ISODate()]}, { $toDate: offset[1] }] },
+                    {$in: [ '$data.status', ['A','J','I']]},
+                    {$gte: [ '$data.status', offset[0] ] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            'data.status': 1, 'data.createdDate': -1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            'newRoot': { 
+                $mergeObjects: [{'member': '$data'}, { offset: ['$data.status', '$data.createdDate'] } ]
+            }
+        }
+    }
+])

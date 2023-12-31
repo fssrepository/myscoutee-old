@@ -1,0 +1,26 @@
+platform :ios, '10.0'
+use_frameworks!
+
+target 'App' do
+  # Add your Pods here
+  pod 'Firebase/Core'
+  pod 'Firebase/Messaging'
+  pod 'Firebase/MLVision'
+  
+  pod 'Firebase/MLVisionBarcodeModel'
+  pod 'Firebase/MLVisionFaceModel'
+  
+  pod 'GoogleMaps'
+  #pod 'Google-Maps-iOS-Utils'
+  
+  # Automatic Capacitor Pod dependencies, do not delete
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  
+  # Do not delete
+end
+
+#pre_install do |installer|
+#    # workaround for https://github.com/CocoaPods/CocoaPods/issues/3289
+#    Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+#end

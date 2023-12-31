@@ -1,0 +1,62 @@
+use('myscoutee_db');
+
+var offset = [
+    0.0,
+    '2021-05-07T17:23:17.258Z'
+];
+
+var location = {
+    type: 'Point',
+    coordinates: [19.1627264, 47.5889664]
+}
+
+var limit = 20;
+var step = 5;
+
+var group = new BinData(3, "PkoHFjkq6xouVW/lzz01pQ==");
+
+db.events.aggregate([
+    { 
+        $geoNear : 
+        { 
+            near : location, 
+            spherical     : true, 
+            minDistance   : offset[0], 
+            distanceField : 'distance', 
+            distanceMultiplier: 0.001, 
+            query         : { 'status': 'R', 'group': group } 
+        } 
+    },
+
+    { 
+        $match: { 
+            $expr: { 
+                $and: [ 
+                    {$gt: [ {$ifNull: [ '$createdDate', ISODate()]}, { $toDate: offset[1] }]}, 
+                ] 
+            } 
+        } 
+    },
+
+    { 
+        $addFields: { 
+            'groupKey': {$multiply: [{$floor : [{$divide : ['$distance', step]}]}, step]}, 
+        } 
+    },
+
+    { 
+        $sort: { 
+            'groupKey': 1, 'distance': 1, 'createdDate': -1
+        } 
+    },
+
+    { $limit : limit },
+
+    { 
+        $replaceRoot: {  
+            'newRoot': {  
+                $mergeObjects: [{'event': '$$ROOT'}, { groupKey: '$groupKey', offset: ['$distance', '$createdDate'] } ] 
+            } 
+        } 
+    }
+])

@@ -1,0 +1,136 @@
+use('myscoutee_db');
+
+var offset = [
+    "1900-01-01"
+];
+
+var isAdmin = false;
+
+var email = "raxim.uk@gmail.com";
+var role = "ROLE_ADMIN";
+var profile = BinData(3, "SkOo5PpMDlJ70iQWmczdlA==")
+
+db.users.aggregate([
+    {
+        $match: {
+            $expr: { $eq: ["$email", email] }
+        }
+    },
+    {
+        $unwind: "$profiles"
+    },
+    {
+        $lookup:
+        {
+            from: "profiles",
+            let: { "p_id": "$profiles.$id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: { $eq: ["$$p_id", "$_id"] }
+                    },
+                },
+            ],
+            as: "profile"
+        }
+    },
+    {
+        $unwind: "$profile"
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": "$profile"
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "roles",
+            let: { "p_id": "$_id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: { $eq: ["$$p_id", "$profileId"] }
+                    },
+                },
+            ],
+            as: "role"
+        }
+    },
+    {
+        $unwind: "$role"
+    },
+    {
+        $match: {
+            $expr: { $eq: ["$role.role", role] }
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "groups",
+            let: { "g_id": "$group"},
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {$eq: ["$$g_id", "$_id"]},
+                        
+                    },
+                },
+            ],
+            as: "group"
+        }
+    },
+    {
+        $unwind: "$group"
+    },
+    {
+        $match: {
+            $expr: {
+                $or: [
+                    { $eq: [isAdmin, true ] },
+                    {
+                        $and: [
+                            { $eq: [isAdmin, false ] },
+                            { $eq: ["$group.createdBy", profile] }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        $group: {
+            '_id': "$_id",
+            'role': {
+                $first: "$role.role"
+            },
+            data: {
+                $first: "$group"
+            },
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ {$ifNull: [ "$data.createdDate", ISODate()]}, { $toDate: offset[0] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "data.createdDate": 1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"group": "$data"}, { offset: ["$data.createdDate"] } ]
+            }
+        }
+    }
+])

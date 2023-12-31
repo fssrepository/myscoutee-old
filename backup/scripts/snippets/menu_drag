@@ -1,0 +1,35 @@
+sendTouchEvent = function(x, y, element, eventType) {
+  let touchObj = new Touch({
+    identifier: Date.now(),
+    target: element,
+    clientX: x,
+    clientY: y,
+    radiusX: 11.5,
+    radiusY: 11.5,
+    rotationAngle: 0,
+    force: 1,
+    screenX: 336,
+    screenY:498,
+    pageX:x,
+    pageY:y
+  });
+
+  let touchEvent = new TouchEvent(eventType, {
+    cancelable: true,
+    bubbles: true,
+    touches: [touchObj],
+    targetTouches: [touchObj],
+    changedTouches: [touchObj],
+    shiftKey: false
+  });
+
+  element.dispatchEvent(touchEvent);
+}
+
+frame_wrapper = document.getElementById('frame2handle_1')
+
+sendTouchEvent(159, 316, frame_wrapper, 'touchstart');
+sendTouchEvent(70, 312, frame_wrapper, 'touchmove');
+sendTouchEvent(60, 409, frame_wrapper, 'touchmove');
+sendTouchEvent(68, 512, frame_wrapper, 'touchmove');
+sendTouchEvent(68, 512, frame_wrapper, 'touchend');

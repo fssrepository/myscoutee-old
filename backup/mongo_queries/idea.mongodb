@@ -1,0 +1,96 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+
+//https://www.fileformat.info/tool/guid-base64.htm
+//https://www.guidgenerator.com/online-guid-generator.aspx
+use('myscoutee_db');
+
+//db.createCollection("likes");
+//db.likes.dropIndexes();
+
+//db.likes.find();
+
+//events where the current user was present
+//lookup event $elemMatch in the aggregate, no group by at the end
+//filter events and put the profile in the $geoNera in even on likes
+//further improvement if it's going to neo4j
+//maybe group by 7 days
+
+db.profiles.aggregate([
+    {
+        $geoNear :
+        {
+            near :
+            {
+                type: 'Point',
+                coordinates: [47.48335870973288, 19.097852531771466]
+            },
+            spherical     : true,
+            minDistance   : 0,
+            distanceField : 'distance',
+            distanceMultiplier: 0.001,
+            query         : {'_id': { $in: [new BinData(3,"AEDlF6dOENOu0eYVVQ+BuA==")] }}
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "events",
+            let: { "p_id": "$_id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: [
+                                "$$p_id",
+                                "$members.profile.$id"
+                            ]
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        rate: {
+                            $avg: "$feedbacks.rate"
+                        },
+                        data: "$$ROOT"
+                    }
+                }
+            ],
+            as: "events",
+        }
+    },
+    {
+        $unwind: { path: "$events", preserveNullAndEmptyArrays: true }
+    },
+    {
+        $group: {
+            "_id": "$events._id",
+            "rate": {
+                $avg: "$events.rate"
+            },
+            "distance": {
+                $first : {$multiply: [{$floor : [{$divide : ["$distance", 5]}]}, 5]}
+            },
+            data: { "$first": "$events.data" },
+        }
+    },
+    {
+        $sort: {
+            "distance": 1, "rate": -1, "data.distance": 1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: ["$data", { rate: "$rate", groupKey: "$distance" } ]
+            }
+        }
+    }
+
+]);

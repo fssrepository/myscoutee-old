@@ -1,0 +1,55 @@
+use('myscoutee_db');
+
+var offset = [
+    "1900-01-01"
+];
+
+db.profiles.aggregate([
+    {
+        $match: {
+            "_id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ==")
+        }
+    },
+    {
+        $lookup: {
+            from: "cars",
+            localField: "cars.$id",
+            foreignField: "_id",
+            as: "cars"
+        }
+    },
+    {
+        $unwind: "$cars"
+    },
+    {
+        $group: {
+            '_id': "$cars._id",
+            data: {
+                $first: "$cars"
+            }
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ {$ifNull: [ "$data.createdDate", ISODate()]}, { $toDate: offset[0] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "data.createdDate": 1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"car": "$data"}, { offset: ["$data.createdDate"] } ]
+            }
+        }
+    }
+])

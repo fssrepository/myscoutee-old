@@ -1,0 +1,140 @@
+use('myscoutee_db');
+
+var type = 1.5;
+
+var lastTime = "1900-01-01"
+
+db.likes.aggregate([
+    {
+        $match: {
+          $expr: 
+            {
+              $gte: ['$createdDate', { $toDate: lastTime }]
+            }
+        },
+    },
+    {
+        $lookup:
+        {
+            from: 'likes',
+            let: { p_from: '$from.$id' , p_to: '$to.$id' },
+            pipeline: [
+              {
+                $match: {
+                    $expr: 
+                    {
+                          $or: [
+                            {
+                              $and: [
+                                { $eq: ['$from.$id', '$$p_from'] },
+                                { $eq: ['$to.$id', '$$p_to'] },
+                                { $eq: [ {$ifNull: [ '$ref', 0]}, 0 ]}
+                              ]
+                            },
+                            {
+                              $and: [
+                                { $eq: ['$to.$id', '$$p_from'] },
+                                { $eq: ['$from.$id', '$$p_to'] },
+                                { $eq: [ {$ifNull: [ '$ref', 0]}, 0 ]}
+                              ]
+                            }
+                          ]
+                    }
+                }
+              },
+              { 
+                  $group: {
+                      '_id': '$$p_from', 
+                      'distance': { 
+                          $avg: '$distance' 
+                      },
+                      'type': { 
+                          $avg: { 
+                              $switch: { 
+                                  branches: [ 
+                                      {  
+                                          case: {  
+                                              $and: [ 
+                                                  { $eq: ['$to.$id', '$$p_to' ] }, 
+                                                  { $eq: ['$double', false] },
+                                                  { $eq: [ {$ifNull: [ '$ref', 0]}, 0 ]} 
+                                              ] 
+                                          }, 
+                                          then: 2 
+                                      }, 
+                                      {  
+                                          case: {  
+                                              $and: [ 
+                                                  { $eq: ['$from.$id', '$$p_to' ] }, 
+                                                  { $eq: ['$double', false] },
+                                                  { $eq: [ {$ifNull: [ '$ref', 0]}, 0 ]}
+                                              ] 
+                                          }, 
+                                          then: 1 
+                                      }, 
+                                  ], 
+                                  default: 0 
+                              } 
+                          } 
+                      },
+                      'rate': {
+                              $sum: { 
+                                $switch: { 
+                                    branches: [ 
+                                        {  
+                                            case: {  
+                                                $and: [
+                                                    { $eq: ['$double', false] }, 
+                                                ] 
+                                            }, 
+                                            then: {$divide: [1, '$rate']} 
+                                        } 
+                                    ],
+                                    default: 0 
+                                } 
+                              }
+                      },
+                      'from': {
+                        $first: '$from'
+                      },
+                      'to': {
+                        $first: '$to'
+                      },
+                      'createdDate': { 
+                          $max: '$createdDate' 
+                      }, 
+                  }, 
+              },
+            ],
+          as: 'likes'
+      }
+    },
+    { 
+        $unwind: { path: '$likes' } 
+    },
+
+    {
+      $group: {
+          '_id': '$likes.createdDate',
+          'data': { $first : '$likes'}
+      } 
+    },
+
+    
+    { 
+        $match: { 
+            $expr:  
+            { 
+              $and: [
+                {$eq: [ {$ifNull: ['$data.type', 0.0]}, type ]}
+              ]
+            }
+        }
+    },
+
+    { 
+            $replaceRoot: {  
+                'newRoot': '$data' 
+            } 
+    }
+])

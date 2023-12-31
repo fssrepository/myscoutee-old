@@ -1,0 +1,59 @@
+use('myscoutee_db');
+
+var offset = [
+    "a",
+    "1900-05-06",
+    "1900-01-01"
+];
+
+db.profiles.aggregate([
+    {
+        $match: {
+            "_id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ==")
+        }
+    },
+    {
+        $lookup: {
+            from: "schools",
+            localField: "schools.$id",
+            foreignField: "_id",
+            as: "schools"
+        }
+    },
+    {
+        $unwind: "$schools"
+    },
+    {
+        $group: {
+            '_id': "$schools._id",
+            data: {
+                $first: "$schools"
+            }
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gte: [ "$data.type", offset[0] ] },
+                    {$gt: [ "$data.range.start", { $toDate: offset[1]} ] },
+                    {$gt: [ {$ifNull: [ "$data.createdDate", ISODate()]}, { $toDate: offset[2] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "data.type": 1, "data.range.start": -1, "data.createdDate": 1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"school": "$data"}, { groupKey: "$data.type", offset: ["$data.type", "$data.range.start", "$data.createdDate"] } ]
+            }
+        }
+    }
+])

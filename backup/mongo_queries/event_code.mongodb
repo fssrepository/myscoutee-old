@@ -1,0 +1,35 @@
+use('myscoutee_db');
+
+var param = "";
+
+//"members" : { $elemMatch: { "profile.$id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ=="), "status": "A" } }
+//$eq: ["$members.profile.$id", BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ==")]
+
+db.events.aggregate([
+    {
+        $match: {
+            "_id": BinData(3,"kUS7stzzrX3T20IOYc4GkQ==")
+        }
+    },
+    {
+        $match: {
+            "members" : { $elemMatch: { "profile.$id": BinData(3,"hU+xMMUsO2GW1A0kt7e5kA==") } }
+        }
+    },
+    {
+        $unwind: "$members"
+    },
+    {
+        $group: {
+            '_id': "$members._id",
+            data: {
+                $first: "$members.code"
+            }
+        }
+    },
+    {
+        $replaceRoot: {
+            "newRoot": {"code": "$data"}
+        }
+    }
+]);

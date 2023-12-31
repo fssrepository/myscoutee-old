@@ -1,0 +1,77 @@
+use('myscoutee_db');
+
+var offset = [
+    "0",
+    "1900-05-06",
+    "1900-01-01"
+];
+
+var profileId = new BinData(3, '/UmcaV7ZDlm9uecmc6Iutg==')
+
+db.events.aggregate([
+    {
+        $match: {
+            "_id": BinData(3,"VkMkVtARffwkevv14k24lg==")
+        }
+    },
+    {
+        $lookup: {
+            from: "items",
+            localField: "items.$id",
+            foreignField: "_id",
+            as: "items"
+        }
+    },
+    {
+        $unwind: "$items"
+    },
+    {
+        $group: {
+            '_id': "$items._id",
+            data: {
+                $first: "$items"
+            },
+            evt: {
+                $first: "$$ROOT"
+            },
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gte: [ "$data.type", offset[0] ] },
+                    {$gt: [ "$data.range.start", { $toDate: offset[1]} ] },
+                    {$gt: [ {$ifNull: [ "$data.createdDate", ISODate()]}, { $toDate: offset[2] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "data.type": 1, "data.range.start": 1, "data.createdDate": 1
+        }
+    },
+    { $limit : 20 },
+
+    {
+        $addFields: {
+            'user': { $first : {
+                        $filter: {
+                            input: '$data.members',
+                            as: 'member',
+                            cond: { $eq: [ '$$member.profile.$id', profileId ] }
+                        }
+                }
+            },
+        }
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"item": "$data"}, { groupKey: "$data.type", category: '$evt.info.category', isPromotion: { $cond: [ {$ifNull: ['$ref', false] }, true, false ] }, role: { $cond: [ {$ifNull: ['$user', null] }, '$user.role', null ] }, main: { $cond: [ { $eq: ['$evt.info._id', '$data._id'] }, true, false] }, offset: ["$data.type", "$data.range.start", "$data.createdDate"] } ]
+            }
+        }
+    }
+])

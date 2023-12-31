@@ -1,0 +1,53 @@
+use('myscoutee_db');
+
+//findAll in EventRepository Sort parameter
+//ensureIndex on array element
+//https://stackoverflow.com/questions/9063564/in-mongodb-how-do-you-index-an-embedded-object-fields-in-an-array
+//db.events.find({"members" : { $elemMatch: { "_id" : new BinData(3,"ZU+Ufwg1UBWd3rB5bpcnjA=="), "status" : "A" } }});
+
+var offset = [
+    "2021-05-06",
+    "1900-01-01"
+];
+
+db.events.aggregate([
+    {
+        $match: {
+            "members" : { $elemMatch: { "profile.$id": BinData(3,"QkKAab19pK2zWSdM/UYkrw=="), "status": "A" } }
+        }
+    },
+    /*{
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ "$info.range.start", { $toDate: offset[0]} ] },
+                    {$gt: [ "$createdDate", { $toDate: offset[1] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "info.range.start": 1, "createdDate": -1
+        }
+    },
+    { $limit : 20 },
+    {
+        $addFields: {
+            "groupKey": {
+                $dateToString: {
+                    format: "%Y-%m-%d",
+                    date: "$info.range.start"
+                }
+            },
+        }
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"event": "$$ROOT"}, { groupKey: "$groupKey", sortKey: { $toLong: "$info.range.start" }, offset: ["$info.range.start", "$createdDate"] } ]
+            }
+        }
+    }*/
+]);

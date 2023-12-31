@@ -1,0 +1,93 @@
+//order by likes inside an event
+
+use('myscoutee_db');
+
+var offset = [
+    "2021-05-06",
+    "1900-01-01",
+    "1900-01-01"
+];
+
+db.events.aggregate([
+    {
+        $match: {
+            "members" : { $elemMatch: { "profile.$id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ=="), "status": "A" } }
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ "$info.range.start", { $toDate: offset[0]} ] },
+                    {$gt: [ "$createdDate", { $toDate: offset[1] }] },
+                ]
+            },
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "profiles",
+            let: { p_id: "$members.profile.$id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: [
+                                "$_id",
+                                "$$p_id"
+                            ]
+                        }
+                    }
+                },
+            ],
+            as: "profiles",
+        }
+    },
+    {
+        $unwind: { path: "$profiles" }
+    },
+    {
+        $group: {
+            "_id": "$profiles._id",
+            "createdDate": {
+                $min: "$createdDate"
+            },
+            "startDate": {
+                $min: "$info.range.start"
+            },
+            data: { "$first": "$profiles" },
+        }
+    },
+    {
+        $match: {
+            $expr: {
+                $gt: [ "$data.createdDate", { $toDate: offset[2] }] 
+            },
+        }
+    },
+    {
+        $sort: {
+            "startDate": 1, "createdDate": 1, "data.createdDate": -1
+        }
+    },
+    { $limit : 20 },
+    {
+        $addFields: {
+            "groupKey": {
+                $dateToString: {
+                    format: "%Y-%m-%d",
+                    date: "$info.range.start"
+                }
+            },
+        }
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"profile": "$data"}, { groupKey: "$groupKey", offset: ["$startDate", "$createdDate", "$data.createdDate"] } ]
+            }
+        }
+    }
+]);

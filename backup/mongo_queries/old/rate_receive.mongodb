@@ -1,0 +1,143 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+
+//https://www.fileformat.info/tool/guid-base64.htm
+//https://www.guidgenerator.com/online-guid-generator.aspx
+use('myscoutee_db');
+
+//db.createCollection("likes");
+//db.likes.dropIndexes();
+
+db.likes.drop();
+
+db.likes.insertMany([
+    {
+        "_id" : new BinData(3,"6kTQ5N0URMyMqwAAcuWR/Q"),
+        "from": new BinData(3,"zkcBJJgRyVEinqsczaeMoA=="),
+        "distance": 15,
+        "type": "double",
+    },
+    {
+        "_id" : new BinData(3,"vghBiw8DQhGUIwAAmNNipw"),
+        "from": new BinData(3,"e0BuqGWljqVPp4DvERVNqA=="),
+        "to": new BinData(3,"J0mzbqyp8W6Q2G/gY4hwrw=="),
+        "distance": 12,
+        "type": "single",
+    },
+    {
+        "_id" : new BinData(3,"ZU+Ufwg1UBWd3rB5bpcnjA=="),
+        "from": new BinData(3,"e0BuqGWljqVPp4DvERVNqA=="),
+        "to": new BinData(3,"zkcBJJgRyVEinqsczaeMoA=="),
+        "distance": 2,
+        "type": "double",
+    },
+]);
+
+db.likes.createIndex({"from": 1});
+
+db.likes.find();
+
+db.profiles.aggregate([
+    {
+        $geoNear :
+        {
+            near :
+            {
+                type: 'Point',
+                coordinates: [47.48335870973288, 19.097852531771466]
+            },
+            spherical     : true,
+            minDistance   : 14396,
+            //maxDistance   : 30000,
+            distanceField : 'distance',
+            distanceMultiplier: 0.001,
+            query         : {'_id': { $nin: [new BinData(3,"kU5Iz++EcCBFW9lJ4iR7jA=="), new BinData(3,"e0BuqGWljqVPp4DvERVNqA==")] }, 'gender': 'man'}
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "likes",
+            let: { "profile_id": "$_id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: 
+                        {
+                            $or: [
+                                {
+                                    $and: [
+                                        { $eq: [ "$from", "$$profile_id" ] },
+                                        { $eq: [ "$to", new BinData(3,"e0BuqGWljqVPp4DvERVNqA==") ] },
+                                        { $eq: [ "$type", "double"] },
+                                    ]
+                                },
+                                {
+                                    $and: [
+                                        { $eq: [ "$from", new BinData(3,"e0BuqGWljqVPp4DvERVNqA==") ] },
+                                        { $eq: [ "$to", "$$profile_id"]},
+                                        { $eq: [ "$type", "double"] },
+                                    ]
+                                },
+                                {
+                                    $and: [
+                                        { $eq: [ "$to", new BinData(3,"e0BuqGWljqVPp4DvERVNqA==") ] },
+                                        { $eq: [ "$from", "$$profile_id"]},
+                                        { $eq: [ "$type", "single"] },
+                                    ]
+                                },
+
+                            ]
+                        },
+                    }
+                }
+            ],
+            as: "likes",
+        }
+    },
+    {
+        $unwind: { path: "$likes", preserveNullAndEmptyArrays: true }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $not : {
+                    $and: [
+                        { $eq: [ "$from", new BinData(3,"e0BuqGWljqVPp4DvERVNqA==") ] },
+                        { $eq: [ "$type", "single"] },
+                    ]
+                }
+            },
+        }
+    },
+    {
+        $group: {
+            "_id": "$_id",
+            "likes": {
+                $avg: "$likes.distance"
+            },
+            "distance": {
+                $first : {$multiply: [{$floor : [{$divide : ["$distance", 5]}]}, 5]}
+            },
+            data: { "$first": "$$ROOT" },
+        }
+    },
+    {
+        $sort: {
+            "distance": 1, "likes": -1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: ["$data", { likes: "$likes", distance: "$distance" } ]
+            }
+        }
+    }
+]);

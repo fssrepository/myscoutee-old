@@ -1,0 +1,6 @@
+{
+  "appId": "com.raxim.capacitor",
+  "appName": "capacitor",
+  "bundledWebRuntime": false,
+  "webDir": "dist"
+}

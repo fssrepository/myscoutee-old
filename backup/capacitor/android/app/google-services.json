@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "246323226128",
+    "firebase_url": "https://bymysocialdate.firebaseio.com",
+    "project_id": "bymysocialdate",
+    "storage_bucket": "bymysocialdate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246323226128:android:260456a9a14af849",
+        "android_client_info": {
+          "package_name": "com.myscoutee.myscoutee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246323226128-8o26frd2b15q0rm0l8qt5c532amlqu4s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqZ4X-cqXKma4A7A9IWs5Mb2_-_Y-wGQc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246323226128:android:dd3d1be9dc1aebb8",
+        "android_client_info": {
+          "package_name": "com.raxim.capacitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246323226128-8o26frd2b15q0rm0l8qt5c532amlqu4s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqZ4X-cqXKma4A7A9IWs5Mb2_-_Y-wGQc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

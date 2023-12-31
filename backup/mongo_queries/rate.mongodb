@@ -1,0 +1,180 @@
+use('myscoutee_db');
+
+var offset = [
+    0,
+    0,
+    0,
+    "1900-01-01"
+];
+
+var location = {
+    type: 'Point',
+    coordinates: [19.1627264, 47.5889664]
+}
+
+var profileId = new BinData(3, "m06Y/C9esup/JPmLNdhTqA==");
+var gender = 'm'
+
+var group = new BinData(3, "PkoHFjkq6xouVW/lzz01pQ==");
+
+var type = 0.0;
+
+var step = 1;
+
+var limit = 20
+
+var score = 0
+
+db.profiles.aggregate([
+    { 
+                            $geoNear : 
+                            { 
+                                near          : location,
+                                spherical     : true, 
+                                minDistance   : offset[0], 
+                                distanceField : 'distance', 
+                                distanceMultiplier: 0.001, 
+                                query         : {'_id': { $nin: [ profileId ] }, 'gender': gender, 'group': group } 
+                            } 
+                    },
+
+                        { 
+                            $lookup: 
+                            { 
+                                from: 'likes', 
+                                let: { p_id: '$_id' }, 
+                                pipeline: [ 
+                                    { 
+                                        $match: { 
+                                            $expr:  
+                                            { 
+                                                $or: [ 
+                                                    { 
+                                                        $and: [ 
+                                                            { $eq: ['$from.$id', '$$p_id'] }, 
+                                                            { $eq: ['$to.$id', profileId ] },
+                                                            {$eq: [ {$ifNull: [ '$ref', 0]}, 0 ]}
+
+                                                        ] 
+                                                    }, 
+                                                    { 
+                                                        $and: [ 
+                                                            { $eq: ['$to.$id', '$$p_id'] }, 
+                                                            { $eq: ['$from.$id', profileId ] },
+                                                            {$eq: [ {$ifNull: [ '$ref', 0]}, 0 ]}
+                                                        ] 
+                                                    },
+                                                ] 
+                                            }, 
+                                        } 
+                                    },
+                                    { 
+                                        $group: {
+                                            '_id': '$$p_id', 
+                                            'distance': { 
+                                                $avg: '$distance' 
+                                            },
+                                            'type': { 
+                                                $avg: { 
+                                                    $switch: { 
+                                                        branches: [ 
+                                                            {  
+                                                                case: {  
+                                                                    $and: [ 
+                                                                        { $eq: ['$to.$id', profileId ] }, 
+                                                                        { $eq: ['$double', false] }, 
+                                                                    ] 
+                                                                }, 
+                                                                then: 2 
+                                                            }, 
+                                                            {  
+                                                                case: {  
+                                                                    $and: [ 
+                                                                        { $eq: ['$from.$id', profileId ] }, 
+                                                                        { $eq: ['$double', false] }, 
+                                                                    ] 
+                                                                }, 
+                                                                then: 1 
+                                                            }, 
+                                                        ], 
+                                                        default: 0 
+                                                    } 
+                                                } 
+                                            },
+                                            'rate': { 
+                                                $sum: { 
+                                                    $switch: { 
+                                                        branches: [ 
+                                                            {  
+                                                                case: {  
+                                                                    $and: [ 
+                                                                        { $eq: ['$createdBy.$id', profileId ] }, 
+                                                                        { $eq: ['$double', false] }, 
+                                                                    ] 
+                                                                }, 
+                                                                then: '$rate' 
+                                                            } 
+                                                        ],
+                                                        default: 0 
+                                                    } 
+                                                } 
+                                            },
+                                            'createdDate': { 
+                                                $max: '$createdDate' 
+                                            }, 
+                                        }, 
+                                    },
+                                ], 
+                                as: 'likes', 
+                            } 
+                        },
+
+
+            { 
+                            $unwind: { path: '$likes', preserveNullAndEmptyArrays: true } 
+                        },
+
+            
+            { 
+                            $match: { 
+                                $expr:  
+                                { 
+                                            $and: [ 
+                                                {$eq: [ '$status', 'A' ] }, 
+                                                {$eq: [ {$ifNull: ['$likes.type', 0]}, type ]}, 
+                                                {$gt: [{$ifNull: [ '$likes.createdDate', ISODate()]}, {$toDate: offset[3] }] }, 
+                                                {$gte: [{$ifNull: [ '$likes.distance', {$abs: {$subtract: ['$score', score] }} ]}, offset[1] ] }, 
+                                                {$gte: ['$distance', offset[2] ] }, 
+                                            ] 
+                                }, 
+                            } 
+                        },
+
+                {
+                $addFields: {
+                    'groupKey': {$multiply: [{$floor : [{$divide : ['$distance', 5]}]}, 5]},
+                }
+            },
+
+            {
+                $addFields: {
+                    'likes.rate': {$ifNull: [ '$likes.rate', 0]},
+                }
+            },
+
+            { 
+                            $sort: { 
+                                'groupKey': 1, 'likes.rate': -1, 'likes.distance': 1
+                            } 
+                        },
+
+            { $limit : limit },
+
+            { 
+                            $replaceRoot: {  
+                                'newRoot': {  
+                                    $mergeObjects: [{'profile': '$$ROOT'}, { rate: '$likes.rate', groupKey: '$groupKey', offset: ['$groupKey', '$likes.rate', '$likes.distance', Date()] } ]
+                                } 
+                            } 
+                    }
+]);

@@ -11,6 +11,11 @@ git config --global user.email {email}
 git config --global user.name {name}
 git config --global user.password {personal access token - Profile -> Settings -> Develpoper Settings (last menu item)}
 
+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
+
+docker save -o myscoutee.tar myscoutee:0.1.0
+sudo docker load -i myscoutee.tar
+
 ./gradlew bootRun
 
 --refresh-dependencies
@@ -65,3 +70,7 @@ Remote Debug:
 2) the generated mosquitto executable should be attached by the gdbserver (can beoutside of the container seems also)
    start.sh contains the command (the ubuntu is using libc, while alpine linux is using musl-libc which are not compatible)
 3) Attach (gdb) -> launch.json
+
+RUN apk add --update busybox-suid && apk --update add tzdata && cp /usr/share/zoneinfo/Europe/Brussels /etc/localtime
+
+HLS blue: 217/88/57

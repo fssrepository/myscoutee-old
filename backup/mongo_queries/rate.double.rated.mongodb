@@ -1,0 +1,101 @@
+use('myscoutee_db');
+
+var params = [
+    BinData(3,"TULOVwRNgGjiJij4CSK5iw=="),
+    BinData(3, "ikYPd4N0irJAlPMh3IYUig==")
+];
+
+var offset = [
+    "A",
+    "1900-01-01"
+];
+
+db.likes.aggregate([
+    {
+        $match: {
+            $expr: 
+            {
+            $and: [
+                {$eq: ["$createdBy.$id", params[0]]},
+                {
+                    $or: [
+                        {$eq: ["$from.$id", params[1]]},
+                        {$eq: ["$to.$id", params[1]]}
+                    ]
+                },
+                {
+                    $eq: ["$double", true]
+                },
+                {
+                    $eq: [{$ifNull: [ '$ref', 0]}, 0]
+                },
+            ]
+            }
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "profiles",
+            let: { "from_id": "$from.$id", "to_id" : "$to.$id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $or: [{
+                                    $and: [
+                                        { $eq: ["$$from_id", "$_id"]}, 
+                                        { $ne: ["$$from_id", params[1]]}
+                                    ]},
+                                {
+                                    $and: [
+                                        { $eq: ["$$to_id", "$_id"]}, 
+                                        { $ne: ["$$to_id", params[1]]}
+                                    ]}
+                            ]
+                        }
+                    },
+                },
+            ],
+            as: "profiles",
+        }
+    },
+    {
+        $unwind: "$profiles"
+    },
+    {
+        $group: {
+            '_id': "$profiles._id",
+            'rate': {$first: "$rate"},
+            data: {
+                $first: "$profiles"
+            }
+        }
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ {$ifNull: [ "$data.createdDate", ISODate()]}, { $toDate: offset[1] }] },
+                    {$in: [ "$data.status", ['A', 'F']]},
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "data.status": 1, "data.createdDate": -1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"profile": "$data"}, { rate: {$ifNull: [ "$rate", 0]} ,offset: ["$data.status", "$data.createdDate"] } ]
+            }
+        }
+    }
+]);
+
+//db.likes.find({"createdBy.$id": BinData(3,"P0gwLtku3y0Sx313nA+vgg==")});

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">capacitor</string>
+    <string name="title_activity_main">capacitor</string>
+    <string name="package_name">com.raxim.capacitor</string>
+    <string name="fileprovider_authority">com.raxim.capacitor.fileprovider</string>
+    <string name="custom_url_scheme">com.raxim.capacitor</string>
+    <string name="channel_name">Chat</string>
+    <string name="channel_description">Incoming chat messages.</string>
+    <!--<string name="mqtt_url">tcp://10.0.2.2:8083</string>-->
+    <string name="mqtt_url">tcp://localhost:8083</string>
+    <string name="mqtt_username">myscoutee</string>
+    <string name="mqtt_password">Mixtar1Drang2!</string>
+</resources>

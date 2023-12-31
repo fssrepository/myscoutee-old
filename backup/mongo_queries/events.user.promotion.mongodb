@@ -1,0 +1,76 @@
+use('myscoutee_db');
+
+var offset = [
+    '1900-01-01',
+    10,
+    '1900-01-01'
+];
+                                
+var profileId = new BinData(3, 'IEPQw62w8iUN/JeYhuLmuA==');
+
+var limit = 20;
+
+var format = '%Y-%m-%d';
+
+db.events.aggregate([
+                    { 
+                            $lookup: 
+                            { 
+                                from: 'likes', 
+                                let: { 'p_id': '$_id' }, 
+                                pipeline: [ 
+                                    { 
+                                        $match: { 
+                                            $expr: { 
+                                                $and: [
+                                                    {$eq: [ '$from.$id', profileId ]},
+                                                    {$eq: [ '$$p_id', '$ref' ]},
+                                                ] 
+                                            } 
+                                        } 
+                                    },
+                                ], 
+                                as: 'likes', 
+                            } 
+                    },
+            
+            { 
+                $unwind: { path: '$likes'} 
+            },
+
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ '$info.range.start', { $toDate: offset[0]} ] },
+                    {$lte: [ '$likes.rate', offset[1] ] },
+                    {$gt: [ '$createdDate', { $toDate: offset[2] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            'info.range.start': 1, 'likes.rate': -1 , 'createdDate': 1
+        }
+    },
+    { $limit : limit },
+    {
+        $addFields: {
+            'groupKey': {
+                $dateToString: {
+                    format: format,
+                    date: '$info.range.start'
+                }
+            },
+        }
+    },
+    {
+        $replaceRoot: { 
+            'newRoot': { 
+                $mergeObjects: [{'event': '$$ROOT'}, { groupKey: '$groupKey', rate: '$likes.rate', sortKey: { $toLong: '$info.range.start' }, offset: ['$info.range.start', '$likes.rate', '$createdDate'] } ]
+            }
+        }
+    }
+])

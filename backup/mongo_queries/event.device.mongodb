@@ -1,0 +1,91 @@
+use('myscoutee_db');
+
+var eventIds = [new BinData(3,'7U7dTy5qQuLC9sRRg5Pjrw==')];
+
+db.events.aggregate([
+    {
+        $match: {
+            '_id': {$in : eventIds}
+        }
+    },
+    {
+        $unwind: '$members'
+    },
+    {
+        $match: {
+            $expr: {
+                $and: [
+                    {$in: [ '$members.status', ['A','I']]}
+                ]
+            }
+        },
+    },
+    {
+        $lookup:
+        {
+            from: 'profiles',
+            let: { 'p_id': '$members.profile.$id', 'p_members' : '$members' },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $and: [
+                                {$eq: ['$$p_id', '$_id']},
+                                {$eq: [ '$status', 'A']}
+                            ]
+                        }
+                    },
+                },
+            ],
+            as: 'profiles',
+        }
+    },
+    {
+        $unwind: '$profiles'
+    },
+    {
+        $lookup:
+        {
+            from: 'users',
+            let: { 'p_id': '$profiles._id' },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: ['$$p_id', '$profiles.$id']
+                        }
+                    },
+                }
+            ],
+            as: 'users',
+        }
+    },
+    {
+        $unwind: '$users'
+    },
+    {
+        $lookup:
+        {
+            from: 'tokens',
+            let: { 'u_id': '$users._id' },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ['$$u_id', '$uuid']
+                        }
+                    },
+                }
+            ],
+            as: 'tokens',
+        }
+    },
+    {
+        $unwind: '$tokens'
+    },
+    { 
+        $replaceRoot: {  
+            'newRoot': '$tokens' 
+        } 
+    }
+])

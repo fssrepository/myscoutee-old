@@ -1,0 +1,27 @@
+use('myscoutee_db');
+
+var profileId = new BinData(3, "yknu7RlWklid+4HHAgwQow==");
+var date = "1900-01-01";
+
+db.likes.aggregate([
+    {
+        $match: {
+            $expr: 
+            {
+            $and: [
+                {$eq: ['$createdBy.$id', profileId]},
+                {$gt: [{$ifNull: [ '$createdDate', ISODate()]}, {$toDate: date }] },
+                {
+                    $eq: [{$ifNull: [ '$ref', 0]}, 0]
+                },
+            ]
+            }
+        }
+    },
+    { $count: 'games' },
+    { 
+            $replaceRoot: {  
+                'newRoot': {'root': 'games', 'value': '$games' } 
+            } 
+    }
+]);

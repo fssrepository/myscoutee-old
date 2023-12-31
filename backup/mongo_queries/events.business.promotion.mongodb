@@ -1,0 +1,77 @@
+use('myscoutee_db');
+
+//findAll in EventRepository Sort parameter
+//ensureIndex on array element
+//https://stackoverflow.com/questions/9063564/in-mongodb-how-do-you-index-an-embedded-object-fields-in-an-array
+//db.events.find({members : { $elemMatch: { _id : new BinData(3,ZUUfwg1UBWd3rB5bpcnjA==), status : A } }});
+
+
+var profileId = BinData(3,'lUY4VOkRT7dcUYuHgd//uQ==');
+
+db.promotions.aggregate([
+    { 
+            $match: { 
+                createdBy: profileId 
+            } 
+    },
+    { 
+            $unwind: '$events'
+    },
+    { 
+            $lookup: 
+            { 
+                from: 'events', 
+                let: { 'e_id': '$events.$id' },
+                pipeline: [ 
+                    { 
+                        $match: { 
+                            $expr: { 
+                                $and: [
+                                    {$eq: [ '$status', 'P' ]},
+                                    {$eq: [ '$$e_id', '$ref.$id' ]},
+                                ] 
+                            } 
+                        } 
+                    },
+                    {
+                        $project: {
+                            '_id': '$_id',
+                            'cap': {
+                                $size: {
+                                    $filter: {
+                                        input: '$members',
+                                        as: "member",
+                                        cond: { $eq: [ '$$member.status', 'A' ] }
+                                    },    
+                                }
+                            },
+                            'data': '$$ROOT'
+                        }
+                    },
+                    { 
+                        $match: { 
+                            $expr: { 
+                                $and: [
+                                    {$eq: [ '$cap', '$data.capacity' ]},
+                                ] 
+                            } 
+                        } 
+                    },
+                    { 
+                        $replaceRoot: {  
+                            'newRoot': '$data' 
+                        } 
+                    },
+                ], 
+                as: 'events', 
+            } 
+    },
+    { 
+            $unwind: '$events'
+    },
+    { 
+        $replaceRoot: {  
+            'newRoot': '$events' 
+        } 
+    },
+]);

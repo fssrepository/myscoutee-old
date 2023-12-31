@@ -1,0 +1,33 @@
+use('myscoutee_db');
+
+db.profiles.aggregate([
+    {
+        $match: {
+            "_id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ==")
+        }
+    },
+    {
+        $lookup: {
+            from: "setting",
+            localField: "setting.$id",
+            foreignField: "_id",
+            as: "setting"
+        }
+    },
+    {
+        $unwind: "$setting"
+    },
+    {
+        $group: {
+            '_id': "$setting._id",
+            data: {
+                $first: "$setting"
+            }
+        }
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": "$data"
+        }
+    }
+])

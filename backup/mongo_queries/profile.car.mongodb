@@ -1,0 +1,48 @@
+use('myscoutee_db');
+
+var offset = [
+    '1900-01-01'
+];
+
+var carId = new BinData(3, 'ykaJIaY0x/e1QmgwvV4fgQ==')
+
+var profileId = new BinData(3, 'ukQ9OypuwRummlrGEvsDtg==')
+
+db.profiles.aggregate([
+    {
+        $match: {
+            '_id': profileId
+        }
+    },
+    {
+        $unwind: '$cars'
+    },
+    {
+        $lookup:
+        {
+            from: 'cars',
+            let: { 'c_id': '$cars.$id' },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $and: [ 
+                                { $eq: ['$status', 'A'] },
+                                { $eq: ['$$c_id', carId] }
+                            ]
+                        }
+                    },
+                },
+            ],
+            as: 'cars'
+        }
+    },
+    {
+        $unwind: '$cars'
+    },
+    {
+        $replaceRoot: { 
+            'newRoot': '$cars'
+        }
+    }
+])

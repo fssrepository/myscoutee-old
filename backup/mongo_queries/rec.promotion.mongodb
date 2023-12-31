@@ -1,0 +1,77 @@
+use('myscoutee_db');
+
+var offset = [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    "1900-01-01"
+];
+
+var location = {
+    type: 'Point',
+    coordinates: [19.162726, 47.592243]
+}
+
+var step = 3;
+
+var limit = 20;
+
+var group = BinData(3, "PkoHFjkq6xouVW/lzz01pQ==")
+
+db.promotions.aggregate([
+{ 
+                            $geoNear : 
+                            { 
+                                near : location, 
+                                spherical     : true, 
+                                minDistance   : offset[0], 
+                                distanceField : 'distance', 
+                                distanceMultiplier: 0.001,
+                                /*'type': ?4,*/ /*'group.$id': group*/
+                                query         : { 'group.$id': group } 
+                            } 
+                    },
+
+                    /*{
+                        $lookup: {
+                            from: "groups",
+                            localField: "group.$id",
+                            foreignField: "_id",
+                            as: "groups"
+                        }
+                    },
+
+                    {
+                        $unwind: "$groups"
+                    },
+
+                    {
+                        $match: {
+                            "$groups._id": group
+                        }
+                    },*/
+
+            { 
+                                    $addFields: { 
+                                        'groupKey': {$multiply: [{$floor : [{$divide : ['$distance', step]}]}, step]}, 
+                                    } 
+                                },
+
+            // 'rate': -1,
+            { 
+                            $sort: { 
+                                'groupKey': 1, 'distance': 1, 'createdDate': -1 
+                            } 
+                    },
+
+            { $limit : limit },
+
+            { 
+                            $replaceRoot: {  
+                                'newRoot': {  
+                                    $mergeObjects: [{'promotion': '$$ROOT'}, { groupKey: '$groupKey', offset: ['$groupKey', '$distance', '$createdDate'] } ] 
+                                } 
+                            } 
+                        }
+])

@@ -1,0 +1,64 @@
+use('myscoutee_db');
+
+var offset = [
+    "1900-01-01"
+];
+
+var group = BinData(3, "/ErX/DmqctfK/OZrpEQItQ==")
+var profile = BinData(3, "2U3gYzoxdJeBv8LfUsZAjw==")
+
+db.profiles.aggregate([
+    {
+        $match: {
+            $expr: {
+                $and: [
+                    { $eq: ["$group", group] },
+                    { $ne: ["$_id", profile ] },
+                    { $in: ["$status", ['A', 'F', 'P']] }, //$in not working in spring
+                ]
+                    
+            }
+        }
+    },
+    {
+        $lookup:
+        {
+            from: "roles",
+            let: { "p_id": "$_id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: { $eq: ["$$p_id", "$profileId"] }
+                    },
+                },
+            ],
+            as: "role"
+        }
+    },
+    {
+        $unwind: "$role"
+    },
+    {
+        $match: {
+            $expr: 
+            {
+                $and: [
+                    {$gt: [ {$ifNull: [ "$createdDate", ISODate()]}, { $toDate: offset[0] }] },
+                ]
+            },
+        }
+    },
+    {
+        $sort: {
+            "createdDate": 1
+        }
+    },
+    { $limit : 20 },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"profile": "$$ROOT"}, { role: "$role.role", offset: ["$createdDate"] } ]
+            }
+        }
+    }
+])

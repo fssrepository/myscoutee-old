@@ -1,0 +1,100 @@
+use('myscoutee_db');
+//db.roles.find({"role": "ROLE_USER", "email": "raxim.uk@gmail.com"})
+
+db.profiles.find({});
+
+//db.promotions.find({'events.$id' : new BinData(3, '50tK1mPxlFzTtVW86AQ7tQ==')})
+
+//db.events.find({'ref.$id': new BinData(3, "cEpEBA+ON74gR4AVY+RRvw==") })
+
+//db.promotions.dropIndex({ "item.position" : "2dsphere" });
+//db.promotions.createIndex( { "item.info.position" : "2dsphere" } );
+
+//db.events.find({_id : new BinData(3, "cEBofMTmFTBhLKAe4jjTmA==") })
+//db.events.find({})
+//db.likes.find({})
+//db.likes.deleteOne({_id: new BinData(3, "k0CPIzUqeK1JgasjV6mFjg==")})
+
+/*db.events.updateOne(
+   { _id: new BinData(3, "40wkVlBJGawu2OE+///HlA==") },
+   {
+     $set: {
+       members: [
+         {"profile":{
+         "$ref":"profiles","$id": new BinData(3, "QkKAab19pK2zWSdM/UYkrw==")},
+         "_id": new BinData(3, "QkKAab19pK2zWSdM/UYkrw=="),
+         "status":"A"},
+         {"profile":{
+         "$ref":"profiles","$id": new BinData(3, "QkiTFBGYPFbvbrjs4BtZiw==")},
+         "_id": new BinData(3, "QkiTFBGYPFbvbrjs4BtZiw=="),
+         "status":"L"}
+       ]
+     }
+   }
+)*/
+
+/*db.messages.updateOne(
+   { _id: new BinData(3, "fkH2CxoPvtMX4YkoVE3kog==") },
+   {
+     $set: {
+       msg: {
+        "expl.videos": ["https://www.youtube.com/embed/9alr3t4r_0k"],
+        "expl.version": "0.1.0",
+        "expl.loading": "Betöltés...",
+        "expl.title": "Prioritás vezérelt ingyenes tars-, munka és csapatépítő oldal",
+        "expl.build": "<h2>Építsd fel a csapatod!</h2><h4><i>társ -, munkakereséshez és csapat építéshez</i></h4>",
+        "expl.intro": "Bevezető",
+        "expl.time": "<h2>Idő</h2><ul><li>Social oldalakat drága fenntartani, nem lehetnek ingyenesek teljesen, így sok oldal trükközik!<br />Az oldal <b>teljesen ingyenes normál értelemben véve, inkább segít abban, hogy minél több offline eseményen tudj reszt venni, és ehhez ajánl fizetőseket is</b>!</li><li>Social oldalak használata nagyon kimerítő!<br />Ez az oldal egy teljesen új koncepción, <b>a prioritás matchen alapul</b>.<br />Ahelyett, hogy a rendszer engedi, hogy mindenki mindenkivel cseveghessen, előbb mindenkinek adatlapokat kell prioritizálnia. Az összes priorizálás alapján a rendszer chat szobákat generál 6 emberrel.</li></ul>",
+        "expl.priority": "<h2>Prioritás alapú match</h2><ul><li><b>Nincs több swipe vagy match-re várás!</b></li><li><b>Nincs több inaktív adatlap!</b><br />Ha valaki nem ér rá egy hétig, nem fog regisztrálni eseményekre.</li><li>Ha a férfiak 2-3 szor többen vannak, a prioritás alapú matchelés <b>működni fog</b>!</li><li><b>Sosem kell újból egy eseményre egyedül menned</b>, ha szerveznél egyet! Mindig teltház lesz! Kiválaszthatsz embereket, akiket meginvitálsz es/vagy rabizod a rendszerre, hogy invitáljon embereket a prioritási listád alapján!</li><li>Magad is promotálhatsz ötletet, hirdethetsz meg állást, ahol az érdeklődök prioritizálhatnak időt, és Te is prioritizálhatod az érdeklődöket, kivel szeretnél elöbb találkozni!</li><li>A cégednél kikérheted mindenki véleményét kivel szeretne együtt dolgozni, és a rendszer megmutatja az optimalis csapatszerkezetet!</li><li><b>Fake adatlapokat a rendszer organikusan szűri, mivel az emberek azonnal találkoznak!</b></li></ul>",
+        "expl.group_dating": "<h2>Csoportos ismerkedés</h2><ul><li>Az online világ nagyon eltérő az offline világtól.<br />Az oldal segít, hogy minél többet találkozhass emberekkel, így <b>minél hamarabb megszerezd a szükséges képességeket.</b></li><li><b>Egyedül nem managelheted a teljes világot!</b> Ahogy az offline világban úgy az online világban is másoknak is be kell segítenie a hasonszőrű emberek megtalálásában!</li><li>Egyszerűen <b>több lehetőség nyilik meg az iterakcióra</b> több emberrel!</li></ul>",
+        "expl.equal_opportunity": "<h2>Egyenlő lehetőség</h2><ul><li>Míg a jó képű emberek rengeteg szamukra megtévesztő like-ot kaphatnak, addig a többség sehova sem jut. Ez csak az online világra jellemző viselkedési mintákat hoz létre minkét oldalon!<b>Itt mindenkinek egyenlő lehetősége van ismerkedni!</b></li><li><b>Adatlapokat össze tudsz hasonlítani a saját preferenciád alapján, de fotók alapján megitélni embereket már nem!</b></li></ul>",
+        "expl.follow": "Kövess minket",
+        "expl.report": "Hibabejelentő",
+        "expl.security": "<h2>Biztonság</h2><ul><li><b>A social oldalak reklám alapú finanszírozással működnek.</b><br /><b>Számukra a képernyő minél tovább nézése és minél több adat begyűjtése elengedhetetlen.</b><br />A reklámok eleve féltékenységet szeretnének generálni. Amig másokkal megosztod az életed legjobb pillanatait, másokat féltékennyé teszel, hogy utána az oldal minél többet reklámozhasson rajtad keresztül.<br /> Az oldal üzemeltetőinek dolgozol, addig amig hanyagolod az offline barataid! <br />Ezzel nagyon nehéz üzletileg versenyezni...<br /><b>Ez az oldal affiliate marketingen alapul, ami az online foglalási rendszereknél elterjedt (szállás stb.), ezért az oldal számára már nem annyira fontos a féltékenység gerjesztése, vagy az tulburjánzó adatgyüjtés!</b></li></ul>",
+        "err.no_profile": "Kérlek engedélyezd a localizáciod, és töltsd ki a profilod!",
+        "profile.invited.title": "Meghívtak a ${groupReq.name} csoportba!",
+        "profile.invited.desc": "${groupReq.desc}"
+      }
+   }
+   }
+)*/
+
+//RUCa8h32+6F3EIvbYB0EgA==, zERhjhjd+fnIApNFnqb5oA==, CE2IG4aW/F6L6J1BK1t+vA==
+//2Eeb9mPpijple7kQ4bPiqA==
+
+//kUF5bQiqbymgqzWrN3ydpA==,W0MFnwYVZIgzddC/KJzeqw==,+U/aHNJcV79UroCOFk4hmA==
+//db.profiles.find()
+//db.profiles.find({"_id": BinData(3, "ZUtlZTxdeAAwNzvl5qyhng==")})
+
+/*db.profiles.updateMany(
+   { },
+   {
+     $set: {
+       images: [{
+           "name" : "9550bcf3-24b1-4536-bb9b-e2d69d34cc89"
+       },
+       {
+           "name" : "653a9633-357a-4036-92c1-2079418345a0",
+       },
+       {
+           "name" : "a4e4886a-eec7-4934-b4b8-49f4c8827c88"
+       }],
+     }
+   }
+);*/
+
+//db.events.find({ "_id": BinData(3, "/0X3D//qircAec7JNdd6tg==")})
+//db.likes.find({"createdBy.$id": BinData(3,"TULOVwRNgGjiJij4CSK5iw==")});
+
+//db.profiles.find({"_id" : BinData(3,"TULOVwRNgGjiJij4CSK5iw==")})
+//db.profiles.find();
+//db.events.find({"members" : { $elemMatch: { "profile.$id": BinData(3,"6Uy9WJDwi/B/UiGN2I7HpQ=="), "status": "A" } }});
+//db.events.find({"members" : { $elemMatch: { "profile.$id": BinData(3,"LkCnpdOMpjnQ+95vK/Z1ng=="), "status": "A" } }});
+//db.events.find({'members.profile.$id' : { $in: [ new BinData(3,"B0jA/qFNlCLR5nTo39k/tA==") ] }});
+//db.likes.find({$or : [{ 'from.$id' : { $in: [ new BinData(3,"B0jA/qFNlCLR5nTo39k/tA==") ] }}, { 'to.$id' : { $in: [ new BinData(3,"B0jA/qFNlCLR5nTo39k/tA==") ] }}]});
+
+//db.likes.find({$or : [{ 'from.$id' : { $eq: new BinData(3,"B0jA/qFNlCLR5nTo39k/tA==") }},{ 'to.$id' : { $eq: new BinData(3,"B0jA/qFNlCLR5nTo39k/tA==") }}]});
+
+//db.profiles.find({ '_id' : { $in: [ new BinData(3,"VkbtS7wD8dMy4oRzyTIOng==") ] }})
+// Run a find command to view items sold on April 4th, 2014.
+//db.sales.find({ date: { $gte: new Date('2014-04-04'), $lt: new Date('2014-04-05') } });

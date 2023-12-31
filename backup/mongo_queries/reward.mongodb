@@ -1,0 +1,41 @@
+use('myscoutee_db');
+
+var profile = BinData(3, "gEHObmu8iEpWXHQoohHMlA==")
+
+db.links.aggregate([
+    {
+        $match: {
+            $expr: { $eq: ["$createdBy", profile] }
+        }
+    },
+    {
+        $lookup: {
+            from: "groups",
+            localField: "refId",
+            foreignField: "_id",
+            as: "ref"
+        }
+    },
+    {
+        $unwind: "$ref"
+    },
+    {
+        $group: {
+            '_id': "$refId",
+            'type': {$first: "$type"},
+            'name': {$first: "$ref.name"},
+            'data': {
+                $sum: {
+                    $size: "$usedBys"
+                }
+            },
+        }
+    },
+    {
+        $replaceRoot: { 
+            "newRoot": { 
+                $mergeObjects: [{"ref": "$_id", "type": "$type", "cnt": "$data", "name": "$name"}]
+            }
+        }
+    }
+])
