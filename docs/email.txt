@@ -1,0 +1,31 @@
+https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
+
+token query also check profile is active (A) or not
+
+message queries (channel) should lookup profiles, whether it's active = A
+
+delete profile make status D, check how the app behaves, when tries to login and go to profile page.
+
+install certbot directly to nginx, hence we can shave separate docker container using memory
+
+event chat window make silent
+
+build production images and d9cker-compose, everything should be wrapped up in the image (angular json, configs etc. only public/private keys for certbot not
+
+chat search btn on messages => kinyilo menu gombokkal
+
+deffered profile delete => if you logged within one month, you need to delete it again
+
+how it works description should mention rate button on the panel -> the add to home screen popup should show this info also.
+
+to avoid creating huge documentation
+
+put the delete button far away from logout button
+
+delete profile => delete even chat messages also
+
+update badge on liked/both-liked etc. on notification etc.
+
+instead of changing the progress bar while someone is typing, add something to the avatar bar -> writing title next to the profiles
+
+anonymize chat, random chat, the profile images not shown in the chat, hence, you know people better
