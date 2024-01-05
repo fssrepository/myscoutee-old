@@ -12,6 +12,7 @@ I) Event
    8) event form to be reorganized - no separate campaign/template screen. (just simple event)
       -
    9) publish event??
+   10) you can rate on an event to show interest and the organizer can rate you also or simply accept (rule)
 
 II) Rate
 
