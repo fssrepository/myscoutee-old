@@ -13,6 +13,7 @@ I) Event
       -
    9) publish event??
    10) you can rate on an event to show interest and the organizer can rate you also or simply accept (rule)
+   11) car event - join/leave
 
 II) Rate
 
@@ -36,3 +37,5 @@ Optional:
 
 V) Badge
    1) you can buy something with discounts etc.
+
+VI) who bring what to an event and which amount (sausage etc.)
