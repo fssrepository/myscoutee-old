@@ -11,6 +11,7 @@ I) Event
    7) for geolocation, enter an address -> db will pick up geo cordinates
    8) event form to be reorganized - no separate campaign/template screen. (just simple event)
       -
+   9) publish event??
 
 II) Rate
 
