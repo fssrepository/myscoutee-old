@@ -16,9 +16,8 @@ II) I don't want try to explain the whole functionality, but I tried to open a w
    (stronger connections are going to be grouped together)
    Based on priority each person is being assigned to a random event. (graph algorithm)
    After meeting with each other they can re-prioritize themselves, hence the priority graph will be improved. (AI)
-   Business model is less dependent on subscription fees and more dependent on affiliate systems. (e.g.: Booking.com)
-   As the dating is a group dating, the possibility for various type of events can be better and events are always full.
-   When you want to create an event, then you call people based on mutual priority instead of inviting individually.
+   Business model is less dependent on subscription fees and more dependent on affiliate systems and individual event organizers. (e.g.: Booking.com)
+   When you want to create an event, then you call people based on mutual priority instead of inviting individually. (who you met before on any random event -> hence you are not new to each other, or your level 1 connections)
 2) Some menu has been commented out, as functionality needs to be fixed. (don't remove)
 3) Some documentation is under docs folder and in the entity files.
 
