@@ -2,7 +2,7 @@
 
 I) The reason why i make this project public, as my country is not that supportive to create business,
 but I do feel that project can make the world a better place and i don't want to waste years of work of mine.
-(lots of refactoring, lots of technology upgrade etc., it was also up and running)
+(lots of refactoring, lots of technology upgrade etc., it was also up and running on domain myscoutee.com, and has promo videos under docs/videos)
 
 I try to fix the UI for the time being to ease the understanding. Server side has lots of very detailed tests.
 Naturally a project like that never can be finished, however MVP is almost finished.
