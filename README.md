@@ -8,9 +8,9 @@ but I strongly believe that project can make the world a better place and i don'
 (lots of refactoring, lots of technology upgrade, cleanup and many more etc., it was also up and running on domain myscoutee.com, and has promo videos under docs/videos)
 
 I try to fix the UI for the time being to ease the understanding. Server side has lots of very detailed tests.
-Naturally a project like that never can be finished, however MVP is almost finished.
+Naturally a project like that never can be finished, however MVP is almost finished with some issues (either on UI or server side).
 
-II) I don't want try to explain the whole functionality, but I tried to open a world for you about the possibilities:
+II) I don't want to try to explain the whole functionality, but I tried to open a world for you about the possibilities:
 
 1) The project aim is to create fairness into the dating world, which makes less exhaustive experience in both end.
    Instead of swipe, you rate people 1-10 and based on that you will be placed in a graph.
