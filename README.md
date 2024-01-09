@@ -4,7 +4,7 @@ Licence is BSD. (only one thing, i ask for, just notify me about your website, t
 It's benefitial to fork instead of clone to track down the variations.
 
 I) The reason why i make this project public, as my country is not that supportive to create business,
-but I do feel that project can make the world a better place and i don't want to waste years of work of mine.
+but I strongly believe that project can make the world a better place and i don't want to waste years of work of mine.
 (lots of refactoring, lots of technology upgrade, cleanup and many more etc., it was also up and running on domain myscoutee.com, and has promo videos under docs/videos)
 
 I try to fix the UI for the time being to ease the understanding. Server side has lots of very detailed tests.
@@ -19,6 +19,8 @@ II) I don't want try to explain the whole functionality, but I tried to open a w
    After meeting with each other they can re-prioritize themselves, hence the priority graph will be improved. (AI)
    Business model is less dependent on subscription fees and more dependent on affiliate systems and individual event organizers. (e.g.: Booking.com)
    When you want to create an event, then you call people based on mutual priority instead of inviting individually. (who you met before on any random event -> hence you are not new to each other, or your level 1 connections)
+   It's not a typical dating site, as even job site or any other site can use the algorithm and technic.
+   (even in this project you can rate for events, not only for people)
 2) Some menu has been commented out, as functionality needs to be fixed. (don't remove)
 3) Some documentation is under docs folder and in the entity files.
 
