@@ -248,6 +248,8 @@ const routes: Routes = [
         },
       },
       //groups will be added onto logout screen
+      //create/leave/join group and login into group(switch) on the panel
+      //no settings.component for logout
 
       // it's for group invite, when you are going to restructure a team (at the top menu bar)
       // you can select event created by organizer or you can organize your own by group
@@ -265,6 +267,13 @@ const routes: Routes = [
               component: GroupFormComponent,
               type: 'add',
               icon: 'group_add',
+            },
+            {
+              component: BasketComponent,
+              type: 'explore', //clone a group or promotional event
+              icon: 'explore',
+              // only profiles - members url part will be replaced by profiles
+              url: 'user/groups', // backend call - not rate_met, filter out already added members
             },
             {
               component: GroupFormComponent,
