@@ -5,9 +5,12 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
+import { DataService } from 'src/app/services/data.service';
 import { HttpService } from 'src/app/services/http.service';
 import { EditorComponent } from '../../editor/editor.component';
 
+const DESC_MIN = 10;
+const DESC_MAX = 160;
 @Component({
   selector: 'app-group',
   templateUrl: './group.component.html',
@@ -17,6 +20,9 @@ export class GroupFormComponent implements OnInit {
 
   images: any;
 
+  types: any;
+  visibilities: any;
+
   progress: any = { mode: 'determine', value: 100, color: 'primary' };
   private url: any;
 
@@ -25,8 +31,13 @@ export class GroupFormComponent implements OnInit {
     public dialogRef: MatDialogRef<GroupFormComponent>,
     public dialog: MatDialog,
     private httpService: HttpService,
+    private dataService: DataService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+
+    this.types = this.dataService.groupTypes;
+    this.visibilities = this.dataService.groupVisibilities;
+
     this.data = data.value ? data.value : { images: [] };
     this.url = data.url;
   }
@@ -34,17 +45,16 @@ export class GroupFormComponent implements OnInit {
   ngOnInit(): void {
     this.formGroup = this.fb.group({
       data: this.fb.group({
-        regNum: [this.data.regNum, Validators.required],
-        make: [this.data.make, Validators.required],
-        model: [this.data.model, Validators.required],
-        color: [this.data.color, Validators.required],
-        year: [
-          this.data.year,
-          [Validators.required, Validators.pattern('^[0-9]{4}$')],
-        ],
-        capacity: [
-          this.data.capacity,
-          [Validators.required, Validators.pattern('^[0-9]+$')],
+        type: [this.data.type, Validators.required],
+        visibility: [this.data.visibility, Validators.required],
+        name: [this.data.name, Validators.required],
+        desc: [
+          this.data.desc !== undefined ? this.data.desc : '',
+          [
+            Validators.required,
+            Validators.minLength(DESC_MIN),
+            Validators.maxLength(DESC_MAX),
+          ],
         ],
       }),
       images: [

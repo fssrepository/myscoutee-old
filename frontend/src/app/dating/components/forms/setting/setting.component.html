@@ -10,7 +10,7 @@
 ></mat-progress-bar>
 <form default *ngIf="formGroup" [formGroup]="formGroup">
   <div formGroupName="data">
-    <!--<fieldset>
+    <fieldset>
       <legend>Group</legend>
       <mat-form-field>
         <mat-select [formControlName]="'key'" (selectionChange)="onSelect($event)">
@@ -25,7 +25,7 @@
       <button *ngIf="selected.value !== current" mat-raised-button color="primary" (click)="onClick()">
         Switch
       </button>
-    </fieldset>-->
+    </fieldset>
     <div button-row>
       <button mat-raised-button color="accent" (click)="logout()">
         Logout

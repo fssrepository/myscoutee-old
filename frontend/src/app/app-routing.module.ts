@@ -24,18 +24,6 @@ const routes: Routes = [
       import('./dating/dating.module').then((m) => m.DatingModule),
     canLoad: [AuthGuard],
   },
-  {
-    path: 'business',
-    loadChildren: () =>
-      import('./business/business.module').then((m) => m.BusinessModule),
-    canLoad: [AuthGuard],
-  },
-  {
-    path: 'job',
-    loadChildren: () =>
-      import('./job/job.module').then((m) => m.JobModule),
-    canLoad: [AuthGuard],
-  },
 ];
 
 @NgModule({

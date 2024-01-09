@@ -12,7 +12,9 @@ import {
   QrcodeComponent,
   SettingComponent,
   RewardComponent,
-  PromotionFilterComponent,
+  GroupFormComponent,
+  SchoolComponent,
+  ProfileStatusComponent
 } from './components';
 
 // filter, add, attach
@@ -31,6 +33,7 @@ const routes: Routes = [
         component: MsList,
         data: {
           reuse: true,
+          icon: 'chat',
           actions: [
           ],
           event: true, //temporary
@@ -59,107 +62,7 @@ const routes: Routes = [
           }
         ]
       },
-      /*{
-        path: 'events',
-        component: MsList,
-        data: {
-          reuse: true,
-          icon: 'event',
-          actions: [
-          ],
-          multiple: true,
-          event: true, //temporary
-          animation: 'One',
-          group: 'date',
-        },
-      },*/
-      /*{
-        path: 'events/:id',
-        data: {
-          icon: 'insert_invitation',
-          dialog: true,
-        },
-        children: [
-          { path: '', redirectTo: 'items', pathMatch: 'full' },
-          {
-            path: 'items',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'list',
-              actions: [
-                {
-                  component: EventFormComponent,
-                  type: 'add',
-                  icon: 'add',
-                },
-                {
-                  component: EventFormComponent,
-                  type: 'edit',
-                },
-              ],
-              event: true, //temporary
-              animation: 'One1',
-            },
-          },
-          {
-            path: 'items/:id',
-            data: {
-              icon: 'insert_invitation',
-              dialog: true,
-            },
-            children: [
-              { path: '', redirectTo: 'members', pathMatch: 'full' },
-              {
-                path: 'members',
-                component: MsList,
-                data: {
-                  reuse: true,
-                  animation: 'Two1',
-                },
-              },
-            ],
-          },
-          {
-            path: 'members',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'groups',
-              actions: [
-                {
-                  component: BasketComponent,
-                  type: 'add',
-                  icon: 'add',
-                  multiple: true,
-                  // only profiles - members url part will be replaced by profiles
-                  url: '/games/rate_met', // backend call - not rate_met, filter out already added members
-                },
-              ],
-            },
-          },
-          {
-            path: 'feedbacks',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'feedback_ext',
-              actions: [
-                {
-                  component: FeedbackFormComponent,
-                  type: 'add',
-                  icon: 'add',
-                },
-                {
-                  component: FeedbackFormComponent,
-                  type: 'edit',
-                },
-              ],
-            },
-          },
-        ],
-      },*/
-      /*{
+      {
         path: 'invitations',
         component: MsList,
         data: {
@@ -206,180 +109,8 @@ const routes: Routes = [
           },
         ],
       },
-      {
-        path: 'promotions',
-        component: MsList,
-        data: {
-          reuse: true,
-          icon: 'campaign',
-        },
-      },
-      {
-        path: 'promotions/:id',
-        data: {
-          icon: 'insert_invitation',
-          dialog: true,
-        },
-        children: [
-          { path: '', redirectTo: 'items', pathMatch: 'full' },
-          {
-            path: 'items',
-            component: MsList,
-            data: {
-              reuse: true,
-              event: true, //temporary
-              animation: 'One1',
-            },
-          },
-        ],
-      },*/
     ],
   },
-  /*{
-    path: 'recommendations',
-    data: {
-      reuse: true,
-      icon: 'explore',
-      animation: 'Three',
-    },
-    children: [
-      { path: '', redirectTo: 'events', pathMatch: 'full' },
-      {
-        path: 'events',
-        component: MsList,
-        data: {
-          reuse: true,
-          icon: 'local_activity',
-          event: true, //temporary
-          animation: 'Three1',
-        },
-      },
-      {
-        path: 'events/:id',
-        data: {
-          icon: 'insert_invitation',
-          dialog: true,
-        },
-        children: [
-          { path: '', redirectTo: 'items', pathMatch: 'full' },
-          {
-            path: 'items',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'list',
-              actions: [
-                {
-                  component: EventFormComponent,
-                  type: 'add',
-                  icon: 'add',
-                },
-              ],
-              event: true, //temporary
-              animation: 'Three2',
-            },
-          },
-          {
-            path: 'feedbacks',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'feedback_ext',
-              actions: [
-                {
-                  component: EventFormComponent,
-                  type: 'add',
-                  icon: 'add',
-                },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        path: 'promotions',
-        component: MsList,
-        data: {
-          reuse: true,
-          icon: 'campaign',
-          // actions: [
-          //   // Group-Filter has the common filter settings handling - this component will be removed
-          //   {
-          //     component: PromotionFilterComponent,
-          //     type: 'filter',
-          //     icon: 'search',
-          //   },
-          // ],
-        },
-      },
-      {
-        path: 'promotions/:id',
-        data: {
-          icon: 'insert_invitation',
-          dialog: true,
-        },
-        children: [
-          { path: '', redirectTo: 'events', pathMatch: 'full' },
-          {
-            path: 'events',
-            component: MsList,
-            data: {
-              reuse: true,
-              event: true, //temporary
-              animation: 'One1',
-              actions: [
-                {
-                  component: EventFormComponent,
-                  type: 'clone',
-                },
-              ],
-            },
-          },
-          {
-            path: 'events/:id',
-            data: {
-              icon: 'insert_invitation',
-              dialog: true,
-            },
-            children: [
-              { path: '', redirectTo: 'items', pathMatch: 'full' },
-              {
-                path: 'items',
-                component: MsList,
-                data: {
-                  reuse: true,
-                  icon: 'list',
-                  event: true, //temporary
-                  animation: 'One1',
-                },
-              },
-              {
-                path: 'feedbacks',
-                component: MsList,
-                data: {
-                  reuse: true,
-                  icon: 'feedback_ext',
-                },
-              },
-            ],
-          },
-        ],
-      },
-      {
-        path: 'groups',
-        component: MsList,
-        data: {
-          reuse: true,
-          icon: 'groups',
-          actions: [
-            {
-              type: 'join',
-            },
-          ],
-        },
-      },
-    ],
-  },*/
   {
     path: 'games',
     data: {
@@ -393,38 +124,11 @@ const routes: Routes = [
         component: MsList,
         data: {
           reuse: true,
-          icon: 'rate_ext_new',
+          icon: 'star',
           double: true,
           group: 'dist',
           filter: true
         },
-      },
-      {
-        path: 'rate_double/:id',
-        data: {
-          icon: 'insert_invitation',
-          dialog: true,
-        },
-        children: [
-          { path: '', redirectTo: 'none', pathMatch: 'full' },
-          {
-            path: 'none',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'screen_share',
-              animation: 'Four',
-            },
-          },
-          {
-            path: 'rated',
-            component: MsList,
-            data: {
-              reuse: true,
-              icon: 'rate_ext',
-            },
-          },
-        ],
       },
       {
         path: 'rate_give',
@@ -453,18 +157,18 @@ const routes: Routes = [
           double: true,
         },
       },
-      /*{
-        path: 'rate_met',
+      {
+        //path: 'rate_double/:id',
+        path: 'rate_double',
         component: MsList,
         data: {
           reuse: true,
-          icon: 'history',
+          icon: 'groups',
           double: true,
-        },
-        // filter button - hasonlosag vagy lokalizacio (ez ugyanaz amikor a resztvevoket valasztja ki egy esemenyhez)
-        // basket component filter button
-      },*/
-      // ?state=active,pending,none
+          group: 'dist',
+          filter: true
+        }
+      },
     ],
   },
   {
@@ -481,9 +185,9 @@ const routes: Routes = [
         component: PanelComponent,
         data: {
           reuse: true,
-          //icon: 'profile_ext',
+          icon: 'profile_ext',
           actions: [
-            /*{
+            {
               component: RewardComponent,
               type: 'share',
               icon: 'send',
@@ -492,7 +196,7 @@ const routes: Routes = [
               component: RewardComponent,
               type: 'reward',
               icon: 'military_tech',
-            },*/
+            },
             {
               component: SettingComponent,
               type: 'logout',
@@ -503,7 +207,27 @@ const routes: Routes = [
           ],
         },
       },
-      /*{
+      {
+        path: 'schools',
+        component: MsList,
+        data: {
+          reuse: true,
+          icon: 'school',
+          actions: [
+            {
+              component: SchoolComponent,
+              type: 'add',
+              icon: 'add',
+            },
+            {
+              component: SchoolComponent,
+              type: 'edit',
+            },
+          ],
+          event: true, //temporary
+        },
+      },
+      {
         path: 'cars',
         component: MsList,
         data: {
@@ -522,7 +246,241 @@ const routes: Routes = [
           ],
           event: true, //temporary
         },
-      },*/
+      },
+      //groups will be added onto logout screen
+
+      // it's for group invite, when you are going to restructure a team (at the top menu bar)
+      // you can select event created by organizer or you can organize your own by group
+      // admin groups has statistics tab - who is the less popular, why? who is the most populat why?
+      // why is when you like by category for people
+      // show optimal groups (the size of the group is configurable)
+      {
+        path: 'groups',
+        component: MsList,
+        data: {
+          reuse: true,
+          icon: 'groups',
+          actions: [
+            {
+              component: GroupFormComponent,
+              type: 'add',
+              icon: 'group_add',
+            },
+            {
+              component: GroupFormComponent,
+              type: 'edit',
+            },
+            {
+              component: GroupFormComponent,
+              type: 'share',
+            },
+          ],
+        },
+      },
+      {
+        path: 'groups/:id',
+        data: {
+          icon: 'insert_invitation',
+          dialog: true,
+        },
+        children: [
+          { path: '', redirectTo: 'profiles', pathMatch: 'full' },
+          {
+            path: 'profiles',
+            component: MsList,
+            data: {
+              icon: 'groups',
+              reuse: true,
+              // icon: 'list',
+              actions: [
+                {
+                  component: ProfileStatusComponent,
+                  type: 'edit',
+                },
+              ],
+            },
+          },
+          {
+            path: 'events',
+            component: MsList,
+            data: {
+              reuse: true,
+              icon: 'local_activity',
+              actions: [
+                {
+                  // component: EventFormComponent,
+                  component: QrcodeComponent,
+                  type: 'verify',
+                },
+                {
+                  // component: EventFormComponent,
+                  component: QrcodeComponent,
+                  type: 'code',
+                },
+              ],
+              multiple: true,
+              event: true, //temporary
+              animation: 'One',
+            },
+          },
+          {
+            path: 'events/:id',
+            data: {
+              icon: 'local_activity',
+              dialog: true,
+            },
+            children: [
+              { path: '', redirectTo: 'items', pathMatch: 'full' },
+              {
+                path: 'items',
+                component: MsList,
+                data: {
+                  reuse: true,
+                  actions: [
+                    {
+                      component: EventFormComponent,
+                      type: 'add',
+                      icon: 'add',
+                    },
+                    {
+                      component: EventFormComponent,
+                      type: 'edit',
+                    },
+                  ],
+                  event: true, //temporary
+                  animation: 'One1',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: 'events',
+    component: MsList,
+    data: {
+      reuse: true,
+      icon: 'event',
+      actions: [
+        {
+          component: EventFormComponent,
+          type: 'add',
+          icon: 'add',
+        },
+        {
+          component: BasketComponent,
+          type: 'explore', //clone a group or promotional event
+          icon: 'explore',
+          // only profiles - members url part will be replaced by profiles
+          url: 'events', // backend call - not rate_met, filter out already added members
+        },
+        {
+          // component: EventFormComponent,
+          component: QrcodeComponent,
+          type: 'verify',
+        },
+        {
+          // component: EventFormComponent,
+          component: QrcodeComponent,
+          type: 'code',
+        },
+        {
+          component: EventFormComponent,
+          type: 'edit',
+        },
+      ],
+      multiple: true,
+      event: true, //temporary
+      animation: 'One',
+      group: 'date',
+    },
+  },
+  {
+    path: 'events/:id',
+    data: {
+      icon: 'insert_invitation',
+      dialog: true,
+    },
+    children: [
+      { path: '', redirectTo: 'items', pathMatch: 'full' },
+      {
+        path: 'items',
+        component: MsList,
+        data: {
+          reuse: true,
+          icon: 'list',
+          actions: [
+            {
+              component: EventFormComponent,
+              type: 'add',
+              icon: 'add',
+            },
+            {
+              component: EventFormComponent,
+              type: 'edit',
+            },
+          ],
+          event: true, //temporary
+          animation: 'One1',
+        },
+      },
+      {
+        path: 'items/:id',
+        data: {
+          icon: 'insert_invitation',
+          dialog: true,
+        },
+        children: [
+          { path: '', redirectTo: 'members', pathMatch: 'full' },
+          {
+            path: 'members',
+            component: MsList,
+            data: {
+              reuse: true,
+              animation: 'Two1',
+            },
+          },
+        ],
+      },
+      {
+        path: 'members',
+        component: MsList,
+        data: {
+          reuse: true,
+          icon: 'groups',
+          actions: [
+            {
+              component: BasketComponent,
+              type: 'add',
+              icon: 'add',
+              multiple: true,
+              // only profiles - members url part will be replaced by profiles
+              url: '/games/rate_met', // backend call - not rate_met, filter out already added members
+            },
+          ],
+        },
+      },
+      {
+        path: 'feedbacks',
+        component: MsList,
+        data: {
+          reuse: true,
+          icon: 'feedback_ext',
+          actions: [
+            {
+              component: FeedbackFormComponent,
+              type: 'add',
+              icon: 'add',
+            },
+            {
+              component: FeedbackFormComponent,
+              type: 'edit',
+            },
+          ],
+        },
+      },
     ],
   },
 ];

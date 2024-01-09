@@ -15,7 +15,6 @@ import {
   HelpComponent,
   PanelComponent,
   ProfileComponent,
-  PromotionFilterComponent,
   QrcodeComponent,
   RewardComponent,
   SettingComponent
@@ -28,7 +27,6 @@ import { DatingRoutingModule } from './dating-routing.module';
     SettingComponent,
     EventFormComponent,
     EventFilterComponent,
-    PromotionFilterComponent,
     GroupFilterComponent,
     PanelComponent,
     EditorComponent,

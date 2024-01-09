@@ -28,6 +28,46 @@
         >
           <mat-panel-title>Group data</mat-panel-title>
         </mat-expansion-panel-header>
+        <mat-form-field>
+          <mat-label>Type</mat-label>
+          <mat-select [formControlName]="'type'">
+            <mat-option *ngFor="let type of types" [value]="type.value">
+              {{ type.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Visibility</mat-label>
+          <mat-select [formControlName]="'visibility'">
+            <mat-option *ngFor="let visibility of visibilities" [value]="visibility.value">
+              {{ visibility.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Enter name</mat-label>
+          <input matInput [formControlName]="'name'" />
+          <mat-error *ngIf="formGroup.controls.data.get('name').invalid"
+            >Name is required!</mat-error
+          >
+        </mat-form-field>
+        <fieldset>
+          <legend>Description (min. 10, max. 160)</legend>
+          <div legend-right>
+            {{ formGroup.controls.data.get('desc').value.length }}
+          </div>
+          <mat-form-field>
+            <textarea
+              matInput
+              [formControlName]="'desc'"
+              rows="5"
+              maxlength="160"
+            ></textarea>
+            <mat-error *ngIf="formGroup.controls.data.get('desc').invalid"
+              >Description is required!</mat-error
+            >
+          </mat-form-field>
+        </fieldset>
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header

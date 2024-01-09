@@ -308,7 +308,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.router.navigate([groupType]);
                   }*/
 
-                  this.router.navigate(['job']);
+                  this.router.navigate(['dating']);
                 },
                 error: (err) => {
                   this.router.navigate(['dating/user']);

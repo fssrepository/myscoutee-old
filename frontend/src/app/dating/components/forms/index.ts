@@ -7,3 +7,5 @@ export * from  './event/event.component';
 export * from  './profile/profile.component';
 export * from  './setting/setting.component';
 export * from  './feedback/feedback.component';
+export * from './profile-status/profile-status.component';
+export * from './school/school.component';
