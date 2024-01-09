@@ -1,6 +1,6 @@
 # myscoutee
 
-Licence is BSD. (only one thing, i ask, just notify me about your website, that my effort was not wasted)
+Licence is BSD. (only one thing, i ask for, just notify me about your website, that my effort was not wasted)
 
 I) The reason why i make this project public, as my country is not that supportive to create business,
 but I do feel that project can make the world a better place and i don't want to waste years of work of mine.
