@@ -33,7 +33,7 @@ const routes: Routes = [
         component: MsList,
         data: {
           reuse: true,
-          icon: 'chat',
+          //icon: 'chat',
           actions: [
           ],
           event: true, //temporary
@@ -62,7 +62,7 @@ const routes: Routes = [
           }
         ]
       },
-      {
+      /*{
         path: 'invitations',
         component: MsList,
         data: {
@@ -108,7 +108,7 @@ const routes: Routes = [
             },
           },
         ],
-      },
+      },*/
     ],
   },
   {
@@ -157,7 +157,7 @@ const routes: Routes = [
           double: true,
         },
       },
-      {
+      /*{
         //path: 'rate_double/:id',
         path: 'rate_double',
         component: MsList,
@@ -168,7 +168,7 @@ const routes: Routes = [
           group: 'dist',
           filter: true
         }
-      },
+      },*/
     ],
   },
   {
@@ -185,9 +185,9 @@ const routes: Routes = [
         component: PanelComponent,
         data: {
           reuse: true,
-          icon: 'profile_ext',
+          //icon: 'profile_ext',
           actions: [
-            {
+            /*{
               component: RewardComponent,
               type: 'share',
               icon: 'send',
@@ -196,7 +196,7 @@ const routes: Routes = [
               component: RewardComponent,
               type: 'reward',
               icon: 'military_tech',
-            },
+            },*/
             {
               component: SettingComponent,
               type: 'logout',
@@ -207,7 +207,7 @@ const routes: Routes = [
           ],
         },
       },
-      {
+      /*{
         path: 'schools',
         component: MsList,
         data: {
@@ -363,10 +363,10 @@ const routes: Routes = [
             ],
           },
         ],
-      },
+      },*/
     ],
   },
-  {
+  /*{
     path: 'events',
     component: MsList,
     data: {
@@ -491,7 +491,7 @@ const routes: Routes = [
         },
       },
     ],
-  },
+  },*/
 ];
 
 @NgModule({
