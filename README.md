@@ -25,7 +25,7 @@ II) I don't want to try to explain the whole functionality, but I tried to open 
 3) Some documentation is under docs folder and in the entity files.
 
 Lots of refactoring has happened lately:
-1) mysql/neo4j -> mongodb (to make the MVP faster)
+1) mysql/neo4j -> mongodb (to create the MVP faster)
 2) kotlin -> java
 3) mosquitto project has been customized
 ...
