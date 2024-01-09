@@ -2,6 +2,8 @@
 2) group tab on profile screen
 3) invitation screen
 
+4) event calendar explore (list out all of the group events, and you can join)
+   special group (can rate inside for people or ideas - login into the group button is allowed) or you can create event only
 
 bugs:
 -----
