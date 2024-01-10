@@ -20,8 +20,8 @@
    
    When you want to create an event, then you call people based on mutual priority instead of inviting individually. (who you met before on any random event -> hence you are not new to each other, or your level 1 connections)
 2) Some menu has been commented out, as functionality needs to be fixed. (don't remove)
-3) Some documentation is under docs folder and in the entity files.
-
+3) Some documentation is under docs folder (has got promo videos) and in the entity files.
+                                           ---------------------- 
 
 
 firebase:
