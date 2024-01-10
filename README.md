@@ -1,17 +1,14 @@
 # myscoutee
 
-The project's aim is to create fairness into the dating world, which makes less exhaustive experience in both end.
-   
-Instead of swipe, you rate people 1-10 and based on that you will be placed in a graph.
-(stronger connections are going to be grouped together)
+Swiping (Tinder) is very exhausting and non-fair. Intead of swing you can rate/prioritise people 1-10, who you would like to met first.
    
 Based on mutual priority each person is being assigned to a generated group event with chat. (graph algorithm)
    
-After meeting with each other they can re-prioritize each other, hence the priority graph will be improved. (AI)
+Mutual priorities can be changed at any moment, hence the graph can be developed. (AI reinforced training)
    
-Business model is less dependent on subscription fees and more dependent on affiliate systems and individual event organizers. (e.g.: Booking.com)
-   
-When you want to create an event, then you can invite people based on mutual priority next to the manual invitation. (who you met before on any random event -> hence you are not new to each other, or your level 1 connections)
+Group dating allows to shift business model towards affiliate systems (Booking.com) from subscription.
+
+You can invite people to an event based on mutual priorities too and even choose events from organisers.
    
 The algorithm can be used even on job site. (rate on jobs or ideas etc.)
 
