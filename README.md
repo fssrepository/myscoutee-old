@@ -50,4 +50,4 @@ docker build --no-cache -t myscoutee-nginx:0.1.0 .
 Other:
 ------
 
-Preliminarly it was kotlin, mysql/neo4j and ionic based, which has been transformed to java, mongodb, pwa.
+Preliminarly it was kotlin, mysql/neo4j and ionic based (own android and ios plugins), which has been transformed to java, mongodb, pwa.
