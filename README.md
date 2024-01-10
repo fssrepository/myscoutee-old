@@ -46,3 +46,8 @@ cd /home/raxim/workspace/myscoutee/server/docker/images/mosquitto/
 docker build --no-cache -t eclipse-mosquitto:2.0.18-ext_auth .
 
 docker build --no-cache -t myscoutee-nginx:0.1.0 .
+
+Other:
+------
+
+Preliminarly it was kotlin, mysql/neo4j and ionic based, which has been transformed to java, mongodb, pwa.
