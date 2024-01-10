@@ -14,7 +14,7 @@
    
    Based on priority each person is being assigned to a random event. (graph algorithm)
    
-   After meeting with each other they can re-prioritize themselves, hence the priority graph will be improved. (AI)
+   After meeting with each other they can re-prioritize each other, hence the priority graph will be improved. (AI)
    
    Business model is less dependent on subscription fees and more dependent on affiliate systems and individual event organizers. (e.g.: Booking.com)
    
