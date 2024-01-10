@@ -28,8 +28,11 @@ docker:
 cd ./server
 
 gradle build -x test
+
 docker-compose build --no-cache (build context)
+
 docker-compose up
+
 
 cd ./frontend
 
