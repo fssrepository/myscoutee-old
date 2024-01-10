@@ -21,7 +21,7 @@
 firebase:
 ---------
 
-You need to have a firebase project. (cloud messaging + web app -> relevant files are empty or keys are simply deactivated)
+You need to have a firebase project. (cloud messaging + web app)
 
 docker:
 -------
