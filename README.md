@@ -1,9 +1,5 @@
 # myscoutee
 
-##### MVP readiness with some issues. (trying to fix for the time being, mostly on UI to ease the understanding)
-##### As i'm unable to continue based on my tricky situation, pls. try to fork instead of clone!
-##### Just notify me about your website to let me know that my effort is not wasted.
-
 1) The project's aim is to create fairness into the dating world, which makes less exhaustive experience in both end.
    
    It's not a typical dating site, as even job site or any other site can use the algorithm and technic.
@@ -29,7 +25,9 @@ https://github.com/fssrepository/myscoutee/assets/45578746/8d0b41d7-0da9-475d-92
 https://github.com/fssrepository/myscoutee/assets/45578746/e3e2323b-ca66-48eb-90b4-ed6287b51016
 
 
-
+##### MVP readiness with some issues. (trying to fix for the time being, mostly on UI to ease the understanding)
+##### As i'm unable to continue based on my tricky situation, pls. try to fork instead of clone!
+##### Just notify me about your website to let me know that my effort is not wasted.
 
 firebase:
 ---------
