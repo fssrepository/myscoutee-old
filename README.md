@@ -22,7 +22,7 @@ firebase:
 
 You need to have a firebase project. (cloud messaging + web app -> relevant files are empty or keys are simply deactivated)
 
-environment.prod.ts/environment.ts/FirebaseConfig.java/application-dev.yaml/....adminsdk.json (under src/main/resources)
+environment.prod.ts/environment.ts/FirebaseConfig.java/application-dev.yaml/....adminsdk.json (under src/main/resources) - don't share these files to the outer world, as it contains your credentials!
 
 docker:
 -------
