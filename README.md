@@ -4,7 +4,7 @@ Swiping (e.g.: Tinder) or traditional dating websites are very exhausting and no
    
 Based on mutual priority each person is being assigned to a generated group event with chat. (graph algorithm)
    
-Mutual priorities can be changed at any moment, hence the social graph can be improved. (similar to AI reinforced learning)
+Mutual priorities can be changed at any moment, hence the social graph can be improved. (similar to AI reinforced training)
    
 Group dating allows to shift business model towards affiliate systems (e.g.: Booking.com) from subscription.
 
