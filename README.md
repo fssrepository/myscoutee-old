@@ -4,7 +4,7 @@ Swiping (Tinder) is very exhausting and non-fair. Intead of swipes you can rate/
    
 Based on mutual priority each person is being assigned to a generated group event with chat. (graph algorithm)
    
-Mutual priorities can be changed at any moment, hence the graph can be developed. (AI reinforced training)
+Mutual priorities can be changed at any moment, hence the social graph can be improved. (similar to AI reinforced learning)
    
 Group dating allows to shift business model towards affiliate systems (Booking.com) from subscription.
 
