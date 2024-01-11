@@ -6,7 +6,7 @@ Based on mutual priority each person is being assigned to a generated group even
    
 Mutual priorities can be changed at any moment, hence the social graph can be improved. (similar to AI reinforced learning)
    
-Group dating allows to shift business model towards affiliate systems (Booking.com) from subscription.
+Group dating allows to shift business model towards affiliate systems (e.g.: Booking.com) from subscription.
 
 You can invite people to an event based on mutual priorities too and even choose events from organisers.
    
