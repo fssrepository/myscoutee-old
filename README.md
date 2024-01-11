@@ -8,7 +8,7 @@ Mutual priorities can be changed at any moment, hence the social graph can be im
    
 Group dating allows to shift business model towards affiliate systems (e.g.: Booking.com) from subscription.
 
-You can invite people to an event based on mutual priorities too and even choose events from organisers.
+You can invite people to an event based on mutual priorities too and even choose events from organisers. Multi-stage/multi-slot events are also possible. (e.g.: FIFA like competition)
    
 The algorithm can be used even on job site. (rate on jobs or ideas etc.)
 
