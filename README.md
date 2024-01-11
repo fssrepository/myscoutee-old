@@ -1,6 +1,6 @@
 # myscoutee
 
-Swiping (e.g.: Tinder) or traditional dating websites is very exhausting and non-fair. Intead of swipes you can rate/prioritise people 1-10 to decide, who you would like to met first.
+Swiping (e.g.: Tinder) or traditional dating websites are very exhausting and non-fair. Intead of swipes you can rate/prioritise people 1-10 to decide, who you would like to met first.
    
 Based on mutual priority each person is being assigned to a generated group event with chat. (graph algorithm)
    
