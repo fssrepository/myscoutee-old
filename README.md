@@ -16,6 +16,8 @@ https://github.com/fssrepository/myscoutee/assets/45578746/8d0b41d7-0da9-475d-92
 
 https://github.com/fssrepository/myscoutee/assets/45578746/e3e2323b-ca66-48eb-90b4-ed6287b51016
 
+Contribution:
+-------------
 
 ##### MVP readiness with some issues. (some menu has been commented out - don't remove, where the functionality does exist in the backend)
 ##### As i'm unable to continue based on my tricky situation, pls. try to fork instead of clone!
