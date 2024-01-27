@@ -2,13 +2,13 @@
 
 Swiping (e.g.: Tinder) or traditional dating websites are very exhausting and non-fair. Intead of swipes you can rate/prioritise people 1-10 to decide, who you would like to met first. You can rate for pairs also to help others.
    
-Based on mutual priority each person is being assigned to a generated group event with chat. (graph algorithm)
+Based on mutual priority each person is being assigned to a group chat, where the participants can decide how they would like to met with each other. (graph algorithm) They can organise event for themselves or just choose from a promoted/organised one.
+
+If you have met someone already, you can invite him/her to an event based on mutual priorities too. (organise or choose from promoted ones) Multi-stage/multi-slot events are also possible. (e.g.: FIFA like competition)
    
 Mutual priorities can be changed at any moment, hence the social graph can be improved. (similar to AI reinforced training)
    
 Group dating allows to shift business model towards affiliate systems (e.g.: Booking.com) from subscription.
-
-You can invite people to an event based on mutual priorities too and even choose events from organisers. Multi-stage/multi-slot events are also possible. (e.g.: FIFA like competition)
    
 The algorithm can be used even on job site. (rate on jobs or ideas etc.)
 
