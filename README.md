@@ -12,11 +12,11 @@ https://github.com/fssrepository/myscoutee/assets/45578746/e3e2323b-ca66-48eb-90
 Contribution:
 -------------
 * MVP readiness with some issues - just notify me about your website that my effort is not wasted.
-* You need to have a firebase project and configure it properly in the repo. (cloud messaging + web app)
 * Transformed kotlin -> java, mysql/neo4j -> mongodb and ionic -> pwa to speed up the development.
 
-docker:
+Boot Up:
 -------
+* You need to have a firebase project and configure it properly in the repo. (cloud messaging + web app)
 * cd ./server
 * gradle build -x test
 * docker-compose build --no-cache (build context)
@@ -24,8 +24,8 @@ docker:
 * cd ./frontend
 * ng serve --ssl
 
-docker dependencies:
---------------------
+Dependencies
+------------
 * cd /home/raxim/workspace/myscoutee/server/docker/images/mosquitto/
 * docker build --no-cache -t eclipse-mosquitto:2.0.18-ext_auth .
 * docker build --no-cache -t myscoutee-nginx:0.1.0 .
