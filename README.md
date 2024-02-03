@@ -1,5 +1,3 @@
-# myscoutee
-
 Swiping (e.g.: Tinder) or traditional dating websites are very exhausting and non-fair. Intead of swipes you can rate/prioritise people 1-10 to decide, who you would like to met first. You can rate for pairs also to help others.
    
 Based on mutual priority each person is being assigned to a group chat, where the participants can decide how they would like to met with each other. (graph algorithm) They can organise event for themselves or just choose from a promoted/organised one.
@@ -19,8 +17,8 @@ https://github.com/fssrepository/myscoutee/assets/45578746/e3e2323b-ca66-48eb-90
 Contribution:
 -------------
 
-##### MVP readiness with some issues. Pls. just notify me about your website to let me know that my effort is not wasted.
-##### You need to have a firebase project and configure it properly in the repo. (cloud messaging + web app)
+⋅⋅* MVP readiness with some issues. Pls. just notify me about your website to let me know that my effort is not wasted.
+⋅⋅* You need to have a firebase project and configure it properly in the repo. (cloud messaging + web app)
 
 docker:
 -------
