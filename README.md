@@ -21,7 +21,6 @@ docker:
 * gradle build -x test
 * docker-compose build --no-cache (build context)
 * docker-compose up
-
 * cd ./frontend
 * ng serve --ssl
 
