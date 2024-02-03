@@ -13,31 +13,20 @@ Contribution:
 -------------
 * MVP readiness with some issues - just notify me about your website that my effort is not wasted.
 * You need to have a firebase project and configure it properly in the repo. (cloud messaging + web app)
+* Transformed kotlin -> java, mysql/neo4j -> mongodb and ionic -> pwa to speed up the development.
 
 docker:
 -------
-cd ./server
+* cd ./server
+* gradle build -x test
+* docker-compose build --no-cache (build context)
+* docker-compose up
 
-gradle build -x test
-
-docker-compose build --no-cache (build context)
-
-docker-compose up
-
-
-cd ./frontend
-
-ng serve --ssl
+* cd ./frontend
+* ng serve --ssl
 
 docker dependencies:
 --------------------
-
-cd /home/raxim/workspace/myscoutee/server/docker/images/mosquitto/
-
-docker build --no-cache -t eclipse-mosquitto:2.0.18-ext_auth .
-
-docker build --no-cache -t myscoutee-nginx:0.1.0 .
-
-Other:
-------
-Preliminarly it was kotlin, mysql/neo4j and ionic based (own android and ios plugins), which has been transformed to java, mongodb, pwa to speed up the development.
+* cd /home/raxim/workspace/myscoutee/server/docker/images/mosquitto/
+* docker build --no-cache -t eclipse-mosquitto:2.0.18-ext_auth .
+* docker build --no-cache -t myscoutee-nginx:0.1.0 .
