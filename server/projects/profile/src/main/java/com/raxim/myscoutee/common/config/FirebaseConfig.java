@@ -17,7 +17,7 @@ public class FirebaseConfig {
     @PostConstruct
     public void init() throws IOException {
         InputStream serviceAccount = FirebaseConfig.class
-                .getResourceAsStream("/myscoutee-firebase-adminsdk-242c8-2aa0246e44.json");
+                .getResourceAsStream("/myscoutee-5be7c-firebase-adminsdk-3molu-615659ccc7.json");
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

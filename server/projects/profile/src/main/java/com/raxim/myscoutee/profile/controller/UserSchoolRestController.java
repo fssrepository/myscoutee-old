@@ -46,7 +46,7 @@ public class UserSchoolRestController {
     // TODO: school fix - discreet group - isBusiness/isSchool event - discreet
     // level
     @GetMapping("/schools")
-    public ResponseEntity<PageDTO<SchoolDTO>> getSchools(@PathVariable String id, PageParam pageParam,
+    public ResponseEntity<PageDTO<SchoolDTO>> getSchools(PageParam pageParam,
             Authentication auth) {
         FirebasePrincipal firebasePrincipal = (FirebasePrincipal) auth.getPrincipal();
         Profile profile = firebasePrincipal.getUser().getProfile();

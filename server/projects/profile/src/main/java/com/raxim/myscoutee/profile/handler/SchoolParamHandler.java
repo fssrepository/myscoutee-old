@@ -33,7 +33,7 @@ public class SchoolParamHandler implements IParamHandler {
         String createdDateF = createdDateFrom.atStartOfDay(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-        Object[] tOffset = new Object[] { fromF, createdDateF, type };
+        Object[] tOffset = new Object[] { type, fromF, createdDateF };
 
         pageParam.setId(profile.getId());
         pageParam.setOffset(tOffset);

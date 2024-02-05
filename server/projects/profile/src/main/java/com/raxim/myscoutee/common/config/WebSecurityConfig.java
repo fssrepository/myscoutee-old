@@ -36,7 +36,7 @@ public class WebSecurityConfig {
         return (web) -> web
                 .ignoring()
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico",
-                        "/user/profile/images/**", "/games/*/*/images/**");
+                        "/user/profile/images/**", "/games/*/*/images/**", "user/cars/*/images/**");
     }
 
     @Autowired

@@ -40,6 +40,7 @@ public class CarService {
             } else {
                 lCar = (Car) pCar.clone();
                 lCar.setId(UUID.randomUUID());
+                lCar.setStatus("A");
             }
 
             Car respCar = this.carRepository.save(lCar);

@@ -42,6 +42,7 @@ public class SchoolService {
                         lSchool.setStatus(pSchool.getStatus());
                     } else {
                         lSchool.setId(UUID.randomUUID());
+                        lSchool.setStatus("A");
                     }
                     return lSchool;
                 } catch (CloneNotSupportedException e) {

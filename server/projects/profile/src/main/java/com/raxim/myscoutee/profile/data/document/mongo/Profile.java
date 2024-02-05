@@ -1,6 +1,7 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -125,11 +126,11 @@ public class Profile implements Cloneable {
 
     @DBRef
     @JsonIgnore
-    private List<Car> cars;
+    private List<Car> cars = new ArrayList<>();
 
     @DBRef
     @JsonIgnore
-    private List<School> schools;
+    private List<School> schools = new ArrayList<>();
 
     @GeoSpatialIndexed(name = "position", type = GeoSpatialIndexType.GEO_2DSPHERE)
     @JsonDeserialize(using = GeoJsonPointDeserializer.class)

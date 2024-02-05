@@ -9,10 +9,7 @@
     <h3 *ngIf="!msg" class="server-msg">Server is down!</h3>
   </div>
 
-  <!--<div class="addToHome"><h3>Add to home screen to enable notification!</h3></div>-->
-
   <div *ngIf="msg" class="mat-into-panel">
-    <!--<div [innerHtml]="msg['expl.build']"></div>-->
     <div id="firebaseui-auth-container"></div>
     <div id="loader">{{ msg['expl.loading'] }}</div>
   </div>
@@ -20,62 +17,6 @@
   <div class="mat-into-panel" *ngIf="msg" [innerHtml]="msg['expl.gdpr']"></div>
   
   <div class="mat-into-panel" *ngIf="msg" [innerHtml]="msg['expl.howto']"></div>
-
-  <!--<div *ngIf="msg" class="mat-into-panel">
-    <h2>{{ msg['expl.intro'] }}</h2>
-    <iframe
-      *ngFor="let video of msg['expl.videos']"
-      width="100%"
-      height="200vh"
-      src="https://www.youtube.com/embed/videoseries?list=PLxtLUXGICqdHaHC36Dv1t2IVchqwA7uz4"
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen
-    ></iframe>
-  </div>
-
-  <div class="mat-into-panel" *ngIf="msg" [innerHtml]="msg['expl.time']"></div>
-
-  <div
-    class="mat-into-panel"
-    *ngIf="msg"
-    [innerHtml]="msg['expl.priority']"
-  ></div>
-
-  <div
-    class="mat-into-panel"
-    *ngIf="msg"
-    [innerHtml]="msg['expl.group_dating']"
-  ></div>
-
-  <div
-    class="mat-into-panel"
-    *ngIf="msg"
-    [innerHtml]="msg['expl.equal_opportunity']"
-  ></div>
-
-  <div
-    class="mat-into-panel"
-    *ngIf="msg"
-    [innerHtml]="msg['expl.security']"
-  ></div>-->
-
-  <!-- <div class="mat-into-panel">
-    <h2 *ngIf="msg">{{ msg['expl.report'] }}</h2>
-    <div class="btn_bar">
-      <div style="display: flex; grid-area: 1 / 1">
-        <div class="btn_base">
-          <div class="github container">
-            <a href="https://github.com/myscoutee/myscoutee" target="_blank">
-              <img class="img" />
-            </a>
-          </div>
-        </div>
-      </div>
-      <ms-menu style="grid-area: 1 / 1; pointer-events: none"></ms-menu>
-    </div>
-  </div> -->
 
   <div class="mat-into-panel">
     <h2 *ngIf="msg">{{ msg['expl.follow'] }}</h2>

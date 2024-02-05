@@ -17,7 +17,8 @@ import {
   ProfileComponent,
   QrcodeComponent,
   RewardComponent,
-  SettingComponent
+  SettingComponent,
+  SchoolComponent,
 } from './components';
 import { DatingRoutingModule } from './dating-routing.module';
 @NgModule({
@@ -37,6 +38,7 @@ import { DatingRoutingModule } from './dating-routing.module';
     HelpComponent,
     GroupFormComponent,
     RewardComponent,
+    SchoolComponent,
   ],
   imports: [
     UIModule,
