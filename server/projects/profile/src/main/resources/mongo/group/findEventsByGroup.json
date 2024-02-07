@@ -1,0 +1,77 @@
+[
+    {
+        "$match": {
+            "_id": ":#{#groupId}"
+        }
+    },
+    {
+        "$lookup": {
+            "from": "events",
+            "let": {
+                "p_group": "$$ROOT"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                {
+                                    "$eq": [
+                                        "$group",
+                                        "$$p_group._id"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "as": "events"
+        }
+    },
+    {
+        "$unwind": "$events"
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$and": [
+                    {
+                        "$or": [
+                            {
+                                "$lt": [
+                                    "$events.updatedDate",
+                                    "?#{#param.offset[0]}"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$sort": {
+            "events.updatedDate": -1
+        }
+    },
+    {
+        "$limit": "?#{#param.limit}"
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$mergeObjects": [
+                    {
+                        "item": "$events"
+                    },
+                    {
+                        "offset": [
+                            "$events.updatedDate"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]

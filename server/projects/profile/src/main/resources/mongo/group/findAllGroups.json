@@ -31,7 +31,7 @@
             "pipeline": [
                 {
                     "$lookup": {
-                        "from": "users",
+                        "from": "profiles",
                         "localField": "profiles.$id",
                         "foreignField": "_id",
                         "as": "profiles"

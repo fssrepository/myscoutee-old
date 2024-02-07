@@ -1,0 +1,130 @@
+[
+    {
+        "$geoNear": {
+            "near": ":#{#loc}",
+            "spherical": true,
+            "minDistance": "?#{#param.offset[0]}",
+            "distanceField": "distance",
+            "query": {
+                "system": false,
+                "status": "A",
+                "visibility": "pu",
+                "type": "s",
+                "group": ":#{#groupId}"
+            }
+        }
+    },
+    {
+        "$lookup": {
+            "from": "profiles",
+            "let": {
+                "g_id": "$_id"
+            },
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$eq": [
+                                "$$g_id",
+                                "$group"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "as": "profiles"
+        }
+    },
+    {
+        "$unwind": {
+            "path": "$profiles",
+            "preserveNullAndEmptyArrays": true
+        }
+    },
+    {
+        "$match": {
+            "profiles": {
+                "$in": [
+                    null,
+                    []
+                ]
+            }
+        }
+    },
+    {
+        "$addFields": {
+            "groupKey": {
+                "$multiply": [
+                    {
+                        "$floor": {
+                            "$divide": [
+                                "$distance",
+                                "?#{#param.step}"
+                            ]
+                        }
+                    },
+                    "?#{#param.step}"
+                ]
+            }
+        }
+    },
+    {
+        "$match": {
+            "$expr": {
+                "$or": [
+                    {
+                        "$gt": [
+                            "$groupKey",
+                            "?#{#param.offset[0]}"
+                        ]
+                    },
+                    {
+                        "$and": [
+                            {
+                                "$eq": [
+                                    "$groupKey",
+                                    "?#{#param.offset[0]}"
+                                ]
+                            },
+                            {
+                                "$lt": [
+                                    "$createdDate",
+                                    {
+                                        "$toDate": "?#{#param.offset[1]}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "$sort": {
+            "groupKey": 1,
+            "createdDate": -1
+        }
+    },
+    {
+        "$limit": "?#{#param.limit}"
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$mergeObjects": [
+                    {
+                        "group": "$$ROOT"
+                    },
+                    {
+                        "groupKey": "$groupKey",
+                        "offset": [
+                            "$groupKey",
+                            "$createdDate"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+]

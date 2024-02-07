@@ -11,9 +11,11 @@ import com.mongodb.client.model.geojson.Point;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
+import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
@@ -35,6 +37,15 @@ public class GroupService {
 
     public List<GroupDTO> getAllGroups(PageParam pageParam, Point position, String access) {
         return this.groupRepository.findAllGroups(pageParam, position, access);
+    }
+
+    //recommendation
+    public List<GroupDTO> getRecGroups(PageParam pageParam, Point position, UUID groupId) {
+        return this.groupRepository.findRecGroups(pageParam, position, groupId);
+    }
+
+    public List<EventDTO> getEventsByGroup(UUID groupUuid, PageParam pageParam) {
+        return this.groupRepository.findEventsByGroup(groupUuid, pageParam);
     }
 
     public List<ProfileDTO> getProfilesByGroup(UUID groupUuid, PageParam pageParam) {

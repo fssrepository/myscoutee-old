@@ -39,6 +39,7 @@ public class AppTestConstants {
     public static final UUID UUID_EVENT_ITEM_33_M2_S1 = UUID.fromString("b5aa652d-b55b-4861-b45b-0b3d58d16808");
 
     public final static UUID UUID_GROUP_DATING = UUID.fromString("b33ec186-aea8-4636-b635-4a2f620a0c54");
+    public final static UUID UUID_GROUP_3 = UUID.fromString("15ad960f-b104-45ee-8510-ebf6ac78d3d8");
 
     public final static Point LOCATION_PROFILE_LIAM = new Point(new Position(List.of(47.497912, 19.040235)));
     public final static Point LOCATION_PROFILE_OLIVER = new Point(new Position(List.of(47.497912, 19.040235)));

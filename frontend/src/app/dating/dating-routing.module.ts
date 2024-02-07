@@ -326,6 +326,12 @@ const routes: Routes = [
               actions: [
                 {
                   component: ProfileStatusComponent,
+                  type: 'route',
+                  icon: 'group_add',
+                  url: 'dating/user/groups/profiles?excludeGroupId=:id' //list out profiles in parent group which is not assigned to this sub group
+                },
+                {
+                  component: ProfileStatusComponent,
                   type: 'edit',
                 },
               ],
@@ -338,6 +344,11 @@ const routes: Routes = [
               reuse: true,
               icon: 'local_activity',
               actions: [
+                {
+                  component: EventFormComponent,
+                  type: 'add',
+                  icon: 'add',
+                },
                 {
                   // component: EventFormComponent,
                   component: QrcodeComponent,

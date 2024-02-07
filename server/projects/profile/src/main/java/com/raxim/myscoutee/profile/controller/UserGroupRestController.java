@@ -1,5 +1,6 @@
 package com.raxim.myscoutee.profile.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,11 +24,14 @@ import com.raxim.myscoutee.common.util.ControllerUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Group;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.User;
+import com.raxim.myscoutee.profile.data.dto.rest.EventDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.GroupDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.LinkDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageDTO;
 import com.raxim.myscoutee.profile.data.dto.rest.PageParam;
 import com.raxim.myscoutee.profile.data.dto.rest.ProfileDTO;
+import com.raxim.myscoutee.profile.handler.GroupEventParamHandler;
+import com.raxim.myscoutee.profile.handler.GroupRecParamHandler;
 import com.raxim.myscoutee.profile.handler.ParamHandlers;
 import com.raxim.myscoutee.profile.handler.UserParamHandler;
 import com.raxim.myscoutee.profile.repository.mongo.GroupRepository;
@@ -102,8 +106,9 @@ public class UserGroupRestController {
         User user = principal.getUser();
         Profile profile = user.getProfile();
 
-        pageParam = paramHandlers.handle(profile, pageParam, UserParamHandler.TYPE);
-        List<GroupDTO> groupDTOs = this.userService.getGroupsByUser(user.getId(), pageParam);
+        pageParam = paramHandlers.handle(profile, pageParam, GroupRecParamHandler.TYPE);
+        List<GroupDTO> groupDTOs = this.groupService.getRecGroups(pageParam, CommonUtil.point(profile.getPosition()),
+                user.getGroup());
 
         List<Object> lOffset = CommonUtil.offset(groupDTOs, pageParam.getOffset());
 
@@ -159,6 +164,21 @@ public class UserGroupRestController {
         return response;
     }
 
+    @GetMapping({ "/groups/profiles" })
+    public ResponseEntity<PageDTO<ProfileDTO>> getProfilesByParentGroup(PageParam pageParam,
+            Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+
+        pageParam = paramHandlers.handle(profile, pageParam, UserParamHandler.TYPE);
+
+        List<ProfileDTO> profileDTOs = this.groupService.getProfilesByGroup(profile.getGroup(), pageParam);
+
+        List<Object> lOffset = CommonUtil.offset(profileDTOs, pageParam.getOffset());
+
+        return ResponseEntity.ok(
+                new PageDTO<>(profileDTOs, lOffset, 0));
+    }
+
     // consider discreet group also
     // clicking on + button, show the "met" tab, hence you can choose members
     // already met to invite
@@ -175,6 +195,21 @@ public class UserGroupRestController {
 
         return ResponseEntity.ok(
                 new PageDTO<>(profileDTOs, lOffset, 0));
+    }
+
+    @GetMapping({ "/groups/{groupId}/events" })
+    public ResponseEntity<PageDTO<EventDTO>> getEventsByGroup(@PathVariable String groupId, PageParam pageParam,
+            Authentication auth) {
+        Profile profile = ((FirebasePrincipal) auth.getPrincipal()).getUser().getProfile();
+
+        pageParam = paramHandlers.handle(profile, pageParam, GroupEventParamHandler.TYPE);
+
+        List<EventDTO> eventDTOs = this.groupService.getEventsByGroup(UUID.fromString(groupId), pageParam);
+
+        List<Object> lOffset = CommonUtil.offset(eventDTOs, pageParam.getOffset());
+
+        return ResponseEntity.ok(
+                new PageDTO<>(eventDTOs, lOffset, 0));
     }
 
     @PostMapping({ "/groups/{groupId}/profiles/{profileId}/{type}" })

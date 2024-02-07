@@ -1,0 +1,157 @@
+[
+    {
+        "_id": {
+            "$binary": "NkaorobBPrNUDApiL0o1tg==",
+            "$type": "03"
+        },
+        "name": "dating",
+        "type": "i",
+        "visibility": "pu",
+        "system": true,
+        "desc": "Dating",
+        "position": {
+            "type": "Point",
+            "coordinates": [
+                47.497912,
+                19.040235
+            ]
+        },
+        "createdDate": {
+            "$date": "2023-06-12T12:30:00Z"
+        },
+        "createdBy": "2e7b0c6c-57e6-4c0a-98c0-516abed677ab",
+        "status": "A"
+    },
+    {
+        "_id": {
+            "$binary": {
+                "base64": "RUcnbv5yEHZLXAqAAJkLhA==",
+                "subType": "03"
+            }
+        },
+        "category": "g",
+        "type": "i",
+        "name": "Dating Group 1",
+        "visibility": "pu",
+        "discreet": true,
+        "system": false,
+        "desc": "Dating Group 1",
+        "position": {
+            "type": "Point",
+            "coordinates": [
+                47.497912,
+                19.040235
+            ]
+        },
+        "createdDate": {
+            "$date": "2024-02-05T08:54:28.868Z"
+        },
+        "updatedDate": {
+            "$date": "2024-02-06T08:54:28.867Z"
+        },
+        "createdBy": "2e7b0c6c-57e6-4c0a-98c0-516abed677ab",
+        "status": "A"
+    },
+    {
+        "_id": {
+            "$binary": {
+                "base64": "10M00i3zGE9Q4kBdITA9iA==",
+                "subType": "03"
+            }
+        },
+        "category": "g",
+        "type": "s",
+        "name": "Dating Group 2",
+        "visibility": "pu",
+        "discreet": true,
+        "system": false,
+        "desc": "Dating Group 2",
+        "position": {
+            "type": "Point",
+            "coordinates": [
+                47.497912,
+                19.040235
+            ]
+        },
+        "createdDate": {
+            "$date": "2024-02-06T08:58:39.365Z"
+        },
+        "updatedDate": {
+            "$date": "2024-02-06T08:55:14.036Z"
+        },
+        "createdBy": "2e7b0c6c-57e6-4c0a-98c0-516abed677ab",
+        "status": "A",
+        "group": {
+            "$binary": "NkaorobBPrNUDApiL0o1tg==",
+            "$type": "03"
+        }
+    },
+    {
+        "_id": {
+            "$binary": {
+                "base64": "7kUEsQ+WrRXY03is9usQhQ==",
+                "subType": "03"
+            }
+        },
+        "category": "g",
+        "type": "s",
+        "name": "Dating Group 3",
+        "visibility": "pu",
+        "discreet": true,
+        "system": false,
+        "desc": "Dating Group 3",
+        "position": {
+            "type": "Point",
+            "coordinates": [
+                47.497912,
+                19.040235
+            ]
+        },
+        "createdDate": {
+            "$date": "2024-02-06T08:58:39.365Z"
+        },
+        "updatedDate": {
+            "$date": "2024-02-06T08:55:14.036Z"
+        },
+        "createdBy": "2e7b0c6c-57e6-4c0a-98c0-516abed677ab",
+        "status": "A",
+        "group": {
+            "$binary": "NkaorobBPrNUDApiL0o1tg==",
+            "$type": "03"
+        }
+    },
+    {
+        "_id": {
+            "$binary": {
+                "base64": "VEpHd1aWzrlFREtKgKvZpQ==",
+                "subType": "03"
+            }
+        },
+        "category": "g",
+        "type": "s",
+        "name": "Dating Group 4",
+        "visibility": "pu",
+        "discreet": true,
+        "system": false,
+        "desc": "Dating Group 4",
+        "position": {
+            "type": "Point",
+            "coordinates": [
+                47.497912,
+                19.040235
+            ]
+        },
+        "createdDate": {
+            "$date": "2024-02-06T08:58:39.365Z"
+        },
+        "updatedDate": {
+            "$date": "2024-02-06T08:55:14.036Z"
+        },
+        "createdBy": "2e7b0c6c-57e6-4c0a-98c0-516abed677ab",
+        "status": "A",
+        "group": {
+            "$binary": "RUcnbv5yEHZLXAqAAJkLhA==",
+            "$type": "03"
+        }
+    }
+]

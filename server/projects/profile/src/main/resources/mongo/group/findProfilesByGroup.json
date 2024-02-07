@@ -43,7 +43,7 @@
                                             "$and": [
                                                 {
                                                     "$eq": [
-                                                        "$$p_group.privacy.discreet",
+                                                        "$$p_group.discreet",
                                                         false
                                                     ]
                                                 },
