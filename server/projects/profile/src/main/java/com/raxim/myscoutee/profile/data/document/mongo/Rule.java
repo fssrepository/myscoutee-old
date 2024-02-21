@@ -52,12 +52,6 @@ public class Rule {
     @JsonProperty(value = "mutual")
     private Boolean mutual;
 
-    // ehelyett utolso x esemeny - ido bar-on kivalasztva
-    // nem regebbi mint 'from' esemeny
-    @JsonProperty(value = "from")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime from;
-
     // Balanced Female/Male Ratio
     @JsonProperty(value = "balanced")
     private Boolean balanced;
@@ -85,14 +79,6 @@ public class Rule {
 
     public void setMutual(Boolean mutual) {
         this.mutual = mutual;
-    }
-
-    public LocalDateTime getFrom() {
-        return from;
-    }
-
-    public void setFrom(LocalDateTime from) {
-        this.from = from;
     }
 
     public String getType() {

@@ -5,6 +5,7 @@
             "$type": "03"
         },
         "type": "E",
+        "stageIdx": -1,
         "name": "Event1",
         "range": {
             "start": {
@@ -17,7 +18,7 @@
         "status": "P",
         "access": "P",
         "rule" : {
-            "priority": true,
+            "type": "P",
             "eventGrace": 50
         },
         "capacity" : {
@@ -27,7 +28,7 @@
         "createdDate": {
             "$date": "2021-01-30T04:17:08.000Z"
         },
-        "num": 1,
+        "numOfMembers": 2,
         "members": [
             {
                 "profile": {
@@ -39,6 +40,17 @@
                 },
                 "status": "A",
                 "role": "A"
+            },
+            {
+                "profile": {
+                    "$ref": "profiles",
+                    "$id": {
+                        "$binary": "8EtHJWvMTFOkPpQ5p9yRrQ==",
+                        "$type": "03"
+                    }
+                },
+                "status": "A",
+                "role": "U"
             }
         ],
         "group": {
@@ -55,7 +67,12 @@
             "$binary": "pUQakRBTZ8lMwwVGHzQ3sg==",
             "$type": "03"
         },
+        "parentId": {
+            "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
+            "$type": "03"
+        },
         "type": "E",
+        "stageIdx": -1,
         "name": "Event11",
         "range": {
             "start": {
@@ -67,10 +84,6 @@
         },
         "status": "P",
         "access": "P",
-        "rule" : {
-            "priority": true,
-            "eventGrace": 50
-        },
         "capacity" : {
             "min" : 4,
             "max" : 6
@@ -78,20 +91,6 @@
         "createdDate": {
             "$date": "2021-01-30T04:17:08.000Z"
         },
-        "num": 1,
-        "members": [
-            {
-                "profile": {
-                    "$ref": "profiles",
-                    "$id": {
-                        "$binary": "vldSpDImQDm8GnsRzFMYJQ==",
-                        "$type": "03"
-                    }
-                },
-                "status": "A",
-                "role": "A"
-            }
-        ],
         "group": {
             "$binary": "NkaorobBPrNUDApiL0o1tg==",
             "$type": "03"
@@ -106,7 +105,12 @@
             "$binary": "f0XjJP5nYzMiKNTVqFsTlg==",
             "$type": "03"
         },
+        "parentId": {
+            "$binary": "oEy7pm3PAx0lyLoCFSX6kg==",
+            "$type": "03"
+        },
         "type": "E",
+        "stageIdx": -1,
         "name": "Event12",
         "range": {
             "start": {
@@ -118,10 +122,6 @@
         },
         "status": "P",
         "access": "P",
-        "rule" : {
-            "priority": true,
-            "eventGrace": 50
-        },
         "capacity" : {
             "min" : 2,
             "max" : 6
@@ -129,20 +129,6 @@
         "createdDate": {
             "$date": "2021-01-30T04:17:08.000Z"
         },
-        "num": 1,
-        "members": [
-            {
-                "profile": {
-                    "$ref": "profiles",
-                    "$id": {
-                        "$binary": "vldSpDImQDm8GnsRzFMYJQ==",
-                        "$type": "03"
-                    }
-                },
-                "status": "A",
-                "role": "A"
-            }
-        ],
         "group": {
             "$binary": "NkaorobBPrNUDApiL0o1tg==",
             "$type": "03"
@@ -158,6 +144,7 @@
             "$type": "03"
         },
         "type": "E",
+        "stageIdx": -1,
         "name": "Event2",
         "range": {
             "start": {
@@ -171,7 +158,7 @@
         "createdDate": {
             "$date": "2021-01-30T04:17:08.000Z"
         },
-        "num": 2,
+        "numOfMembers": 2,
         "members": [
             {
                 "profile": {
@@ -211,6 +198,7 @@
             "$type": "03"
         },
         "type": "E",
+        "stageIdx": -1,
         "name": "Event3",
         "range": {
             "start": {
@@ -224,7 +212,7 @@
         "createdDate": {
             "$date": "2021-01-30T04:17:08.000Z"
         },
-        "num": 4,
+        "numOfMembers": 4,
         "members": [
             {
                 "profile": {

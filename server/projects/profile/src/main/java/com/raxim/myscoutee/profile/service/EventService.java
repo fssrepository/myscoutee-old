@@ -221,7 +221,7 @@ public class EventService {
             Member newMember = new Member(profile);
             newMember.setUpdatedDate(LocalDateTime.now());
             newMember.setCreatedDate(LocalDateTime.now());
-            newMember.setRole("M"); // Manager
+            newMember.setRole("A"); // Manager
             newMember.setStatus("A");
 
             events.add(event);

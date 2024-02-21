@@ -91,8 +91,10 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     private int slotIdx;
 
     // in the main event => current Stage idx, in the child event it's and index of the stage => "assign to stage" menu item
+    // pre selection from main event -> someone is interested
+    // it's going to the parentEvent.members, and later on organized to a stageIdx = 0, slotIdx = 0
     @JsonProperty(value = "stage")
-    private int stageIdx;
+    private int stageIdx = -1;
 
     // ref counter - how many clones are there, hence we can show on the view
     @JsonIgnore

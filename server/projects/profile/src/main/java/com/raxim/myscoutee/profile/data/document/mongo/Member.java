@@ -36,7 +36,7 @@ public class Member implements Cloneable, Comparable<Member> {
     //you can filter by status on event screen, the members has been ordered by rate added
     //on the promoter screen, if new candidate has been arrived, it will be a notification
     //so it will be a candidate record and a user record (added when promoter rates candidate or accepts)
-    // User (U), Admin (A), Promoter (P), Manager (M), Candidate (C)
+    // User (U), Admin (A), Promoter (P), Manager (A), Candidate (C)
     @JsonProperty(value = "role")
     private String role;
 

@@ -2,7 +2,6 @@ package com.raxim.myscoutee.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -36,33 +35,26 @@ public class EventRepositoryAlgoTest {
     @Test
     public void shouldFindCandidates() {
         List<Event> events = eventRepository.findAll();
-        
-        List<EventWithCandidates> eventsWithCandidates = eventRepository.findEventsWithCandidates();
-        assertEquals(3, eventsWithCandidates.size());
-        assertEquals("P", eventsWithCandidates.get(0).getEvent().getStatus());
+        assertEquals(5, events.size());
 
-        EventWithCandidates eventWithCandidates1 = eventsWithCandidates.get(1);
-        assertEquals("P", eventWithCandidates1.getEvent().getStatus());
-        assertEquals(2, eventWithCandidates1.getCandidates().size());
+        List<EventWithCandidates> eventsWithCandidates = eventRepository.findEventsWithCandidates();
+        assertEquals(1, eventsWithCandidates.size());
+
+        EventWithCandidates eventWithCandidates = eventsWithCandidates.get(0);
+        assertEquals(2, eventWithCandidates.getEvent().getItems().size());
+        assertEquals("P", eventWithCandidates.getEvent().getStatus());
+        assertEquals(2, eventWithCandidates.getCandidates().size());
 
         // mutual
-        events.get(1).getRule().setMutual(true);
-        eventRepository.saveAll(events);
+        Event event = eventWithCandidates.getEvent();
+        event.getRule().setMutual(true);
+        eventRepository.save(event);
 
         eventsWithCandidates = eventRepository.findEventsWithCandidates();
 
-        eventWithCandidates1 = eventsWithCandidates.get(1);
-        assertEquals("P", eventWithCandidates1.getEvent().getStatus());
-        assertEquals(5, eventWithCandidates1.getCandidates().size());
-
-        events.get(1).getRule().setFrom(LocalDateTime.of(2021, 1, 1, 0, 0, 0));
-        eventRepository.saveAll(events);
-
-        eventsWithCandidates = eventRepository.findEventsWithCandidates();
-
-        eventWithCandidates1 = eventsWithCandidates.get(1);
-        assertEquals("P", eventWithCandidates1.getEvent().getStatus());
-        assertEquals(2, eventWithCandidates1.getCandidates().size());
+        eventWithCandidates = eventsWithCandidates.get(0);
+        assertEquals("P", eventWithCandidates.getEvent().getStatus());
+        assertEquals(5, eventWithCandidates.getCandidates().size());
     }
 
 }
