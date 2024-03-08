@@ -32,4 +32,10 @@ public class EventUtil {
                 .collect(Collectors.toSet());
         return edges;
     }
+
+    public static Set<String> getIds(Set<Member> members) {
+        return members.stream()
+                .map(candidate -> candidate.getProfile().getId().toString())
+                .collect(Collectors.toSet());
+    }
 }

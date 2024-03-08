@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.generator.EventGeneratorByRandom;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.service.iface.IEventGeneratorService;
@@ -28,7 +28,7 @@ public class EventGeneratorRandomService implements IEventGeneratorService {
     }
 
     // only profiles with status is 'A'
-    public List<Event> generate(FilteredEdges filteredEdges, String flags) {
+    public List<Event> generate(ObjGraph filteredEdges, String flags) {
         Range lFlags = new Range(6, 12);
         if (flags != null) {
             lFlags = JsonUtil.jsonToObject(flags, Range.class, objectMapper);

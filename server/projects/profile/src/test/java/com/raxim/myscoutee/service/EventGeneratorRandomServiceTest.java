@@ -33,7 +33,7 @@ import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorRandomService;
@@ -73,8 +73,8 @@ public class EventGeneratorRandomServiceTest extends AbstractAlgoTest {
 
                 String flags = jsonToString(FLAGS_DEFAULT, objectMapper);
 
-                FilteredEdges filteredEdges = loadJson(this, "algo/filteredEdges.json",
-                                FilteredEdges.class, objectMapper);
+                ObjGraph filteredEdges = loadJson(this, "algo/filteredEdges.json",
+                                ObjGraph.class, objectMapper);
                 when(likeService.getEdges(Set.of("A")))
                                 .thenReturn(filteredEdges);
 
@@ -121,8 +121,8 @@ public class EventGeneratorRandomServiceTest extends AbstractAlgoTest {
 
                 String flags = jsonToString(FLAGS_DEFAULT, objectMapper);
 
-                FilteredEdges filteredEdges = loadJson(this, "algo/filteredEdgesWithIgnored.json",
-                                FilteredEdges.class, objectMapper);
+                ObjGraph filteredEdges = loadJson(this, "algo/filteredEdgesWithIgnored.json",
+                                ObjGraph.class, objectMapper);
                 when(likeService.getEdges(Set.of("A")))
                                 .thenReturn(filteredEdges);
 

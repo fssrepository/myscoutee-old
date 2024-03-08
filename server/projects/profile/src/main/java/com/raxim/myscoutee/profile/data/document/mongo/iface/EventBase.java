@@ -7,9 +7,9 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Amount;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
-import com.raxim.myscoutee.profile.data.document.mongo.RangeInt;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 
 public abstract class EventBase {
@@ -52,7 +52,7 @@ public abstract class EventBase {
     private Amount amount;
 
     @JsonProperty(value = "capacity")
-    private RangeInt capacity;
+    private Range capacity;
 
     @JsonProperty(value = "urlRef")
     private String urlRef;
@@ -73,11 +73,11 @@ public abstract class EventBase {
         this.type = type;
     }
 
-    public RangeInt getCapacity() {
+    public Range getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(RangeInt capacity) {
+    public void setCapacity(Range capacity) {
         this.capacity = capacity;
     }
 

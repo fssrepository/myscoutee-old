@@ -17,6 +17,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
+import com.raxim.myscoutee.common.config.FilterConfig;
 import com.raxim.myscoutee.common.config.JsonConfig;
 import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
@@ -26,7 +27,8 @@ import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
@@ -36,7 +38,7 @@ import com.raxim.myscoutee.profile.service.LikeService;
 
 @DataMongoTest
 @DirtiesContext
-@Import({ RepositoryConfig.class, JsonConfig.class })
+@Import({ RepositoryConfig.class, JsonConfig.class, FilterConfig.class })
 @TestPropertySource(properties = { "de.flapdoodle.mongodb.embedded.version=6.0.6",
                 "logging.level.org.springframework.data.mongodb=DEBUG" })
 @TestData({ "mongo/profiles.json", "mongo/priority/events.json", "mongo/likes.json" })
@@ -58,17 +60,20 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
         @Autowired
         private EventRepository eventRepository;
 
+        @Autowired
+        private ProfileObjGraphFilter profileObjGraphFilter;
+
         @Test
         public void shouldGeneratePriorityEvent() {
                 LikeService likeService = new LikeService(profileRepository, likeRepository, eventRepository,
                                 sequenceRepository);
                 EventGeneratorByPriorityService eventGeneratorPriorityService = new EventGeneratorByPriorityService(
-                                eventRepository);
+                                eventRepository, profileObjGraphFilter);
 
                 List<EventWithCandidates> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
                 assertTrue(eventWithCandidates.size() > 0);
                 assertEquals("P", eventWithCandidates.get(0).getEvent().getStatus());
-                assertEquals(1, eventWithCandidates.get(2).getEvent().getMembers().size());
+                assertEquals(2, eventWithCandidates.get(0).getEvent().getMembers().size());
 
                 Event event = this.eventRepository.findById(eventWithCandidates.get(0).getEvent().getId()).get();
                 assertEquals("P", event.getStatus());
@@ -79,15 +84,16 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
                 event.setRange(rangeLocal);
                 this.eventRepository.save(event);
 
-                FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+                List<Event> events = this.eventRepository.findAll();
+
+                ObjGraph filteredEdges = likeService.getEdges(Set.of("A", "F"));
 
                 eventGeneratorPriorityService.generate(filteredEdges, null);
 
+                events = this.eventRepository.findAll();
+
                 event = this.eventRepository.findById(eventWithCandidates.get(0).getEvent().getId()).get();
                 assertEquals("T", event.getStatus());
-
-                event = this.eventRepository.findById(eventWithCandidates.get(2).getEvent().getId()).get();
-                assertEquals("P", event.getStatus());
 
                 assertEquals(2, event.getMembers().size());
 

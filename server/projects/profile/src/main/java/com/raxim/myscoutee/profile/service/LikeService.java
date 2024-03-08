@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +17,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.raxim.myscoutee.algo.dto.Edge;
+import com.raxim.myscoutee.algo.dto.FGraph;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
@@ -23,7 +26,6 @@ import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Sequence;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
@@ -51,7 +53,7 @@ public class LikeService {
         this.sequenceRepository = sequenceRepository;
     }
 
-    public FilteredEdges getEdges(Set<String> ignoredStatuses) {
+    public ObjGraph<Profile> getEdges(Set<String> ignoredStatuses) {
         List<LikeGroup> likeGroups = likeRepository.findLikeGroups();
 
         // merge likes
@@ -59,11 +61,19 @@ public class LikeService {
             return group.reduce();
         }).filter(like -> like != null).toList();
 
-        // nodes
-        Map<String, Profile> nodes = new HashMap<>();
+        Map<String, Profile> profiles = new HashMap<>();
         likesBoth.forEach(likeBoth -> {
-            nodes.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
-            nodes.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
+            profiles.put(likeBoth.getFrom().getId().toString(), likeBoth.getFrom());
+            profiles.put(likeBoth.getTo().getId().toString(), likeBoth.getTo());
+        });
+
+        // nodes
+        Map<String, Node> nodes = new HashMap<>();
+        likesBoth.forEach(likeBoth -> {
+            nodes.put(likeBoth.getFrom().getId().toString(),
+                    new Node(likeBoth.getFrom().getId().toString(), likeBoth.getFrom().getGender()));
+            nodes.put(likeBoth.getTo().getId().toString(),
+                    new Node(likeBoth.getTo().getId().toString(), likeBoth.getTo().getGender()));
         });
 
         // edges
@@ -102,7 +112,9 @@ public class LikeService {
         }
 
         ignoredEdges.add(ignoredEdgesByStatus);
-        return new FilteredEdges(nodes, edges, ignoredEdges);
+
+        FGraph fGraph = new FGraph(nodes, edges, new HashSet<>(), ignoredEdges);
+        return new ObjGraph<Profile>(profiles, fGraph);
     }
 
     public List<LikeDTO> saveLikes(Profile profile, List<LikeDTO> pfLikes) {

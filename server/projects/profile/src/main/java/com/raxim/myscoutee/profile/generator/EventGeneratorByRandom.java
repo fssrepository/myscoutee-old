@@ -3,25 +3,25 @@ package com.raxim.myscoutee.profile.generator;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.raxim.myscoutee.algo.BCTree;
-import com.raxim.myscoutee.algo.CTree;
-import com.raxim.myscoutee.algo.dto.DGraph;
+import com.raxim.myscoutee.algo.Algo;
+import com.raxim.myscoutee.algo.dto.FGraph;
+import com.raxim.myscoutee.algo.dto.Node;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
-public class EventGeneratorByRandom extends GeneratorBase<Event> {
+public class EventGeneratorByRandom extends GeneratorBase<Event, Profile> {
 
-    public EventGeneratorByRandom(FilteredEdges filteredEdges, Object flags) {
+    public EventGeneratorByRandom(ObjGraph<Profile> filteredEdges, Object flags) {
         super(filteredEdges, flags);
     }
 
@@ -29,27 +29,21 @@ public class EventGeneratorByRandom extends GeneratorBase<Event> {
     public List<Event> generate() {
 
         Range lFlags = (Range) getFlags();
-
-        DGraph dGraph = new DGraph();
-        dGraph.addAll(getFilteredEdges().getEdges());
-
         Range range = new Range(lFlags.getMin(), lFlags.getMax());
-        List<BCTree> bcTrees = dGraph.stream().map(cGraph -> {
-            CTree cTree = new CTree(cGraph, List.of(AppConstants.MAN, AppConstants.WOMAN),
-                    getFilteredEdges().getIgnoredEdges());
-            return new BCTree(cTree, range);
-        }).toList();
+        List<String> types = List.of(AppConstants.MAN, AppConstants.WOMAN);
 
-        List<List<Member>> membersByGroup = new ArrayList<>();
-        bcTrees.forEach(bcTree -> bcTree.forEach(cGroup -> {
-            List<Member> profiles = cGroup.stream()
-                    .map(node -> new Member(getFilteredEdges().getNodes().get(node.getId()), "A", "U"))
-                    .toList();
-            membersByGroup.add(profiles);
-        }));
+        FGraph fGraph = getObjGraph().getfGraph();
 
-        List<Event> handledEvents = membersByGroup.stream()
-                .map(members -> {
+        Algo algo = new Algo();
+        List<List<Node>> nodesByEvent = algo.runRandom(fGraph, types, range);
+
+        List<Event> handledEvents = nodesByEvent.stream()
+                .map(nodes -> {
+
+                    List<Member> members = nodes.stream()
+                            .map(n -> new Member(getObjGraph().getNodes().get(n.getId()), "A", "U"))
+                            .toList();
+
                     Event event = new Event();
                     event.setId(UUID.randomUUID());
                     event.setType("E");

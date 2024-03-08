@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.generator.EventGeneratorByScore;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
@@ -29,7 +29,7 @@ public class EventGeneratorByScoreService implements IEventGeneratorService {
     }
 
     @Override
-    public List<Event> generate(FilteredEdges filteredEdges, String flags) {
+    public List<Event> generate(ObjGraph filteredEdges, String flags) {
         List<Event> events = this.eventRepository.findEvents();
 
         List<String> rankTypes = events.stream()

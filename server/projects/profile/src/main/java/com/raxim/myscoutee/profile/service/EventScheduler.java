@@ -17,8 +17,9 @@ import com.google.firebase.messaging.Notification;
 import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
 import com.raxim.myscoutee.profile.data.document.mongo.DBMessage;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
@@ -144,7 +145,7 @@ public class EventScheduler {
 
         String flags = schedule.map(Schedule::getFlags).orElse(null);
 
-        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
+        ObjGraph filteredEdges = likeService.getEdges(Set.of("A"));
 
         List<Event> genEvents = eventGeneratorRandomService.generate(filteredEdges, flags);
 
@@ -181,7 +182,7 @@ public class EventScheduler {
 
         String flags = schedule.map(Schedule::getFlags).orElse(null);
 
-        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+        ObjGraph<Profile> filteredEdges = likeService.getEdges(Set.of("A", "F"));
 
         eventGeneratorByPriorityService.generate(filteredEdges, flags);
 
@@ -200,7 +201,7 @@ public class EventScheduler {
 
         String flags = schedule.map(Schedule::getFlags).orElse(null);
 
-        FilteredEdges filteredEdges = likeService.getEdges(Set.of("A", "F"));
+        ObjGraph<Profile> filteredEdges = likeService.getEdges(Set.of("A", "F"));
 
         eventGeneratorByScoreService.generate(filteredEdges, flags);
 

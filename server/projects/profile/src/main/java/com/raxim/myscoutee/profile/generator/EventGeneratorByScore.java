@@ -22,16 +22,16 @@ import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Rule;
 import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.util.AppConstants;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
-public class EventGeneratorByScore extends GeneratorBase<Event> {
+public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
 
     private final List<Event> events;
     private final Map<String, List<ScoreMatrix>> scoreMatricesByType;
 
-    public EventGeneratorByScore(List<Event> events, FilteredEdges filteredEdges, String flags,
+    public EventGeneratorByScore(List<Event> events, ObjGraph<Profile> filteredEdges, String flags,
             Map<String, List<ScoreMatrix>> scoreMatricesByType) {
         super(filteredEdges, flags);
         this.events = events;
@@ -74,16 +74,16 @@ public class EventGeneratorByScore extends GeneratorBase<Event> {
 
                             Set<Edge> sIgnoredEdges = EventUtil.permutate(cItem.getMembers());
 
-                            Set<Edge> sIgnoredEdgesByRate = getFilteredEdges().getEdges().stream()
+                            Set<Edge> sIgnoredEdgesByRate = getObjGraph().getfGraph().getEdges().stream()
                                     .filter(edge -> nextRule.getRate() != null &&
                                             edge.getWeight() >= nextRule.getRate())
                                     .collect(Collectors.toSet());
                             List<Set<Edge>> ignoredEdges = List.of(sIgnoredEdges, sIgnoredEdgesByRate);
-                            ignoredEdges.addAll(getFilteredEdges().getIgnoredEdges());
+                            ignoredEdges.addAll(getObjGraph().getfGraph().getIgnoredEdges());
 
                             Set<Edge> possibleEdges = EventUtil.permutate(cItem.getMembers());
 
-                            List<Edge> validEdges = getFilteredEdges().getEdges().stream()
+                            List<Edge> validEdges = getObjGraph().getfGraph().getEdges().stream()
                                     .filter(edge -> possibleEdges.contains(edge))
                                     .toList();
 
@@ -93,7 +93,7 @@ public class EventGeneratorByScore extends GeneratorBase<Event> {
                             Set<Node> activeNodes = cItem.getMembers().stream()
                                     .filter(member -> "A".equals(member.getStatus()))
                                     .map(member -> {
-                                        Profile profile = getFilteredEdges().getNodes()
+                                        Profile profile = getObjGraph().getNodes()
                                                 .get(member.getProfile().getId().toString());
                                         return new Node(profile.getId().toString(), profile.getGender());
                                     })
@@ -120,7 +120,7 @@ public class EventGeneratorByScore extends GeneratorBase<Event> {
                                 if (itCGroup.hasAnyNext()) {
                                     CGroup cGroup = itCGroup.next();
                                     Set<Member> newMembers = cGroup.stream()
-                                            .map(node -> new Member(getFilteredEdges().getNodes().get(node.getId()),
+                                            .map(node -> new Member(getObjGraph().getNodes().get(node.getId()),
                                                     "P",
                                                     "U"))
                                             .collect(Collectors.toSet());

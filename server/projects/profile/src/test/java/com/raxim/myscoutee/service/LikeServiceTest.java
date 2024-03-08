@@ -28,17 +28,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raxim.myscoutee.algo.AbstractAlgoTest;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.common.config.JsonConfig;
 import com.raxim.myscoutee.common.data.TestEvent;
 import com.raxim.myscoutee.common.data.TestLike;
 import com.raxim.myscoutee.common.data.TestProfile;
-import com.raxim.myscoutee.common.util.JsonUtil;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Sequence;
-import com.raxim.myscoutee.profile.data.dto.FilteredEdges;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
@@ -166,10 +165,10 @@ public class LikeServiceTest extends AbstractAlgoTest {
 
                 when(eventRepository.findAll()).thenReturn(events);
 
-                FilteredEdges filteredEdges = likeService.getEdges(Set.of("A"));
+                ObjGraph filteredEdges = likeService.getEdges(Set.of("A"));
 
-                assertEquals(6, filteredEdges.getEdges().size());
-                assertEquals(3, filteredEdges.getIgnoredEdges().size());
+                assertEquals(6, filteredEdges.getfGraph().getEdges().size());
+                assertEquals(3, filteredEdges.getfGraph().getIgnoredEdges().size());
                 assertEquals(8, filteredEdges.getNodes().size());
         }
 

@@ -22,11 +22,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.common.repository.GeoJsonPointDeserializer;
 import com.raxim.myscoutee.common.util.CommonUtil;
 import com.raxim.myscoutee.profile.converter.Convertable;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.EventBase;
 import com.raxim.myscoutee.profile.data.document.mongo.iface.Tree;
+import com.raxim.myscoutee.profile.util.AppConstants;
 
 @Document(collection = "events")
 public class Event extends EventBase implements Convertable<Event>, Tree<Event> {
@@ -83,16 +85,19 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     @JsonProperty(value = "multislot")
     private Boolean multislot;
 
-    //click on ... button on event item (no slot number on event edit screen), "clone as slot" menu item => enter slot number
+    // click on ... button on event item (no slot number on event edit screen),
+    // "clone as slot" menu item => enter slot number
 
     // based on created date make a slotIdx (sync method)
     // leave it 0, if there is only one item in the slot
     @JsonIgnore
     private int slotIdx;
 
-    // in the main event => current Stage idx, in the child event it's and index of the stage => "assign to stage" menu item
+    // in the main event => current Stage idx, in the child event it's and index of
+    // the stage => "assign to stage" menu item
     // pre selection from main event -> someone is interested
-    // it's going to the parentEvent.members, and later on organized to a stageIdx = 0, slotIdx = 0
+    // it's going to the parentEvent.members, and later on organized to a stageIdx =
+    // 0, slotIdx = 0
     @JsonProperty(value = "stage")
     private int stageIdx = -1;
 
@@ -108,7 +113,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
     @JsonProperty(value = "rule")
     private Rule rule = new Rule();
 
-    //people don't see each other
+    // people don't see each other
     @JsonProperty(value = "discreet")
     private Boolean discreet;
 
@@ -237,6 +242,16 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
         return rule;
     }
 
+    public List<String> getTypes() {
+        List<String> types;
+        if (Boolean.TRUE.equals(rule.getBalanced())) {
+            types = List.of(AppConstants.MAN, AppConstants.WOMAN);
+        } else {
+            types = List.of();
+        }
+        return types;
+    }
+
     public void setRule(Rule rule) {
         this.rule = rule;
     }
@@ -293,7 +308,7 @@ public class Event extends EventBase implements Convertable<Event>, Tree<Event> 
             int max = getItems().stream().filter(item -> item.getStageIdx() == getStageIdx())
                     .mapToInt(item -> item.getCapacity().getMax())
                     .sum();
-            setCapacity(RangeInt.of(min, max));
+            setCapacity(Range.of(min, max));
         }
 
         if (getMembers() != null) {

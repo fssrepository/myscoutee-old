@@ -23,4 +23,5 @@ public class EventWithCandidates {
     public void setEvent(Event event) {
         this.event = event;
     }
+
 }

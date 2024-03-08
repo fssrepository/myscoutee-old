@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.RangeInt;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
 
 public class EventTest {
@@ -17,7 +17,7 @@ public class EventTest {
     @Test
     public void shouldSync() {
         Event event = new Event();
-        event.setCapacity(RangeInt.of(2, 6));
+        event.setCapacity(Range.of(2, 6));
 
         LocalDateTime eventStart = LocalDateTime.of(2020, 2, 1, 0, 0, 0);
         LocalDateTime eventEnd = LocalDateTime.of(2020, 2, 1, 0, 0, 0);
@@ -25,7 +25,7 @@ public class EventTest {
 
         List<Event> items = new ArrayList<>();
         Event eventItem = new Event();
-        eventItem.setCapacity(RangeInt.of(3, 8));
+        eventItem.setCapacity(Range.of(3, 8));
 
         LocalDateTime itemStart = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
         LocalDateTime itemEnd = LocalDateTime.of(2021, 1, 1, 0, 0, 0);
@@ -44,7 +44,7 @@ public class EventTest {
     @Test
     public void shouldShiftAndSync() {
         Event event = new Event();
-        event.setCapacity(RangeInt.of(2, 6));
+        event.setCapacity(Range.of(2, 6));
 
         LocalDateTime eventStart = LocalDateTime.of(2020, 2, 1, 0, 0, 0);
         LocalDateTime eventEnd = LocalDateTime.of(2020, 3, 1, 0, 0, 0);
@@ -52,7 +52,7 @@ public class EventTest {
 
         List<Event> items = new ArrayList<>();
         Event eventItem = new Event();
-        eventItem.setCapacity(RangeInt.of(3, 8));
+        eventItem.setCapacity(Range.of(3, 8));
 
         LocalDateTime itemStart = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
         LocalDateTime itemEnd = LocalDateTime.of(2021, 1, 1, 0, 0, 0);

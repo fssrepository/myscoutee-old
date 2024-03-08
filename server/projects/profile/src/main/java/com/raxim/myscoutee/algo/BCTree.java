@@ -19,8 +19,17 @@ public class BCTree implements Iterable<CGroup> {
     }
 
     public BCTree(CTree cTree, Range range, Set<Node> usedNodes) {
+        this(cTree, range, usedNodes, false);
+
+    }
+
+    public BCTree(CTree cTree, Range range, Set<Node> usedNodes, boolean inclNodes) {
         this.cTree = cTree;
-        this.range = range;
+        if (inclNodes == true) {
+            this.range = range.add(-usedNodes.size());
+        } else {
+            this.range = range;
+        }
         this.usedNodes = usedNodes;
     }
 

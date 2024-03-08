@@ -1,8 +1,9 @@
 package com.raxim.myscoutee.profile.data.document.mongo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raxim.myscoutee.algo.dto.Range;
 
 public class Slot {
     @JsonProperty(value = "range")
@@ -12,7 +13,7 @@ public class Slot {
     private int numOfItems;
 
     @JsonProperty(value = "capacity")
-    private RangeInt capacity;
+    private Range capacity;
 
     public RangeLocal getRange() {
         return range;
@@ -30,11 +31,11 @@ public class Slot {
         this.numOfItems = numOfItems;
     }
 
-    public RangeInt getCapacity() {
+    public Range getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(RangeInt capacity) {
+    public void setCapacity(Range capacity) {
         this.capacity = capacity;
     }
 
