@@ -12,6 +12,7 @@ public class BCTree implements Iterable<CGroup> {
 
     private final CTree cTree;
     private final Range range;
+    private final boolean hasAny;
     private final Set<Node> usedNodes;
 
     public BCTree(CTree cTree, Range range) {
@@ -19,12 +20,13 @@ public class BCTree implements Iterable<CGroup> {
     }
 
     public BCTree(CTree cTree, Range range, Set<Node> usedNodes) {
-        this(cTree, range, usedNodes, false);
+        this(cTree, range, usedNodes, false, false);
 
     }
 
-    public BCTree(CTree cTree, Range range, Set<Node> usedNodes, boolean inclNodes) {
+    public BCTree(CTree cTree, Range range, Set<Node> usedNodes, boolean inclNodes, boolean hasAny) {
         this.cTree = cTree;
+        this.hasAny = hasAny;
         if (inclNodes == true) {
             this.range = range.add(-usedNodes.size());
         } else {
@@ -35,7 +37,7 @@ public class BCTree implements Iterable<CGroup> {
 
     @Override
     public Iterator<CGroup> iterator() {
-        return new BCTreeIterator(this, range);
+        return new BCTreeIterator(this, range, this.hasAny);
     }
 
     public CTree getcTree() {

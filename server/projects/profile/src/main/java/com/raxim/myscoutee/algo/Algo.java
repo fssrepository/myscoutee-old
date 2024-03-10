@@ -13,14 +13,14 @@ import com.raxim.myscoutee.algo.dto.Range;
 //can be Runnable
 public class Algo {
 
-    public List<Set<Node>> run(FGraph fGraph, List<String> types, Range range) {
+    public List<Set<Node>> run(FGraph fGraph, List<String> types, Range range, boolean hasAny) {
         DGraph dGraph = new DGraph();
         dGraph.addAll(fGraph.getEdges());
 
         List<BCTree> bcTrees = dGraph.stream().map(cGraph -> {
             CTree cTree = new CTree(cGraph, types,
                     fGraph.getIgnoredEdges());
-            return new BCTree(cTree, range, fGraph.getIgnoredNodes(), true);
+            return new BCTree(cTree, range, fGraph.getIgnoredNodes(), true, hasAny);
         }).toList();
 
         List<Set<Node>> nodesByGroup = new ArrayList<>();

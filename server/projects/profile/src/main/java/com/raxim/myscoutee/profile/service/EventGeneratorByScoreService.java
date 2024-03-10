@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
+import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
 import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.generator.EventGeneratorByScore;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
@@ -21,10 +22,13 @@ import com.raxim.myscoutee.profile.service.iface.IEventGeneratorService;
 @Service
 public class EventGeneratorByScoreService implements IEventGeneratorService {
     private final EventRepository eventRepository;
+    private final ProfileObjGraphFilter profileObjGraphFilter;
     private final ScoreMatrixRepository scoreMatrixRepository;
 
-    public EventGeneratorByScoreService(EventRepository eventRepository, ScoreMatrixRepository scoreMatrixRepository) {
+    public EventGeneratorByScoreService(EventRepository eventRepository, ProfileObjGraphFilter profileObjGraphFilter,
+            ScoreMatrixRepository scoreMatrixRepository) {
         this.eventRepository = eventRepository;
+        this.profileObjGraphFilter = profileObjGraphFilter;
         this.scoreMatrixRepository = scoreMatrixRepository;
     }
 
@@ -39,7 +43,8 @@ public class EventGeneratorByScoreService implements IEventGeneratorService {
         Map<String, List<ScoreMatrix>> scoreMatricesByType = dbScoreMatrices.stream()
                 .collect(Collectors.groupingBy(ScoreMatrix::getName));
 
-        EventGeneratorByScore eventGeneratorByScore = new EventGeneratorByScore(events, filteredEdges, flags,
+        EventGeneratorByScore eventGeneratorByScore = new EventGeneratorByScore(events, profileObjGraphFilter,
+                filteredEdges, flags,
                 scoreMatricesByType);
         List<Event> eventsToSave = eventGeneratorByScore.generate();
 

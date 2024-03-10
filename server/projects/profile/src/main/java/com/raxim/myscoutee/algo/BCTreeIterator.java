@@ -14,15 +14,17 @@ public class BCTreeIterator implements Iterator<CGroup> {
 
     private final BCTree bcTree;
     private final Range range;
+    private final boolean hasAny;
     private final CTreeIterator cTreeIterator;
 
     private CGroup cGroup = new CGroup();
     private CGroup cTree = new CGroup();
 
     public BCTreeIterator(BCTree bcTree,
-            final Range range) {
+            final Range range, boolean hasAny) {
 
         this.bcTree = bcTree;
+        this.hasAny = hasAny;
         this.cTreeIterator = (CTreeIterator) bcTree.getcTree().iterator();
 
         int min = range.getMin() < 2 ? 2 : range.getMin() + (range.getMin() % cTreeIterator.getTypes().size());
@@ -31,16 +33,10 @@ public class BCTreeIterator implements Iterator<CGroup> {
         this.range = new Range(min, max);
     }
 
-    public boolean hasAnyNext() {
-        handleGroup();
-        return hasAnyRemaining();
-    }
-
     @Override
     public boolean hasNext() {
         handleGroup();
-
-        return hasRemaining();
+        return hasAny ? hasAnyRemaining() : hasRemaining();
     }
 
     private void handleGroup() {

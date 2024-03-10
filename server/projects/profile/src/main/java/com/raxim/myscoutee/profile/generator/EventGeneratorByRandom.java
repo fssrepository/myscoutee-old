@@ -36,7 +36,7 @@ public class EventGeneratorByRandom extends GeneratorBase<Event, Profile> {
         FGraph fGraph = getObjGraph().getfGraph();
 
         Algo algo = new Algo();
-        List<Set<Node>> nodesByEvent = algo.run(fGraph, types, range);
+        List<Set<Node>> nodesByEvent = algo.run(fGraph, types, range, false);
 
         List<Event> handledEvents = nodesByEvent.stream()
                 .map(nodes -> {

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.raxim.myscoutee.algo.Algo;
 import com.raxim.myscoutee.algo.BCTree;
 import com.raxim.myscoutee.algo.BCTreeIterator;
 import com.raxim.myscoutee.algo.CTree;
@@ -16,13 +17,15 @@ import com.raxim.myscoutee.algo.dto.CGroup;
 import com.raxim.myscoutee.algo.dto.DGraph;
 import com.raxim.myscoutee.algo.dto.Edge;
 import com.raxim.myscoutee.algo.dto.Node;
+import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
+import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Rule;
 import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
-import com.raxim.myscoutee.algo.dto.ObjGraph;
+import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
 import com.raxim.myscoutee.profile.util.AppConstants;
 import com.raxim.myscoutee.profile.util.EventUtil;
 
@@ -30,11 +33,14 @@ public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
 
     private final List<Event> events;
     private final Map<String, List<ScoreMatrix>> scoreMatricesByType;
+    private final ProfileObjGraphFilter profileObjGraphFilter;
 
-    public EventGeneratorByScore(List<Event> events, ObjGraph<Profile> filteredEdges, String flags,
+    public EventGeneratorByScore(List<Event> events, ProfileObjGraphFilter profileObjGraphFilter,
+            ObjGraph<Profile> filteredEdges, String flags,
             Map<String, List<ScoreMatrix>> scoreMatricesByType) {
         super(filteredEdges, flags);
         this.events = events;
+        this.profileObjGraphFilter = profileObjGraphFilter;
         this.scoreMatricesByType = scoreMatricesByType;
     }
 
@@ -72,61 +78,24 @@ public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
                         List<Member> cMembers = new ArrayList<>();
                         if (Boolean.TRUE.equals(nextItem.getRule().getMutual())) {
 
-                            Set<Edge> sIgnoredEdges = EventUtil.permutate(cItem.getMembers());
+                            EventWithCandidates eventWithCandidates = new EventWithCandidates();
+                            eventWithCandidates.setCandidates(cItem.getMembers());
+                            nextItem.setCapacity(Range.of(firstXWinner, firstXWinner));
+                            eventWithCandidates.setEvent(nextItem);
 
-                            Set<Edge> sIgnoredEdgesByRate = getObjGraph().getfGraph().getEdges().stream()
-                                    .filter(edge -> nextRule.getRate() != null &&
-                                            edge.getWeight() >= nextRule.getRate())
-                                    .collect(Collectors.toSet());
-                            List<Set<Edge>> ignoredEdges = List.of(sIgnoredEdges, sIgnoredEdgesByRate);
-                            ignoredEdges.addAll(getObjGraph().getfGraph().getIgnoredEdges());
+                            ObjGraph<Profile> objGraph = this.profileObjGraphFilter.filter(getObjGraph(),
+                                    eventWithCandidates);
 
-                            Set<Edge> possibleEdges = EventUtil.permutate(cItem.getMembers());
+                            Algo algo = new Algo();
+                            List<Set<Node>> candidates = algo.run(objGraph.getfGraph(),
+                                    eventWithCandidates.getEvent().getTypes(),
+                                    eventWithCandidates.getEvent().getCapacity(), true);
 
-                            List<Edge> validEdges = getObjGraph().getfGraph().getEdges().stream()
-                                    .filter(edge -> possibleEdges.contains(edge))
-                                    .toList();
+                            // hasAnyMember
+                            cMembers = candidates.get(0).stream()
+                                    .map(node -> new Member(objGraph.getNodes().get(node.getId()), "P", "U"))
+                                    .collect(Collectors.toList());
 
-                            DGraph dGraph = new DGraph();
-                            dGraph.addAll(validEdges);
-
-                            Set<Node> activeNodes = cItem.getMembers().stream()
-                                    .filter(member -> "A".equals(member.getStatus()))
-                                    .map(member -> {
-                                        Profile profile = getObjGraph().getNodes()
-                                                .get(member.getProfile().getId().toString());
-                                        return new Node(profile.getId().toString(), profile.getGender());
-                                    })
-                                    .collect(Collectors.toSet());
-
-                            Range range = new Range(firstXWinner, firstXWinner);
-
-                            List<String> types;
-                            if (Boolean.TRUE.equals(nextRule.getBalanced())) {
-                                types = List.of(AppConstants.MAN, AppConstants.WOMAN);
-                            } else {
-                                types = List.of();
-                            }
-
-                            List<BCTree> bcTrees = dGraph.stream().map(cGraph -> {
-                                CTree cTree = new CTree(cGraph, types, ignoredEdges);
-                                return new BCTree(cTree, range, activeNodes);
-                            }).toList();
-
-                            Iterator<BCTree> itBCTree = bcTrees.iterator();
-                            if (itBCTree.hasNext()) {
-                                BCTree bcTree = itBCTree.next();
-                                BCTreeIterator itCGroup = (BCTreeIterator) bcTree.iterator();
-                                if (itCGroup.hasAnyNext()) {
-                                    CGroup cGroup = itCGroup.next();
-                                    Set<Member> newMembers = cGroup.stream()
-                                            .map(node -> new Member(getObjGraph().getNodes().get(node.getId()),
-                                                    "P",
-                                                    "U"))
-                                            .collect(Collectors.toSet());
-                                    cMembers = new ArrayList<>(newMembers);
-                                }
-                            }
                         } else {
                             Stream<Member> sMembers = cItem.getMembers().stream()
                                     .filter(member -> "A".equals(member.getStatus())
