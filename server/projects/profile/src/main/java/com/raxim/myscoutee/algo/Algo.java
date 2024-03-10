@@ -10,6 +10,7 @@ import com.raxim.myscoutee.algo.dto.FGraph;
 import com.raxim.myscoutee.algo.dto.Node;
 import com.raxim.myscoutee.algo.dto.Range;
 
+//can be Runnable
 public class Algo {
 
     public List<Set<Node>> run(FGraph fGraph, List<String> types, Range range) {
