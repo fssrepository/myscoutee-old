@@ -34,7 +34,7 @@ public class EventGeneratorByRandom extends GeneratorBase<Event, Profile> {
         List<String> types = List.of(AppConstants.MAN, AppConstants.WOMAN);
 
         Algo algo = new Algo();
-        List<Set<Node>> nodesByEvent = algo.run(getfGraph(), types, range, false);
+        List<Set<Node>> nodesByEvent = algo.run(getGraph(), types, range, false);
 
         List<Event> handledEvents = nodesByEvent.stream()
                 .map(nodes -> {

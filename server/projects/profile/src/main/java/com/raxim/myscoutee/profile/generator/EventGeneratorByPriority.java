@@ -32,7 +32,7 @@ public class EventGeneratorByPriority extends GeneratorBase<Event, Profile> {
                 return event;
             }
 
-            FGraph fGraph = getfGraph().filter(event);
+            FGraph fGraph = getGraph().filter(event);
 
             Algo algo = new Algo();
             List<Set<Node>> candidates = algo.run(fGraph,

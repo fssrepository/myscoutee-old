@@ -68,7 +68,7 @@ public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
                             nextItem.setCandidates(cItem.getMembers());
                             nextItem.setCapacity(Range.of(firstXWinner, firstXWinner));
 
-                            FGraph fGraph = getfGraph().filter(nextItem);
+                            FGraph fGraph = getGraph().filter(nextItem);
 
                             Algo algo = new Algo();
                             List<Set<Node>> candidates = algo.run(fGraph,

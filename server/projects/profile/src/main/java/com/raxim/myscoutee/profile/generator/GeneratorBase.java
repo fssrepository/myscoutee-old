@@ -7,16 +7,16 @@ import com.raxim.myscoutee.algo.dto.FGraph;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 
 public abstract class GeneratorBase<T, P> {
-    private final FGraph fGraph;
+    private final FGraph graph;
     private final Map<String, Profile> profiles;
 
-    public GeneratorBase(FGraph fGraph, Map<String, Profile> profiles) {
-        this.fGraph = fGraph;
+    public GeneratorBase(FGraph graph, Map<String, Profile> profiles) {
+        this.graph = graph;
         this.profiles = profiles;
     }
 
-    public FGraph getfGraph() {
-        return fGraph;
+    public FGraph getGraph() {
+        return graph;
     }
 
     public Profile getProfileById(String id) {
