@@ -24,15 +24,10 @@ import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
-import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
-import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
-import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScoreMatrixRepository;
-import com.raxim.myscoutee.profile.repository.mongo.SequenceRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorByScoreService;
-import com.raxim.myscoutee.profile.service.LikeService;
 
 @DataMongoTest
 @DirtiesContext
@@ -44,22 +39,13 @@ import com.raxim.myscoutee.profile.service.LikeService;
 public class EventGeneratorScoreServiceTestInt extends AbstractAlgoTest {
 
         @Autowired
-        private ProfileRepository profileRepository;
-
-        @Autowired
         private LikeRepository likeRepository;
-
-        @Autowired
-        private SequenceRepository sequenceRepository;
 
         @Autowired
         private ScoreMatrixRepository scoreMatrixRepository;
 
         @Autowired
         private EventRepository eventRepository;
-
-        @Autowired
-        private ProfileObjGraphFilter profileObjGraphFilter;
 
         @Test
         public void shouldGenerateScoreEventsWithTwoStages() {
@@ -79,14 +65,10 @@ public class EventGeneratorScoreServiceTestInt extends AbstractAlgoTest {
                         this.eventRepository.save(item);
                 });
 
-                LikeService likeService = new LikeService(profileRepository, likeRepository, eventRepository,
-                                sequenceRepository);
                 EventGeneratorByScoreService eventGeneratorByScoreService = new EventGeneratorByScoreService(
-                                eventRepository, profileObjGraphFilter, scoreMatrixRepository);
+                                eventRepository, likeRepository, scoreMatrixRepository);
 
-                ObjGraph filteredEdges = likeService.getEdges(Set.of("A", "F"));
-
-                List<Event> events = eventGeneratorByScoreService.generate(filteredEdges, null);
+                List<Event> events = eventGeneratorByScoreService.generate(null);
 
                 Event parentEvent = events.get(0);
                 assertEquals(0, parentEvent.getStageIdx());
@@ -114,8 +96,7 @@ public class EventGeneratorScoreServiceTestInt extends AbstractAlgoTest {
 
                 this.eventRepository.saveAll(eventsToSave);
 
-                filteredEdges = likeService.getEdges(Set.of("A", "F"));
-                events = eventGeneratorByScoreService.generate(filteredEdges, null);
+                events = eventGeneratorByScoreService.generate(null);
 
                 parentEvent = events.get(0);
                 assertEquals(0, parentEvent.getStageIdx());
@@ -149,8 +130,7 @@ public class EventGeneratorScoreServiceTestInt extends AbstractAlgoTest {
 
                 this.eventRepository.saveAll(eventsToSave);
 
-                filteredEdges = likeService.getEdges(Set.of("A", "F"));
-                events = eventGeneratorByScoreService.generate(filteredEdges, null);
+                events = eventGeneratorByScoreService.generate(null);
 
                 parentEvent = events.get(0);
                 assertEquals(1, parentEvent.getStageIdx());

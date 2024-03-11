@@ -11,6 +11,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import com.raxim.myscoutee.profile.data.document.mongo.Like;
 import com.raxim.myscoutee.profile.data.document.mongo.LikeGroup;
 import com.raxim.myscoutee.profile.data.dto.rest.LikeDTO;
+import com.raxim.myscoutee.profile.util.LikesWrapper;
 
 @RepositoryRestResource(collectionResourceRel = "likes", path = "likes")
 public interface LikeRepository extends MongoRepository<Like, UUID> {
@@ -23,6 +24,15 @@ public interface LikeRepository extends MongoRepository<Like, UUID> {
 
     @Aggregation(pipeline = "findLikeGroups")
     List<LikeGroup> findLikeGroups();
+
+    default LikesWrapper findAllByGroup() {
+        List<LikeGroup> likeGroups = this.findLikeGroups();
+        // merge likes
+        List<Like> likesBoth = likeGroups.stream().map(group -> {
+            return group.reduce();
+        }).filter(like -> like != null).toList();
+        return new LikesWrapper(likesBoth);
+    }
 
     @Aggregation(pipeline = "findLikeGroup")
     LikeGroup findLikeGroup(@Param("from") UUID from, @Param("to") UUID to, @Param("ref") UUID ref);

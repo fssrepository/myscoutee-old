@@ -193,11 +193,8 @@
         }
     },
     {
-        "$replaceRoot": {
-            "newRoot": {
-                "event": "$$ROOT",
-                "candidates": "$candidates.mergedMembers"
-            }
+        "$addFields": {
+            "candidates": "$candidates.mergedMembers"
         }
     }
 ]

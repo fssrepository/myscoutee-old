@@ -3,7 +3,6 @@ package com.raxim.myscoutee.profile.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,9 +16,7 @@ import com.google.firebase.messaging.Notification;
 import com.raxim.myscoutee.common.config.firebase.FirebaseAuthenticationToken;
 import com.raxim.myscoutee.profile.data.document.mongo.DBMessage;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Schedule;
-import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.repository.mongo.MessageRepository;
 import com.raxim.myscoutee.profile.repository.mongo.ScheduleRepository;
 import com.raxim.myscoutee.profile.repository.mongo.UserRepository;
@@ -32,7 +29,6 @@ public class EventScheduler {
     private final EventGeneratorRandomService eventGeneratorRandomService;
     private final EventGeneratorByPriorityService eventGeneratorByPriorityService;
     private final EventGeneratorByScoreService eventGeneratorByScoreService;
-    private final LikeService likeService;
     private final ScheduleRepository scheduleRepository;
     private final MessageRepository messageRepository;
 
@@ -47,7 +43,6 @@ public class EventScheduler {
         this.eventGeneratorRandomService = eventGeneratorService;
         this.eventGeneratorByPriorityService = eventGeneratorByPriorityService;
         this.eventGeneratorByScoreService = eventGeneratorByScoreService;
-        this.likeService = likeService;
         this.scheduleRepository = scheduleRepository;
         this.messageRepository = messageRepository;
     }
@@ -145,12 +140,10 @@ public class EventScheduler {
 
         String flags = schedule.map(Schedule::getFlags).orElse(null);
 
-        ObjGraph filteredEdges = likeService.getEdges(Set.of("A"));
-
-        List<Event> genEvents = eventGeneratorRandomService.generate(filteredEdges, flags);
+        List<Event> genEvents = eventGeneratorRandomService.generate(flags);
 
         // generate messages and save with system, hence the user can see the channels!
-        //on accept invitation it is the same
+        // on accept invitation it is the same
         List<DBMessage> dbMessages = genEvents.stream().map(event -> {
             DBMessage dbMessage = new DBMessage();
             dbMessage.setId(UUID.randomUUID());
@@ -182,9 +175,7 @@ public class EventScheduler {
 
         String flags = schedule.map(Schedule::getFlags).orElse(null);
 
-        ObjGraph<Profile> filteredEdges = likeService.getEdges(Set.of("A", "F"));
-
-        eventGeneratorByPriorityService.generate(filteredEdges, flags);
+        eventGeneratorByPriorityService.generate(flags);
 
         sendRandomEventNotification();
 
@@ -201,9 +192,7 @@ public class EventScheduler {
 
         String flags = schedule.map(Schedule::getFlags).orElse(null);
 
-        ObjGraph<Profile> filteredEdges = likeService.getEdges(Set.of("A", "F"));
-
-        eventGeneratorByScoreService.generate(filteredEdges, flags);
+        eventGeneratorByScoreService.generate(flags);
 
         sendRandomEventNotification();
 

@@ -9,30 +9,25 @@ import java.util.stream.Stream;
 
 import com.raxim.myscoutee.algo.Algo;
 import com.raxim.myscoutee.algo.Fifa;
+import com.raxim.myscoutee.algo.dto.FGraph;
 import com.raxim.myscoutee.algo.dto.Node;
-import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.algo.dto.Range;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.Rule;
 import com.raxim.myscoutee.profile.data.document.mongo.ScoreMatrix;
-import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
 import com.raxim.myscoutee.profile.util.AppConstants;
 
 public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
 
     private final List<Event> events;
     private final Map<String, List<ScoreMatrix>> scoreMatricesByType;
-    private final ProfileObjGraphFilter profileObjGraphFilter;
 
-    public EventGeneratorByScore(List<Event> events, ProfileObjGraphFilter profileObjGraphFilter,
-            ObjGraph<Profile> filteredEdges, String flags,
-            Map<String, List<ScoreMatrix>> scoreMatricesByType) {
-        super(filteredEdges, flags);
+    public EventGeneratorByScore(List<Event> events, Map<String, List<ScoreMatrix>> scoreMatricesByType,
+            FGraph fGraph, Map<String, Profile> profiles, String flags) {
+        super(fGraph, profiles, flags);
         this.events = events;
-        this.profileObjGraphFilter = profileObjGraphFilter;
         this.scoreMatricesByType = scoreMatricesByType;
     }
 
@@ -70,22 +65,19 @@ public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
                         List<Member> cMembers = new ArrayList<>();
                         if (Boolean.TRUE.equals(nextItem.getRule().getMutual())) {
 
-                            EventWithCandidates eventWithCandidates = new EventWithCandidates();
-                            eventWithCandidates.setCandidates(cItem.getMembers());
+                            nextItem.setCandidates(cItem.getMembers());
                             nextItem.setCapacity(Range.of(firstXWinner, firstXWinner));
-                            eventWithCandidates.setEvent(nextItem);
 
-                            ObjGraph<Profile> objGraph = this.profileObjGraphFilter.filter(getObjGraph(),
-                                    eventWithCandidates);
+                            FGraph fGraph = getfGraph().filter(nextItem);
 
                             Algo algo = new Algo();
-                            List<Set<Node>> candidates = algo.run(objGraph.getfGraph(),
-                                    eventWithCandidates.getEvent().getTypes(),
-                                    eventWithCandidates.getEvent().getCapacity(), true);
+                            List<Set<Node>> candidates = algo.run(fGraph,
+                                    nextItem.getTypes(),
+                                    nextItem.getCapacity(), true);
 
                             // hasAnyMember
                             cMembers = candidates.get(0).stream()
-                                    .map(node -> new Member(objGraph.getNodes().get(node.getId()), "P", "U"))
+                                    .map(node -> new Member(getProfileById(node.getId()), "P", "U"))
                                     .collect(Collectors.toList());
 
                         } else {

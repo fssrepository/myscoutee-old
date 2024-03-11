@@ -65,6 +65,8 @@ public abstract class EventBase {
     @JsonProperty(value = "members")
     private Set<Member> members = new HashSet<>();
 
+    private Set<Member> candidates;
+
     public String getType() {
         return type;
     }
@@ -183,5 +185,13 @@ public abstract class EventBase {
 
     public void setOptional(Boolean optional) {
         this.optional = optional;
+    }
+
+    public Set<Member> getCandidates() {
+        return candidates;
+    }
+
+    public void setCandidates(Set<Member> candidates) {
+        this.candidates = candidates;
     }
 }

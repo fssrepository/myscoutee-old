@@ -1,56 +1,52 @@
 package com.raxim.myscoutee.profile.generator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.raxim.myscoutee.algo.Algo;
+import com.raxim.myscoutee.algo.dto.FGraph;
 import com.raxim.myscoutee.algo.dto.Node;
-import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
-import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
 
 public class EventGeneratorByPriority extends GeneratorBase<Event, Profile> {
-    private final List<EventWithCandidates> eventWithCandidates;
-    private final ProfileObjGraphFilter profileObjGraphFilter;
+    private final List<Event> events;
 
-    public EventGeneratorByPriority(List<EventWithCandidates> eventWithCandidates,
-            ProfileObjGraphFilter profileObjGraphFilter,
-            ObjGraph<Profile> objGraph,
+    public EventGeneratorByPriority(List<Event> events,
+            FGraph fGraph, Map<String, Profile> profiles,
             String flags) {
-        super(objGraph, flags);
-        this.eventWithCandidates = eventWithCandidates;
-        this.profileObjGraphFilter = profileObjGraphFilter;
+        super(fGraph, profiles, flags);
+        this.events = events;
     }
 
     @Override
     public List<Event> generate() {
-        List<Event> handledEvents = eventWithCandidates.stream().map(event -> {
-            event.getEvent().syncStatus();
+        List<Event> handledEvents = events.stream().map(event -> {
+            event.syncStatus();
 
-            if ("T".equals(event.getEvent().getStatus())
-                    || "A".equals(event.getEvent().getStatus())) {
+            if ("T".equals(event.getStatus())
+                    || "A".equals(event.getStatus())) {
                 // send notification either Timed out, or event Activated
-                return event.getEvent();
+                return event;
             }
 
-            ObjGraph<Profile> objGraph = this.profileObjGraphFilter.filter(getObjGraph(), event);
+            FGraph fGraph = getfGraph().filter(event);
 
             Algo algo = new Algo();
-            List<Set<Node>> candidates = algo.run(objGraph.getfGraph(),
-                    event.getEvent().getTypes(),
-                    event.getEvent().getCapacity(), true);
+            List<Set<Node>> candidates = algo.run(fGraph,
+                    event.getTypes(),
+                    event.getCapacity(), true);
 
             Set<Member> newMembers = candidates.get(0).stream()
-                    .map(node -> new Member(objGraph.getNodes().get(node.getId()), "I", "U"))
+                    .map(node -> new Member(getProfileById(node.getId()), "I", "U"))
                     .collect(Collectors.toSet());
 
-            event.getEvent().getMembers().addAll(newMembers);
+            event.getMembers().addAll(newMembers);
 
-            return event.getEvent();
+            return event;
         }).toList();
 
         List<Event> respEvents = handledEvents.stream().flatMap(event -> event.flatten().stream()).toList();

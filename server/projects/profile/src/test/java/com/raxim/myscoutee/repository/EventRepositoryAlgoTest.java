@@ -16,7 +16,6 @@ import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 
 @DataMongoTest
@@ -37,23 +36,22 @@ public class EventRepositoryAlgoTest {
         List<Event> events = eventRepository.findAll();
         assertEquals(5, events.size());
 
-        List<EventWithCandidates> eventsWithCandidates = eventRepository.findEventsWithCandidates();
+        List<Event> eventsWithCandidates = eventRepository.findEventsWithCandidates();
         assertEquals(1, eventsWithCandidates.size());
 
-        EventWithCandidates eventWithCandidates = eventsWithCandidates.get(0);
-        assertEquals(2, eventWithCandidates.getEvent().getItems().size());
-        assertEquals("P", eventWithCandidates.getEvent().getStatus());
+        Event eventWithCandidates = eventsWithCandidates.get(0);
+        assertEquals(2, eventWithCandidates.getItems().size());
+        assertEquals("P", eventWithCandidates.getStatus());
         assertEquals(2, eventWithCandidates.getCandidates().size());
 
         // mutual
-        Event event = eventWithCandidates.getEvent();
-        event.getRule().setMutual(true);
-        eventRepository.save(event);
+        eventWithCandidates.getRule().setMutual(true);
+        eventRepository.save(eventWithCandidates);
 
         eventsWithCandidates = eventRepository.findEventsWithCandidates();
 
         eventWithCandidates = eventsWithCandidates.get(0);
-        assertEquals("P", eventWithCandidates.getEvent().getStatus());
+        assertEquals("P", eventWithCandidates.getStatus());
         assertEquals(5, eventWithCandidates.getCandidates().size());
     }
 

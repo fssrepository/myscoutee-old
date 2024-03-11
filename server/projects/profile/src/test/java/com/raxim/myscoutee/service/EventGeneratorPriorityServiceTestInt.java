@@ -23,18 +23,12 @@ import com.raxim.myscoutee.common.config.RepositoryConfig;
 import com.raxim.myscoutee.common.repository.MongoDataLoaderTestExecutionListener;
 import com.raxim.myscoutee.common.repository.TestData;
 import com.raxim.myscoutee.profile.data.document.mongo.Event;
-import com.raxim.myscoutee.profile.data.document.mongo.EventWithCandidates;
 import com.raxim.myscoutee.profile.data.document.mongo.Member;
 import com.raxim.myscoutee.profile.data.document.mongo.Profile;
 import com.raxim.myscoutee.profile.data.document.mongo.RangeLocal;
-import com.raxim.myscoutee.profile.filter.ProfileObjGraphFilter;
-import com.raxim.myscoutee.algo.dto.ObjGraph;
 import com.raxim.myscoutee.profile.repository.mongo.EventRepository;
 import com.raxim.myscoutee.profile.repository.mongo.LikeRepository;
-import com.raxim.myscoutee.profile.repository.mongo.ProfileRepository;
-import com.raxim.myscoutee.profile.repository.mongo.SequenceRepository;
 import com.raxim.myscoutee.profile.service.EventGeneratorByPriorityService;
-import com.raxim.myscoutee.profile.service.LikeService;
 
 @DataMongoTest
 @DirtiesContext
@@ -49,33 +43,22 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
         private static final UUID UUID_PROFILE_SOPHIA = UUID.fromString("39402632-a452-57be-2518-53cc117b1abc");
 
         @Autowired
-        private ProfileRepository profileRepository;
-
-        @Autowired
         private LikeRepository likeRepository;
-
-        @Autowired
-        private SequenceRepository sequenceRepository;
 
         @Autowired
         private EventRepository eventRepository;
 
-        @Autowired
-        private ProfileObjGraphFilter profileObjGraphFilter;
-
         @Test
         public void shouldGeneratePriorityEvent() {
-                LikeService likeService = new LikeService(profileRepository, likeRepository, eventRepository,
-                                sequenceRepository);
                 EventGeneratorByPriorityService eventGeneratorPriorityService = new EventGeneratorByPriorityService(
-                                eventRepository, profileObjGraphFilter);
+                                eventRepository, likeRepository);
 
-                List<EventWithCandidates> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
+                List<Event> eventWithCandidates = this.eventRepository.findEventsWithCandidates();
                 assertTrue(eventWithCandidates.size() > 0);
-                assertEquals("P", eventWithCandidates.get(0).getEvent().getStatus());
-                assertEquals(2, eventWithCandidates.get(0).getEvent().getMembers().size());
+                assertEquals("P", eventWithCandidates.get(0).getStatus());
+                assertEquals(2, eventWithCandidates.get(0).getMembers().size());
 
-                Event event = this.eventRepository.findById(eventWithCandidates.get(0).getEvent().getId()).get();
+                Event event = this.eventRepository.findById(eventWithCandidates.get(0).getId()).get();
                 assertEquals("P", event.getStatus());
 
                 // manipulate startdate enddate of event
@@ -84,15 +67,9 @@ public class EventGeneratorPriorityServiceTestInt extends AbstractAlgoTest {
                 event.setRange(rangeLocal);
                 this.eventRepository.save(event);
 
-                List<Event> events = this.eventRepository.findAll();
+                eventGeneratorPriorityService.generate(null);
 
-                ObjGraph filteredEdges = likeService.getEdges(Set.of("A", "F"));
-
-                eventGeneratorPriorityService.generate(filteredEdges, null);
-
-                events = this.eventRepository.findAll();
-
-                event = this.eventRepository.findById(eventWithCandidates.get(0).getEvent().getId()).get();
+                event = this.eventRepository.findById(eventWithCandidates.get(0).getId()).get();
                 assertEquals("T", event.getStatus());
 
                 assertEquals(2, event.getMembers().size());
