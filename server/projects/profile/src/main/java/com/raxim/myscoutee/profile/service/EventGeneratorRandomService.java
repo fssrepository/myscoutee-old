@@ -46,8 +46,8 @@ public class EventGeneratorRandomService implements IEventGeneratorService {
         FGraph fGraph = lw.fGraph(Set.of("A"));
         Map<String, Profile> profiles = lw.profiles();
 
-        EventGeneratorByRandom eventGeneratorByRandom = new EventGeneratorByRandom(fGraph, profiles, lFlags);
-        List<Event> eventsToSave = eventGeneratorByRandom.generate();
+        EventGeneratorByRandom eventGeneratorByRandom = new EventGeneratorByRandom(fGraph, profiles);
+        List<Event> eventsToSave = eventGeneratorByRandom.generate(lFlags);
 
         List<Event> savedEvents = this.eventRepository.saveAll(eventsToSave);
         return savedEvents;

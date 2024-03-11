@@ -16,14 +16,13 @@ public class EventGeneratorByPriority extends GeneratorBase<Event, Profile> {
     private final List<Event> events;
 
     public EventGeneratorByPriority(List<Event> events,
-            FGraph fGraph, Map<String, Profile> profiles,
-            String flags) {
-        super(fGraph, profiles, flags);
+            FGraph fGraph, Map<String, Profile> profiles) {
+        super(fGraph, profiles);
         this.events = events;
     }
 
     @Override
-    public List<Event> generate() {
+    public List<Event> generate(Object flags) {
         List<Event> handledEvents = events.stream().map(event -> {
             event.syncStatus();
 

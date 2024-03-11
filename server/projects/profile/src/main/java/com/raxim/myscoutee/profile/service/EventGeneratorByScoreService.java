@@ -53,8 +53,8 @@ public class EventGeneratorByScoreService implements IEventGeneratorService {
                 Map<String, Profile> profiles = lw.profiles();
 
                 EventGeneratorByScore eventGeneratorByScore = new EventGeneratorByScore(events, scoreMatricesByType,
-                                fGraph, profiles, flags);
-                List<Event> eventsToSave = eventGeneratorByScore.generate();
+                                fGraph, profiles);
+                List<Event> eventsToSave = eventGeneratorByScore.generate(flags);
 
                 List<Event> savedEvents = this.eventRepository.saveAll(eventsToSave);
                 return savedEvents;

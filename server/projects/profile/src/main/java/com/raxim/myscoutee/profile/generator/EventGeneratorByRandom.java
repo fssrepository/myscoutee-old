@@ -22,14 +22,14 @@ import com.raxim.myscoutee.profile.util.AppConstants;
 
 public class EventGeneratorByRandom extends GeneratorBase<Event, Profile> {
 
-    public EventGeneratorByRandom(FGraph fGraph, Map<String, Profile> profiles, Object flags) {
-        super(fGraph, profiles, flags);
+    public EventGeneratorByRandom(FGraph fGraph, Map<String, Profile> profiles) {
+        super(fGraph, profiles);
     }
 
     @Override
-    public List<Event> generate() {
+    public List<Event> generate(Object flags) {
 
-        Range lFlags = (Range) getFlags();
+        Range lFlags = (Range) flags;
         Range range = new Range(lFlags.getMin(), lFlags.getMax());
         List<String> types = List.of(AppConstants.MAN, AppConstants.WOMAN);
 

@@ -36,8 +36,8 @@ public class EventGeneratorByPriorityService implements IEventGeneratorService {
         Map<String, Profile> profiles = lw.profiles();
 
         EventGeneratorByPriority eventGeneratorByPriority = new EventGeneratorByPriority(events,
-                fGraph, profiles, flags);
-        List<Event> eventsToSave = eventGeneratorByPriority.generate();
+                fGraph, profiles);
+        List<Event> eventsToSave = eventGeneratorByPriority.generate(flags);
 
         List<Event> savedEvents = this.eventRepository.saveAll(eventsToSave);
         return savedEvents;

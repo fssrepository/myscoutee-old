@@ -25,14 +25,14 @@ public class EventGeneratorByScore extends GeneratorBase<Event, Profile> {
     private final Map<String, List<ScoreMatrix>> scoreMatricesByType;
 
     public EventGeneratorByScore(List<Event> events, Map<String, List<ScoreMatrix>> scoreMatricesByType,
-            FGraph fGraph, Map<String, Profile> profiles, String flags) {
-        super(fGraph, profiles, flags);
+            FGraph fGraph, Map<String, Profile> profiles) {
+        super(fGraph, profiles);
         this.events = events;
         this.scoreMatricesByType = scoreMatricesByType;
     }
 
     @Override
-    public List<Event> generate() {
+    public List<Event> generate(Object flags) {
         List<Event> handledEvents = events.stream().map(event -> {
             event.syncStatus();
 
