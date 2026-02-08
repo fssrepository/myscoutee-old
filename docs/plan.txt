@@ -1,3 +1,5 @@
+cloudflare - caching images (so won't need to use google cloud bandwith)
+
 I) Event
 
    1) add activity/invitations (next to channels - notification icon) tab (direct invitations only, what you can accept, reject)
