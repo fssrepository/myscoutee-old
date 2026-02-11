@@ -5,10 +5,6 @@
 * Group dating allows to shift business model towards affiliate systems (e.g.: Booking.com) from subscription.
 * The algorithm can be used even on job site. (rate on jobs or ideas etc.)
 
-https://github.com/fssrepository/myscoutee/assets/45578746/8d0b41d7-0da9-475d-9202-fc5698442534
-
-https://github.com/fssrepository/myscoutee/assets/45578746/e3e2323b-ca66-48eb-90b4-ed6287b51016
-
 Contribution:
 -------------
 * MVP readiness with some issues - just notify me about your website that my effort is not wasted.
