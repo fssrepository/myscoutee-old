@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { NavigationService } from '../navigation.service';
 
 const physiques = { s: 'Slim', a: 'Average', sp: 'Sum plus', m: 'Muscular' };
@@ -197,20 +198,17 @@ export class TransformService {
     let isChild = url.indexOf('items') !== -1
     let lId = isChild ? id : value["eventId"];
 
-    let image = item["from"] ? location.origin
-      + '/backend/user/profile/images/'
-      + item["from"].name : undefined;
+    let image = item['from']
+      ? this.resolveMessageImage(item['from'])
+      : undefined;
 
     let reads = (item['reads'] !== undefined
       ? (item['reads'] as Array<string>)
       : []
     ).map(
-      (image) =>
-        location.origin
-        + '/backend/user/profile/images/'
-        + image['name']);
+      (readImage) => this.resolveMessageImage(readImage));
 
-    let profile = this.navService.user["profile"];
+    const profile = this.navService.user ? this.navService.user['profile'] : undefined;
     const data = {
       id: lId,
       type: 'msg',
@@ -219,11 +217,20 @@ export class TransformService {
       url: url + '/' + lId,
       children: !isChild,
       value,
-      isOwn: value.from === profile.key,
+      isOwn: profile ? value.from === profile.key : false,
       reads
     };
 
     return data;
+  }
+
+  private resolveMessageImage(image): string {
+    if (environment.mockUiData === true) {
+      return '../assets/img/man.svg';
+    }
+
+    const imageName = image && image['name'] ? image['name'] : image;
+    return location.origin + '/backend/user/profile/images/' + imageName;
   }
 
   transformGroup(id, value, url, inList): any {

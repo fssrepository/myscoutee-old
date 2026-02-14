@@ -229,7 +229,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log('notification click', click)
     );
 
-    if (firebase.apps.length === 0) {
+    if (environment.disableFirebaseAuth) {
+      this.navService.token = 'dev-auth-disabled';
+      if (this.router.url === '/login' || this.router.url === '/') {
+        this.router.navigate(['dating']);
+      }
+    } else if (firebase.apps.length === 0) {
       firebase.initializeApp(environment.firebase);
 
       firebase.auth().onIdTokenChanged((user) => {

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("config")
 public class ConfigProperties {
     private String adminUser;
+    private String firebaseServiceAccountPath;
 
     public String getAdminUser() {
         return adminUser;
@@ -14,5 +15,13 @@ public class ConfigProperties {
 
     public void setAdminUser(String adminUser) {
         this.adminUser = adminUser;
+    }
+
+    public String getFirebaseServiceAccountPath() {
+        return firebaseServiceAccountPath;
+    }
+
+    public void setFirebaseServiceAccountPath(String firebaseServiceAccountPath) {
+        this.firebaseServiceAccountPath = firebaseServiceAccountPath;
     }
 }

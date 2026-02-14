@@ -63,15 +63,19 @@ export class MsBar implements OnInit, OnDestroy {
         msg = msg.substring(0, msg.length - 1);
 
         let msgObj = JSON.parse(msg);
+        const profile = this.navService.user ? this.navService.user['profile'] : undefined;
+
         if (msgObj.message.type === "p") {
-            if (msgObj.message.from === this.navService.user["profile"].key) {
+            if (profile && msgObj.message.from === profile.key) {
                 return;
             }
 
             let msgReadObj = JSON.parse(msg);
             msgReadObj.message.type = "r";
             msgReadObj.reads = new Array<string>();
-            msgReadObj.reads.push(this.navService.user["profile"]["images"][0]);
+            if (profile && profile['images'] && profile['images'][0]) {
+                msgReadObj.reads.push(profile['images'][0]);
+            }
 
             this.mqttService.publish(this.url, JSON.stringify(msgReadObj));
         } else if (msgObj.message.type === "r") {
@@ -82,11 +86,18 @@ export class MsBar implements OnInit, OnDestroy {
     }
 
     send() {
-        let fromImage = this.navService.user["profile"]["images"][0];
+        const profile = this.navService.user ? this.navService.user['profile'] : undefined;
+        if (!profile) {
+            return;
+        }
+
+        let fromImage = profile["images"] && profile["images"][0]
+            ? profile["images"][0]
+            : { name: 'mock-user.jpg' };
         let payload = {
             from: fromImage, message: {
                 type: "p", value: this.message, ref: uuid.v4(),
-                key: uuid.v4(), from: this.navService.user["profile"].key
+                key: uuid.v4(), from: profile.key
             }
         };
         this.add.emit(payload);
@@ -110,8 +121,15 @@ export class MsBar implements OnInit, OnDestroy {
     }
 
     typing(isTyping) {
-        let fromImage = this.navService.user["profile"]["images"][0];
-        let payload = { from: fromImage, message: { type: "w", value: isTyping, from: this.navService.user["profile"].key } };
+        const profile = this.navService.user ? this.navService.user['profile'] : undefined;
+        if (!profile) {
+            return;
+        }
+
+        let fromImage = profile["images"] && profile["images"][0]
+            ? profile["images"][0]
+            : { name: 'mock-user.jpg' };
+        let payload = { from: fromImage, message: { type: "w", value: isTyping, from: profile.key } };
 
         this.mqttService.publish(this.url, JSON.stringify(payload));
     }

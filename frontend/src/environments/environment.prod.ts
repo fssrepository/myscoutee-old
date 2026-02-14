@@ -1,15 +1,12 @@
+import { appKeys } from '../secrets/keys';
+
 export const environment = {
   production: true,
+  mockUiData: false,
+  disableFirebaseAuth: false,
   serverUrl: "http://localhost:8080/",
-  firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
-  },
-  vapid: '',
+  firebase: appKeys.firebase,
+  vapid: appKeys.vapid,
   groupTypes: {
     d: 'dating',
     b: 'business',

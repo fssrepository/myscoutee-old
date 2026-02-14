@@ -82,6 +82,8 @@ const pairRate = {
   url: '/games/rate_double',
 };
 
+const PAIR_RATE_URL = '/games/rate_double';
+
 const actionMap = {
   L: 'leave',
   R: 'reject',
@@ -213,6 +215,17 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
         this.itemsRef.element.nativeElement.parentElement.parentElement;
       this.updatePage(inbox, false);
     });
+  }
+
+  private removePairRateAction(): void {
+    if (!this.actions || this.actions.length === 0) {
+      return;
+    }
+
+    this.actions = this.actions.filter(
+      (action) =>
+        !(action.type === 'route' && action.url && action.url.indexOf(PAIR_RATE_URL) !== -1)
+    );
   }
 
   constructor(
@@ -884,7 +897,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
               }
             }
             if (this.rate && this.double) {
-              this.actions.pop();
+              this.removePairRateAction();
             }
             this.rate = undefined;
           }
@@ -1039,15 +1052,21 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
               });
 
               if (this.mqtt === true && this.offset === undefined) {
+                const profile = this.navService.user
+                  ? this.navService.user['profile']
+                  : undefined;
+
                 let filteredData = data['values']
                   .filter((value) =>
-                    value.message.from !== this.navService.user['profile'].key);
+                    profile ? value.message.from !== profile.key : true);
 
                 if (filteredData.length > 0) {
                   let lastData = filteredData[filteredData.length - 1];
                   lastData.message.type = "r";
                   lastData.reads = new Array<string>();
-                  lastData.reads.push(this.navService.user["profile"]["images"][0]);
+                  if (profile && profile['images'] && profile['images'][0]) {
+                    lastData.reads.push(profile['images'][0]);
+                  }
 
                   this.mqttService.publish(PREFIX + this.itemUrl, JSON.stringify(lastData));
                 }
@@ -1163,7 +1182,11 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
 
     if (item.value.type === "w") {
       console.log("writing");
-      if (this.navService.user["profile"].key === item.value.from) {
+      const profile = this.navService.user
+        ? this.navService.user['profile']
+        : undefined;
+
+      if (profile && profile.key === item.value.from) {
         const scrollView = this.itemsRef.element.nativeElement.parentElement;
         const inbox = scrollView.parentElement;
         inbox.scrollTo({ top: inbox.scrollHeight });
@@ -1322,7 +1345,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           this.rate = undefined;
 
           if (this.double) {
-            this.actions.pop();
+            this.removePairRateAction();
           }
         }
 
@@ -1341,7 +1364,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
               delete this.selectedItems[selectedItem];
 
               if (this.double) {
-                this.actions.pop();
+                this.removePairRateAction();
               }
             }
           }
@@ -1363,6 +1386,8 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           this.rate = evt.rate - 1;
 
           if (!evt.always && this.double) {
+            this.removePairRateAction();
+
             let pairObj = JSON.parse(JSON.stringify(pairRate));
 
             const url = this.items[evt.alias].info.url.substring(1);
@@ -1378,7 +1403,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
           this.rate = undefined;
 
           if (this.double) {
-            this.actions.pop();
+            this.removePairRateAction();
           }
         }
       },

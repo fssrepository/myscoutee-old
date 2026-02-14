@@ -1,11 +1,13 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui';
 import { NavigationService } from '../navigation.service';
 import { HttpService } from '../services/http.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MsDialog } from 'src/lib';
+import { environment } from 'src/environments/environment';
 
 const uiConfig = {
   callbacks: {
@@ -17,7 +19,7 @@ const uiConfig = {
       document.getElementById('loader').style.display = 'none';
     },
   },
-  // signInFlow: 'popup',
+  signInFlow: 'popup',
   signInOptions: [
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     firebase.auth.FacebookAuthProvider.PROVIDER_ID,
@@ -40,9 +42,16 @@ export class LoginComponent implements OnInit {
     private navService: NavigationService,
     private httpService: HttpService,
     private domSanitizer: DomSanitizer,
+    private router: Router,
     public dialog: MatDialog,
   ) { }
   ngOnInit(): void {
+    if (environment.disableFirebaseAuth) {
+      this.navService.token = 'dev-auth-disabled';
+      this.router.navigate(['dating']);
+      return;
+    }
+
     if (this.navService.locale === undefined) {
       this.httpService.get('/i18n_messages').subscribe({
         next: (value) => {

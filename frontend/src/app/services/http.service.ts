@@ -5,9 +5,11 @@ import {
   HttpParams
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { NavigationService } from '../navigation.service';
+import { MockApiService } from './mock-api.service';
 
 const AUTH_FIREBASE_HEADER = 'X-Authorization-Firebase';
 const AUTH_LINK_HEADER = 'X-Authorization-Link';
@@ -26,8 +28,13 @@ export class HttpService {
 
   constructor(
     private httpClient: HttpClient,
-    private navService: NavigationService
+    private navService: NavigationService,
+    private mockApiService: MockApiService
   ) {
+    if (this.isMockEnabled()) {
+      return;
+    }
+
     // different db name for different profile
     this.openReq = indexedDB.open('myscoutee_db', 1);
 
@@ -52,6 +59,10 @@ export class HttpService {
   // private REST_API_SERVER = 'http://localhost:4200';
 
   public get(urlPart: string, params: HttpParams = new HttpParams()) {
+    if (this.isMockEnabled()) {
+      return this.mockApiService.get(urlPart, params);
+    }
+
     let headers = new HttpHeaders();
 
     if (this.navService.token !== undefined) {
@@ -68,6 +79,10 @@ export class HttpService {
   }
 
   public index(like) {
+    if (this.isMockEnabled() || !this.db) {
+      return;
+    }
+
     let objStore = this.db
       .transaction(['likes'], 'readwrite')
       .objectStore('likes');
@@ -76,6 +91,10 @@ export class HttpService {
   }
 
   public sync(): Promise<any> {
+    if (this.isMockEnabled() || !this.db) {
+      return Promise.resolve({});
+    }
+
     return new Promise((resolve, reject) => {
       if (!this.isPending) {
         this.batch().then((res) => {
@@ -122,6 +141,10 @@ export class HttpService {
   }
 
   async batch(): Promise<any> {
+    if (this.isMockEnabled() || !this.db) {
+      return Promise.resolve([]);
+    }
+
     return new Promise<any>((resolve, reject) => {
       const objStore = this.db
         .transaction(['likes'], 'readonly')
@@ -166,6 +189,10 @@ export class HttpService {
     urlPart: string,
     params: HttpParams = new HttpParams()
   ) {
+    if (this.isMockEnabled()) {
+      return this.mockApiService.delete(urlPart);
+    }
+
     let headers = new HttpHeaders();
     headers = headers.append(AUTH_FIREBASE_HEADER, this.navService.token);
 
@@ -179,6 +206,10 @@ export class HttpService {
     body: any,
     params: HttpParams = new HttpParams()
   ) {
+    if (this.isMockEnabled()) {
+      return this.mockApiService.post(urlPart, body, params);
+    }
+
     let headers = new HttpHeaders();
     headers = headers.append(AUTH_FIREBASE_HEADER, this.navService.token);
 
@@ -196,6 +227,10 @@ export class HttpService {
     body: any,
     params: HttpParams = new HttpParams()
   ) {
+    if (this.isMockEnabled()) {
+      return this.mockApiService.patch(urlPart, body, params);
+    }
+
     let headers = new HttpHeaders();
     headers = headers.append(AUTH_FIREBASE_HEADER, this.navService.token);
 
@@ -209,6 +244,10 @@ export class HttpService {
     body: any,
     params: HttpParams = new HttpParams()
   ) {
+    if (this.isMockEnabled()) {
+      return this.mockApiService.upload(urlPart);
+    }
+
     let headers = new HttpHeaders();
     headers = headers.append(AUTH_FIREBASE_HEADER, this.navService.token);
 
@@ -234,5 +273,9 @@ export class HttpService {
 
     console.log(errorMessage);
     return throwError(error.error);
+  }
+
+  private isMockEnabled(): boolean {
+    return environment.mockUiData === true;
   }
 }

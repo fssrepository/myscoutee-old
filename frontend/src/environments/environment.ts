@@ -2,18 +2,15 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { appKeys } from '../secrets/keys';
+
 export const environment = {
   production: false,
+  mockUiData: true,
+  disableFirebaseAuth: true,
   serverUrl: "http://localhost:8080/",
-  firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
-  },
-  vapid: '',
+  firebase: appKeys.firebase,
+  vapid: appKeys.vapid,
   groupTypes: {
     d: 'dating',
     b: 'business',

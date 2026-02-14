@@ -55,3 +55,8 @@ Thumbs.db
 /**/CMakeFiles
 /**/CMakeCache.txt
 /**/cmake_install.cmake
+
+# local secrets
+/frontend/src/secrets/keys.ts
+/server/projects/profile/secrets/application-dev-secrets.yaml
+/server/projects/profile/secrets/firebase-service-account.json

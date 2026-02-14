@@ -13,12 +13,15 @@ management:
 
 config:
   adminUser: ${ADMIN_USER:myscoutee@gmail.com}
+  firebase-service-account-path: ${FIREBASE_SERVICE_ACCOUNT_PATH:./secrets/firebase-service-account.json}
 
 fcm:
   url: "https://fcm.googleapis.com/fcm/send"
-  apiKey: ""
+  apiKey: ${FCM_API_KEY:}
 
 spring:
+  config:
+    import: optional:file:./secrets/application-dev-secrets.yaml
   servlet:
     multipart:
       max-file-size: 10MB
