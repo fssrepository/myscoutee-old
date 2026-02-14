@@ -1,4 +1,4 @@
-import { HttpParams } from '@angular/common/http';
+import { HttpEventType, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
@@ -24,6 +24,51 @@ export class MockApiService {
   ];
 
   private readonly vehicleMakes = ['Toyota', 'Honda', 'Ford', 'BMW', 'Audi'];
+
+  private readonly schools = [
+    {
+      name: 'National Taiwan University',
+      locationKey: 'loc-taipei-ntu',
+      role: 'Student',
+      type: 'w',
+      years: [2014, 2018],
+    },
+    {
+      name: 'National Chengchi University',
+      locationKey: 'loc-taipei-nccu',
+      role: 'Exchange Student',
+      type: 'w',
+      years: [2016, 2017],
+    },
+    {
+      name: 'Taipei Medical University',
+      locationKey: 'loc-taipei-tmu',
+      role: 'Research Assistant',
+      type: 'c',
+      years: [2019, 2021],
+    },
+    {
+      name: 'National Yang Ming Chiao Tung University',
+      locationKey: 'loc-hsinchu-nycu',
+      role: 'Alumni',
+      type: 'w',
+      years: [2011, 2015],
+    },
+    {
+      name: 'Soochow University',
+      locationKey: 'loc-taipei-scu',
+      role: 'Teaching Assistant',
+      type: 'c',
+      years: [2018, 2020],
+    },
+    {
+      name: 'National Central University',
+      locationKey: 'loc-taoyuan-ncu',
+      role: 'Student',
+      type: 'w',
+      years: [2020, 2024],
+    },
+  ];
 
   get(urlPart: string, params: HttpParams = new HttpParams()): Observable<any> {
     const data = this.createGetResponse(urlPart, params);
@@ -51,6 +96,14 @@ export class MockApiService {
   }
 
   upload(urlPart: string): Observable<any> {
+    if (urlPart.indexOf('/schools/parse') !== -1) {
+      return of({
+        type: HttpEventType.Response,
+        status: 200,
+        body: [this.schoolSlot(0), this.schoolSlot(1), this.schoolSlot(2)],
+      }).pipe(delay(120));
+    }
+
     return of({ ok: true, uploaded: true, url: urlPart }).pipe(delay(120));
   }
 
@@ -105,7 +158,12 @@ export class MockApiService {
       const profile = this.profile(0);
       return {
         profile,
+        schools: this.schools.map((_, idx) => this.schoolSlot(idx)),
       };
+    }
+
+    if (urlPart.indexOf('/user/schools') !== -1) {
+      return this.schoolListPayload(params);
     }
 
     const direction = parseInt(params.get('direction') || '1', 10);
@@ -245,16 +303,18 @@ export class MockApiService {
     }
 
     if (url.indexOf('/schools') !== -1) {
+      const school = this.schoolInfo(idx);
       return {
         ...base,
         school: {
           key: this.id('school', idx),
-          name: 'University ' + (idx + 1),
-          role: idx % 2 === 0 ? 'Student' : 'Alumni',
-          type: idx % 2 === 0 ? 'w' : 'c',
+          name: school.name,
+          locationKey: school.locationKey,
+          role: school.role,
+          type: school.type,
           range: {
-            start: new Date(2014 + (idx % 6), 0, 1).toISOString(),
-            end: new Date(2018 + (idx % 6), 0, 1).toISOString(),
+            start: new Date(school.years[0], 8, 1).toISOString(),
+            end: new Date(school.years[1], 5, 30).toISOString(),
           },
           createdDate: new Date(Date.now() - idx * 86_400_000).toISOString(),
         },
@@ -475,6 +535,52 @@ export class MockApiService {
       },
       num: this.num(0, 7),
       createdDate: new Date(Date.now() - idx * 86_400_000).toISOString(),
+    };
+  }
+
+  private schoolInfo(idx: number): any {
+    return this.schools[idx % this.schools.length];
+  }
+
+  private schoolSlot(idx: number): any {
+    const school = this.schoolInfo(idx);
+    return {
+      key: this.id('school', idx),
+      type: school.type,
+      name: school.name,
+      locationKey: school.locationKey,
+      range: {
+        start: new Date(school.years[0], 8, 1).toISOString(),
+        end: new Date(school.years[1], 5, 30).toISOString(),
+      },
+      role: school.role,
+    };
+  }
+
+  private schoolListPayload(params: HttpParams): any {
+    const direction = parseInt(params.get('direction') || '1', 10);
+    const offset = params.getAll('offset') || [];
+
+    const now = Date.now();
+    const offsetSeed =
+      offset.length > 0 ? decodeURIComponent(offset[0]) : new Date(now).toISOString();
+
+    const values = this.schools.map((_, idx) => {
+      const slot = this.schoolSlot(idx);
+      return {
+        sortKey: new Date(now - idx * 3_600_000).toISOString(),
+        groupKey: new Date(now).toISOString(),
+        rate: this.num(0, 10),
+        role: 'M',
+        school: slot,
+      };
+    });
+
+    return {
+      role: 'A',
+      scroll: 0,
+      offset: [offsetSeed],
+      values: direction === -1 ? values.reverse() : values,
     };
   }
 

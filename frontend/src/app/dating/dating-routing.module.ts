@@ -196,6 +196,11 @@ const routes: Routes = [
           icon: 'profile_ext',
           actions: [
             {
+              type: 'route',
+              icon: 'school',
+              url: '../schools',
+            },
+            {
               component: RewardComponent,
               type: 'share',
               icon: 'send',

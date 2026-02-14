@@ -10,7 +10,7 @@ import {
   ViewContainerRef
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { HttpService } from 'src/app/services/http.service';
 import { MsPanel } from 'src/lib';
@@ -45,6 +45,7 @@ export class PanelComponent implements OnInit, OnDestroy {
   constructor(
     private cfr: ComponentFactoryResolver,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     public dialog: MatDialog,
     public dataService: DataService,
     private httpService: HttpService,
@@ -88,6 +89,11 @@ export class PanelComponent implements OnInit, OnDestroy {
 
   doAction(idx) {
     switch (this.actions[idx].type) {
+      case 'route':
+        this.router.navigate([this.actions[idx].url], {
+          relativeTo: this.activatedRoute,
+        });
+        break;
       case 'share':
         const params = new HttpParams();
 

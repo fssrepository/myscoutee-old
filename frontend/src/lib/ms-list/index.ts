@@ -1159,8 +1159,12 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
   public addToList(direction: number, data?, isUpdate?) {
     const item = this.transformService.transform(data, this.itemUrl, true);
 
-    let ref = this.refs[item.value.ref];
-    if (ref !== undefined) {
+    let ref = undefined;
+    if (item && item.type === 'msg' && item.value) {
+      ref = this.refs[item.value.ref];
+    }
+
+    if (ref !== undefined && item.type === 'msg') {
       if (item.value.type === "r") {
         for (let read of item.reads) {
           let lRead = this.lReads[read];
@@ -1180,7 +1184,7 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    if (item.value.type === "w") {
+    if (item && item.type === 'msg' && item.value && item.value.type === "w") {
       console.log("writing");
       const profile = this.navService.user
         ? this.navService.user['profile']

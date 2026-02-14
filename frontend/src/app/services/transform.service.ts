@@ -794,6 +794,22 @@ export class TransformService {
       sub += ' \uD83D\uDC76';
     }
 
+    const schools = param && param['schools'] ? (param['schools'] as Array<any>) : [];
+    if (schools.length > 0) {
+      const schoolNames = schools
+        .map((school) => school['name'])
+        .filter((name) => name !== undefined && name !== null && name !== '');
+
+      if (schoolNames.length > 0) {
+        const preview = schoolNames.slice(0, 2).join(', ');
+        const moreCount = schoolNames.length - 2;
+        sub +=
+          ' • \uD83C\uDF93 ' +
+          preview +
+          (moreCount > 0 ? ' +' + moreCount.toString() : '');
+      }
+    }
+
     const imgs = (
       value['images'] !== undefined ? (value['images'] as Array<string>) : []
     ).map(
