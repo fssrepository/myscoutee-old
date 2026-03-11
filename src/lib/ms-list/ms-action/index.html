@@ -1,0 +1,68 @@
+<mat-action-list>
+  <button *ngFor="let action of actions" mat-list-item (click)="do(action)">
+    <ng-container *ngIf="action === 'E'">
+      <mat-icon fontSet="material-icons-outlined">edit</mat-icon
+      >&nbsp;&nbsp;Edit
+    </ng-container>
+    <ng-container *ngIf="action === 'D'">
+      <mat-icon fontSet="material-icons-outlined">delete</mat-icon
+      >&nbsp;&nbsp;Delete
+    </ng-container>
+    <ng-container *ngIf="action === 'L'">
+      <mat-icon fontSet="material-icons-outlined">exit_to_app</mat-icon
+      >&nbsp;&nbsp;Leave
+    </ng-container>
+    <ng-container *ngIf="action === 'CA'">
+      <mat-icon fontSet="material-icons-outlined">cancel_presentation</mat-icon
+      >&nbsp;&nbsp;Cancel
+    </ng-container>
+    <ng-container *ngIf="action === 'A'">
+      <mat-icon fontSet="material-icons-outlined">thumb_up</mat-icon
+      >&nbsp;&nbsp;Accept
+    </ng-container>
+    <ng-container *ngIf="action === 'P'">
+      <mat-icon fontSet="material-icons-outlined">thumb_up</mat-icon
+      >&nbsp;&nbsp;Publish
+    </ng-container>
+    <ng-container *ngIf="action === 'R'">
+      <mat-icon fontSet="material-icons-outlined">thumb_down</mat-icon
+      >&nbsp;&nbsp;Reject
+    </ng-container>
+    <ng-container *ngIf="action === 'U'">
+      <mat-icon fontSet="material-icons-outlined">thumb_up</mat-icon
+      >&nbsp;&nbsp;Recommend
+    </ng-container>
+    <ng-container *ngIf="action === 'Q'">
+      <mat-icon fontSet="material-icons-outlined">qr_code_scanner</mat-icon
+      >&nbsp;&nbsp;Code
+    </ng-container>
+    <ng-container *ngIf="action === 'S'">
+      <mat-icon fontSet="material-icons-outlined">send</mat-icon
+      >&nbsp;&nbsp;Share
+    </ng-container>
+    <ng-container *ngIf="action === 'C'">
+      <mat-icon fontSet="material-icons-outlined">copy_all</mat-icon
+      >&nbsp;&nbsp;Clone
+    </ng-container>
+    <ng-container *ngIf="action === 'J'">
+      <mat-icon fontSet="material-icons-outlined">login</mat-icon
+      >&nbsp;&nbsp;Join
+    </ng-container>
+    <ng-container *ngIf="action === 'W'">
+      <mat-icon fontSet="material-icons-outlined">hourglass_top</mat-icon
+      >&nbsp;&nbsp;Waiting List
+    </ng-container>
+    <ng-container *ngIf="action === 'CH'">
+      <a class="actionLink">
+        <mat-icon fontSet="material-icons-outlined">chat</mat-icon
+        >&nbsp;&nbsp;<p>Chat</p>
+      </a>
+    </ng-container>
+    <ng-container *ngIf="action === 'M'">
+      <a class="actionLink">
+        <mat-icon fontSet="material-icons-outlined">location_on</mat-icon
+        >&nbsp;&nbsp;<p>Map</p>
+      </a>
+    </ng-container>
+  </button>
+</mat-action-list>

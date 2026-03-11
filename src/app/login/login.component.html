@@ -1,0 +1,42 @@
+<div class="mat-intro-background">
+  <div class="mat-into-header">
+    <img src="assets/img/logo/logo.png" />
+    <h1>yScoutee</h1>
+    <div class="info" style="display: grid; text-align: center;">
+      <p class="mobile-only">Mobile Only</p>
+      <p class="version" *ngIf="msg">v{{ msg['expl.version'] }}</p>
+    </div>
+    <h3 *ngIf="!msg" class="server-msg">Server is down!</h3>
+  </div>
+
+  <div *ngIf="msg" class="mat-into-panel">
+    <div id="firebaseui-auth-container"></div>
+    <div id="loader">{{ msg['expl.loading'] }}</div>
+  </div>
+
+  <div class="mat-into-panel" *ngIf="msg" [innerHtml]="msg['expl.gdpr']"></div>
+  
+  <div class="mat-into-panel" *ngIf="msg" [innerHtml]="msg['expl.howto']"></div>
+
+  <div class="mat-into-panel">
+    <h2 *ngIf="msg">{{ msg['expl.follow'] }}</h2>
+    <div class="btn_bar">
+      <div style="display: flex">
+        <div class="btn_base">
+          <div class="facebook container">
+            <a href="https://www.facebook.com/myscoutee.dating" target="_blank">
+              <img class="img" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mat-into-footer">
+    <h3 style="display: flex">
+      &#169; MyScoutee.com, All Rights Reserved
+      <div *ngIf="msg">, v{{ msg['expl.version'] }}</div>
+    </h3>
+  </div>
+</div>

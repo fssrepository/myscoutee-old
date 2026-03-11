@@ -1,0 +1,114 @@
+<div
+  class="panel"
+  [id]="alias"
+  [ngClass]="{'panel_highlighted' : focused}"
+  #panel
+>
+  <ng-container *ngIf="data" [ngSwitch]="data.type">
+    <div
+      class="panel_content panel_default"
+      [ngClass]="{'panel_height': data.type !== 'evt', 'panel_large': enlarged, 'panel_removable': removable}"
+    >
+      <ng-container *ngSwitchCase="'evt'">
+        <mat-card
+          (click)="content()"
+          matRipple
+          [style.background-color]="data.color"
+        >
+          <mat-card-header *ngIf="data.header">
+            <mat-card-title>{{data.header.main}}</mat-card-title>
+            <mat-card-subtitle *ngIf="data.header.sub">
+              {{data.header.sub}}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{data.desc}}</p>
+          </mat-card-content>
+          <mat-card-footer *ngIf="data.footer">{{data.footer}}</mat-card-footer>
+        </mat-card>
+      </ng-container>
+      <ng-container *ngSwitchCase="'img'">
+        <img matRipple
+          *ngIf="data.imgs && visible"
+          [src]="data.imgs[currentIdx]"
+          class="img_content"
+          (click)="content()"
+        />
+        <div *ngIf="data.imgs && data.imgs.length > 0 && visible" class="slide_bar">
+          <div
+            class="slide"
+            *ngFor="let img of data.imgs; let idx = index"
+            (click)="slide(idx)"
+          >
+            <div
+              class="slide_anchor"
+              [ngClass]="{'slide_active' : currentIdx === idx}"
+            ></div>
+          </div>
+        </div>
+        <div *ngIf="data.header && visible" class="panel_header_main" [style.background]="data.color">
+          <b>{{data.header.main}}&nbsp;</b>
+        </div>
+        <div *ngIf="data.header && visible" class="panel_header_sub">
+          <b>{{data.header.sub}}&nbsp;</b>
+          <div style="float: right; height: 2vmax;" *ngIf="data.role">
+            <mat-icon [style.color]="data.role.color">{{data.role.icon}}</mat-icon
+            >
+          </div>
+        </div>
+      </ng-container>
+      <button
+        *ngIf="data.rate !== undefined"
+        mat-icon-button
+        [color]="rated ? 'warn' : 'primary'"
+        class="panel_icon_top"
+        (click)="rate()"
+      >
+        <mat-icon fontSet="material-icons-outlined">rate_ext</mat-icon>
+        <div *ngIf="data.rate" class="btn_label">{{data.rate}}</div>
+      </button>
+      <button
+        mat-icon-button
+        *ngIf="data.actions !== undefined && data.actions.length > 0 && !enlarged"
+        [color]="'primary'"
+        class="panel_icon_top"
+        (click)="more()"
+      >
+        <mat-icon fontSet="material-icons-outlined">more_horiz</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        *ngIf="!enlarged && selectable"
+        [color]="selected ? 'warn' : 'primary'"
+        class="panel_icon_middle"
+        (click)="select()"
+      >
+        <mat-icon fontSet="material-icons-outlined"
+          >{{ selected ? 'radio_button_checked': 'radio_button_unchecked'
+          }}</mat-icon
+        >
+      </button>
+      <button
+        mat-icon-button
+        *ngIf="!enlarged && removable"
+        [color]="removable ? 'warn' : 'primary'"
+        class="panel_icon_middle_left"
+        (click)="remove()"
+      >
+        <mat-icon fontSet="material-icons-outlined">highlight_off</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="panel_icon_tf"
+        (click)="enlarge(!enlarged)"
+      >
+        <mat-icon fontSet="material-icons-outlined" *ngIf="!enlarged"
+          >unfold_more</mat-icon
+        >
+        <mat-icon fontSet="material-icons-outlined" *ngIf="enlarged"
+          >unfold_less</mat-icon
+        >
+      </button>
+    </div>
+  </ng-container>
+</div>

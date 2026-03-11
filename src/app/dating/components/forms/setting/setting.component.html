@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>
+  <button mat-icon-button class="mat-cancel" (click)="back()">
+    <mat-icon>arrow_backward</mat-icon>
+  </button>&nbsp;
+</h1>
+<mat-progress-bar
+  [mode]="progress.mode"
+  [value]="progress.value"
+  [color]="progress.color"
+></mat-progress-bar>
+<form default *ngIf="formGroup" [formGroup]="formGroup">
+  <div formGroupName="data">
+    <div button-row>
+      <button mat-raised-button color="accent" (click)="logout()">
+        Logout
+      </button>
+    </div>
+  </div>
+</form>

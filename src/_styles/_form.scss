@@ -1,0 +1,60 @@
+form[default] {
+
+  div[button-row] {
+    display: grid;
+    margin: 10px;
+    row-gap: 20px;
+  }
+
+  display: flex;
+  flex-direction: column;
+
+  fieldset,
+  mat-form-field,
+  mat-radio-group,
+  mat-slide-toggle {
+    //margin: 10px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  mat-slide-toggle {
+    .mdc-form-field {
+      background: whitesmoke !important;
+    }
+
+    .mdc-switch {
+      margin-left: auto;
+    }
+
+    .mdc-label {
+      margin: 10px;
+    }
+  }
+
+  mat-radio-button {
+    margin: 10px;
+  }
+
+  fieldset {
+    position: relative;
+
+    div[legend-right] {
+      font-weight: bold;
+      color: #ff4081;
+      position: absolute;
+      top: -3px;
+      right: 13px;
+      background: white;
+    }
+
+    &.voice {
+      display: flex;
+      padding: 10px;
+      width: 15vh;
+      margin: auto;
+      flex-direction: row !important;
+    }
+  }
+}

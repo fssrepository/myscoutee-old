@@ -1,0 +1,94 @@
+<nav *ngIf="links && !itemLinks" mat-tab-nav-bar mat-align-tabs="center" [tabPanel]="tabPanel">
+  <a
+    mat-tab-link
+    *ngFor="let link of links"
+    [routerLink]="link.path"
+    routerLinkActive
+    #rla="routerLinkActive"
+    [active]="rla.isActive"
+  >
+  <!--[matBadge]="navService.notif[link.path]" matBadgeColor="accent"-->
+  <mat-icon *ngIf="link.data.icon !== 'person'"
+      [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
+      [color]="rla.isActive ? 'warn' : 'primary'"
+    >
+      {{ link.data.icon }}
+    </mat-icon>
+    <mat-icon *ngIf="link.data.icon === 'person'" [matBadge]="navService.groupName"
+      [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
+      [color]="rla.isActive ? 'warn' : 'primary'"
+    >
+      {{ link.data.icon }}
+    </mat-icon>
+  </a>
+</nav>
+<nav *ngIf="links && itemLinks" mat-tab-nav-bar mat-align-tabs="center" [tabPanel]="tabPanel">
+  <button mat-icon-button (click)="back()">
+    <mat-icon>arrow_backward</mat-icon>
+  </button>
+  <div class="mat-basket-container-small" style="top: 8px;">
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let item of items; let idx = index"
+        (click)="onBasket(idx)" [ngClass]="{'ms-active': idx === selectedIdx}"
+        matRipple
+      >
+        <p *ngIf="item.info.imgs && item.info.imgs[0]" style="width: 40px;">{{ item.info.header ? item.info.name : '' }}</p>
+        <p *ngIf="!item.info.imgs || !item.info.imgs[0]">{{ item.info.header ? item.info.name : '' }}</p>
+        <mat-chip-avatar *ngIf="item.info.imgs && item.info.imgs[0]"><img [src]="item.info.imgs[0]"/></mat-chip-avatar>
+      </mat-chip>
+    </mat-chip-list>
+  </div>
+  <a
+    mat-tab-link
+    *ngFor="let link of itemLinks"
+    [routerLink]="link.path"
+    routerLinkActive
+    #rla="routerLinkActive"
+    [active]="rla.isActive"
+  >
+  <!--[matBadge]="navService.notif[link.path]" matBadgeColor="accent"-->
+    <mat-icon
+      [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
+      [color]="rla.isActive ? 'warn' : 'primary'"
+    >
+      {{ link.data.icon }}
+    </mat-icon>
+  </a>
+</nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+<div
+  [ngStyle]="{
+    position: 'relative',
+    height: links
+      ? 'calc(100vh - ' + (subLinks ? '98px' : '49px') + ')'
+      : '100vh'
+  }"
+  [@routeAnimations]="prepareRoute(outlet)"
+>
+  <router-outlet #outlet="outlet"></router-outlet>
+</div>
+<nav *ngIf="links && subLinks" mat-tab-nav-bar mat-align-tabs="center" class="mat-tab-footer" [tabPanel]="tabPanel">
+  <a
+    mat-tab-link
+    *ngFor="let link of subLinks"
+    [routerLink]="link.path"
+    routerLinkActive
+    #rla="routerLinkActive"
+    [active]="rla.isActive"
+  >
+  <!--[matBadge]="navService.notif[link.path]" matBadgeColor="accent"-->
+    <mat-icon
+      [fontSet]="rla.isActive ? 'material-icons' : 'material-icons-outlined'"
+      [color]="rla.isActive ? 'warn' : 'primary'"
+    >
+      {{ link.data.icon }}
+    </mat-icon>
+  </a>
+</nav>
+
+<div
+  class="fb-customerchat"
+  attribution="setup_tool"
+  page_id="106303131653978"
+></div>

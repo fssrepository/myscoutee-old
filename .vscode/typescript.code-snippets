@@ -1,0 +1,23 @@
+{
+	"Angular Comonent": {
+		"prefix": "comp",
+		"body": [
+			"import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';",
+			"import { DomSanitizer } from '@angular/platform-browser';",
+			"\n@Component({\n\tselector: '$1',\n\ttemplateUrl: './index.html'\n})\nexport class $2 implements OnInit {\n\n\tngOnInit()\n\t{\n\n\t}\n}"
+		],
+		"description": "Generate Angular Component"
+	},
+	"ngFor": {
+		"prefix": "ngFor",
+		"body": [
+			"*ngFor=\"let $1 of $2; let idx = index\""
+		]
+	},
+	"sanitize": {
+		"prefix": "san",
+		"body": [
+			"sanitize(style) {\n\treturn this.sanitizer.bypassSecurityTrustStyle(style);\n}"
+		]
+	}
+}

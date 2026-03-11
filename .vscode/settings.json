@@ -1,0 +1,9 @@
+{
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "todo-tree.defaultHighlight": {
+        "type": "text",
+        "foreground": "black",
+        "background": "yellow",
+    },
+    "todo-tree.flat":true
+}

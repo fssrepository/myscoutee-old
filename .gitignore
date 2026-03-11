@@ -1,0 +1,65 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+/**/.gradle
+/**/build
+/**/.idea
+/**/target
+
+/**/srv
+/**/qm1data
+/**/mysql
+/**/certs
+
+/**/BL_proxy
+
+# compiled output
+/**/dist
+/**/dev
+/**/dist-server
+/**/tmp
+/**/out-tsc
+/**/bin
+
+/**/server/data
+
+# dependencies
+/**/node_modules
+/**/.angular
+
+# IDEs and editors
+.idea
+.project
+.classpath
+.c9/
+*.launch
+/**/.settings
+*.sublime-workspace
+
+# misc
+.sass-cache
+connect.lock
+coverage
+libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/**/typings
+
+# e2e
+#/**/e2e/*.js
+#/**/e2e/*.map
+
+# System Files
+.DS_Store
+Thumbs.db
+
+/**/CMakeFiles
+/**/CMakeCache.txt
+/**/cmake_install.cmake
+
+# local secrets
+/frontend/src/secrets/keys.ts
+/src/secrets/*
+!/src/secrets/keys.example.ts
+/server/projects/profile/secrets/application-dev-secrets.yaml
+/server/projects/profile/secrets/firebase-service-account.json
