@@ -11,6 +11,7 @@ export const environment = {
   serverUrl: "http://localhost:8080/",
   firebase: appKeys.firebase,
   vapid: appKeys.vapid,
+  googleMapsApiKey: appKeys.googleMapsApiKey,
   groupTypes: {
     d: 'dating',
     b: 'business',

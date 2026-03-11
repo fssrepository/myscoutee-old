@@ -12,6 +12,7 @@ export const environment = {
     appId: '',
   },
   vapid: '',
+  googleMapsApiKey: '',
   groupTypes: {
     d: 'dating',
     b: 'business',

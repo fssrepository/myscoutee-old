@@ -8,4 +8,5 @@ export const appKeys = {
     appId: '',
   },
   vapid: '',
+  googleMapsApiKey: '',
 };
