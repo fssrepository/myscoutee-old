@@ -18,7 +18,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "allowedCommonJsDependencies": ["lodash", "dialog-polyfill"],
-            "outputPath": "dist/myscoutee",
+            "outputPath": "docs",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -45,11 +45,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/app/services/mock-api.service.ts",
-                  "with": "src/app/services/mock-api.service.prod.ts"
+                  "with": "src/environments/environment.gh.ts"
                 }
               ],
               "optimization": true,

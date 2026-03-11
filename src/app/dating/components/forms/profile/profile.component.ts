@@ -18,6 +18,8 @@ import { NavigationService } from 'src/app/navigation.service';
 import { EditorComponent } from '../../editor/editor.component';
 
 const AUDIO_LENGTH = 10000;
+const DEFAULT_MAN_AVATAR = 'assets/img/man.svg';
+const DEFAULT_WOMAN_AVATAR = 'assets/img/woman.svg';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -97,10 +99,7 @@ export class ProfileComponent implements OnInit {
       voice: [this.data.voice],
     });
 
-    this.images = (this.data.images as Array<string>).map(
-      (image) =>
-        location.origin + '/backend' + this.url + '/images/' + image['name']
-    );
+    this.refreshImages();
 
     if (this.data.voice) {
       this.voiceUrl = location.origin + '/backend' + this.url + '/voice/' + this.data.voice;
@@ -119,7 +118,60 @@ export class ProfileComponent implements OnInit {
     return img + '?' + Date.now();
   }
 
+  private fallbackImage(idx): string {
+    const gender = (this.data && this.data.gender ? this.data.gender : '').toString().toLowerCase();
+    if (gender === 'w' || gender === 'f') {
+      return DEFAULT_WOMAN_AVATAR;
+    }
+    return DEFAULT_MAN_AVATAR;
+  }
+
+  private resolveImage(image, idx): string {
+    if (image === undefined || image === null) {
+      return this.fallbackImage(idx);
+    }
+
+    const imageName = image && image['name'] ? image['name'] : image;
+    if (imageName === undefined || imageName === null || imageName === '') {
+      return this.fallbackImage(idx);
+    }
+
+    if (typeof imageName === 'string') {
+      if (
+        imageName.indexOf('assets/') === 0 ||
+        imageName.indexOf('http://') === 0 ||
+        imageName.indexOf('https://') === 0 ||
+        imageName.indexOf('data:') === 0
+      ) {
+        return imageName;
+      }
+    }
+
+    return location.origin + '/backend' + this.url + '/images/' + imageName + '?' + Date.now();
+  }
+
+  private refreshImages(): void {
+    this.images = [];
+    for (let idx = 0; idx < 3; idx++) {
+      const image = this.data.images && this.data.images.length > idx
+        ? this.data.images[idx]
+        : undefined;
+      this.images.push(this.resolveImage(image, idx));
+    }
+  }
+
+  onImageError(evt, idx): void {
+    evt.target.src = this.fallbackImage(idx);
+  }
+
   openDialog(idx) {
+    const currentImageValue =
+      this.data.images && this.data.images.length > idx ? this.data.images[idx] : undefined;
+    const currentImageName =
+      currentImageValue && currentImageValue['name']
+        ? currentImageValue['name']
+        : currentImageValue;
+
     var dialogRef = this.dialog.open(EditorComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -127,10 +179,9 @@ export class ProfileComponent implements OnInit {
       width: '100%',
       data: {
         idx,
-        src:
-          this.images[idx] !== undefined
-            ? this.images[idx].split('?')[0] + '_orig'
-            : this.images[idx],
+        src: currentImageName
+          ? location.origin + '/backend' + this.url + '/images/' + currentImageName + '_orig'
+          : undefined,
         value: this.formGroup.controls['images'].value[idx],
       },
     });
@@ -141,17 +192,7 @@ export class ProfileComponent implements OnInit {
         images[result.idx] = { name: result.id, mtx: result.mtx };
         this.formGroup.controls['images'].setValue(images);
         this.data.images[result.idx] = images[result.idx];
-
-        this.images = (this.data.images as Array<string>).map(
-          (image) =>
-            location.origin +
-            '/backend' +
-            this.url +
-            '/images/' +
-            image['name'] +
-            '?' +
-            Date.now()
-        );
+        this.refreshImages();
       }
 
       dialogRef = null;

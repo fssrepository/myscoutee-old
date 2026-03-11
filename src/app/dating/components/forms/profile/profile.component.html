@@ -143,7 +143,7 @@
           *ngFor="let n of numSequence(3); let i = index"
           (click)="openDialog(i)"
         >
-          <img *ngIf="images && images.length > i" mat-card-image [src]="images[i]" />
+          <img mat-card-image [src]="images[i]" (error)="onImageError($event, i)" />
         </mat-card>
       </mat-expansion-panel>
       <mat-expansion-panel>
