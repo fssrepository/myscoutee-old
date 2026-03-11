@@ -83,6 +83,34 @@ const pairRate = {
 };
 
 const PAIR_RATE_URL = '/games/rate_double';
+const MAN_AVATAR_URLS = [
+  'https://randomuser.me/api/portraits/men/11.jpg',
+  'https://randomuser.me/api/portraits/men/23.jpg',
+  'https://randomuser.me/api/portraits/men/32.jpg',
+  'https://randomuser.me/api/portraits/men/41.jpg',
+  'https://randomuser.me/api/portraits/men/52.jpg',
+  'https://randomuser.me/api/portraits/men/55.jpg',
+  'https://randomuser.me/api/portraits/men/66.jpg',
+  'https://randomuser.me/api/portraits/men/71.jpg',
+  'https://randomuser.me/api/portraits/men/76.jpg',
+  'https://randomuser.me/api/portraits/men/82.jpg',
+  'https://randomuser.me/api/portraits/men/87.jpg',
+  'https://randomuser.me/api/portraits/men/94.jpg',
+];
+const WOMAN_AVATAR_URLS = [
+  'https://randomuser.me/api/portraits/women/5.jpg',
+  'https://randomuser.me/api/portraits/women/12.jpg',
+  'https://randomuser.me/api/portraits/women/21.jpg',
+  'https://randomuser.me/api/portraits/women/33.jpg',
+  'https://randomuser.me/api/portraits/women/44.jpg',
+  'https://randomuser.me/api/portraits/women/50.jpg',
+  'https://randomuser.me/api/portraits/women/57.jpg',
+  'https://randomuser.me/api/portraits/women/65.jpg',
+  'https://randomuser.me/api/portraits/women/72.jpg',
+  'https://randomuser.me/api/portraits/women/77.jpg',
+  'https://randomuser.me/api/portraits/women/84.jpg',
+  'https://randomuser.me/api/portraits/women/91.jpg',
+];
 
 const actionMap = {
   L: 'leave',
@@ -226,6 +254,19 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
       (action) =>
         !(action.type === 'route' && action.url && action.url.indexOf(PAIR_RATE_URL) !== -1)
     );
+  }
+
+  private fallbackAvatar(profile): string {
+    const gender = profile && profile['gender'] ? profile['gender'].toString().toLowerCase() : '';
+    const pool = gender === 'w' || gender === 'f' ? WOMAN_AVATAR_URLS : MAN_AVATAR_URLS;
+
+    const seed = profile && profile['key'] ? profile['key'].toString() : 'default-avatar';
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    }
+
+    return pool[hash % pool.length];
   }
 
   constructor(
@@ -1066,6 +1107,8 @@ export class MsList implements OnInit, OnDestroy, AfterViewInit {
                   lastData.reads = new Array<string>();
                   if (profile && profile['images'] && profile['images'][0]) {
                     lastData.reads.push(profile['images'][0]);
+                  } else if (profile) {
+                    lastData.reads.push(this.fallbackAvatar(profile));
                   }
 
                   this.mqttService.publish(PREFIX + this.itemUrl, JSON.stringify(lastData));

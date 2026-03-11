@@ -9,6 +9,34 @@ import * as uuid from 'uuid';
 const DIFF_TYPING = 3000;
 
 const PREFIX = "channels/pages"
+const MAN_AVATAR_URLS = [
+    'https://randomuser.me/api/portraits/men/11.jpg',
+    'https://randomuser.me/api/portraits/men/23.jpg',
+    'https://randomuser.me/api/portraits/men/32.jpg',
+    'https://randomuser.me/api/portraits/men/41.jpg',
+    'https://randomuser.me/api/portraits/men/52.jpg',
+    'https://randomuser.me/api/portraits/men/55.jpg',
+    'https://randomuser.me/api/portraits/men/66.jpg',
+    'https://randomuser.me/api/portraits/men/71.jpg',
+    'https://randomuser.me/api/portraits/men/76.jpg',
+    'https://randomuser.me/api/portraits/men/82.jpg',
+    'https://randomuser.me/api/portraits/men/87.jpg',
+    'https://randomuser.me/api/portraits/men/94.jpg',
+];
+const WOMAN_AVATAR_URLS = [
+    'https://randomuser.me/api/portraits/women/5.jpg',
+    'https://randomuser.me/api/portraits/women/12.jpg',
+    'https://randomuser.me/api/portraits/women/21.jpg',
+    'https://randomuser.me/api/portraits/women/33.jpg',
+    'https://randomuser.me/api/portraits/women/44.jpg',
+    'https://randomuser.me/api/portraits/women/50.jpg',
+    'https://randomuser.me/api/portraits/women/57.jpg',
+    'https://randomuser.me/api/portraits/women/65.jpg',
+    'https://randomuser.me/api/portraits/women/72.jpg',
+    'https://randomuser.me/api/portraits/women/77.jpg',
+    'https://randomuser.me/api/portraits/women/84.jpg',
+    'https://randomuser.me/api/portraits/women/91.jpg',
+];
 
 @Component({
     selector: 'ms-bar',
@@ -57,6 +85,19 @@ export class MsBar implements OnInit, OnDestroy {
         this.avatarsBottom = avatarsBottom;*/
     }
 
+    private fallbackAvatar(profile): string {
+        const gender = profile && profile['gender'] ? profile['gender'].toString().toLowerCase() : '';
+        const pool = gender === 'w' || gender === 'f' ? WOMAN_AVATAR_URLS : MAN_AVATAR_URLS;
+
+        const seed = profile && profile['key'] ? profile['key'].toString() : 'default-avatar';
+        let hash = 0;
+        for (let i = 0; i < seed.length; i++) {
+            hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+        }
+
+        return pool[hash % pool.length];
+    }
+
     handleMsg(msg) {
         //console.log("msg arrived: " + msg);
 
@@ -75,6 +116,8 @@ export class MsBar implements OnInit, OnDestroy {
             msgReadObj.reads = new Array<string>();
             if (profile && profile['images'] && profile['images'][0]) {
                 msgReadObj.reads.push(profile['images'][0]);
+            } else if (profile) {
+                msgReadObj.reads.push(this.fallbackAvatar(profile));
             }
 
             this.mqttService.publish(this.url, JSON.stringify(msgReadObj));
@@ -93,7 +136,7 @@ export class MsBar implements OnInit, OnDestroy {
 
         let fromImage = profile["images"] && profile["images"][0]
             ? profile["images"][0]
-            : { name: 'mock-user.jpg' };
+            : this.fallbackAvatar(profile);
         let payload = {
             from: fromImage, message: {
                 type: "p", value: this.message, ref: uuid.v4(),
@@ -128,7 +171,7 @@ export class MsBar implements OnInit, OnDestroy {
 
         let fromImage = profile["images"] && profile["images"][0]
             ? profile["images"][0]
-            : { name: 'mock-user.jpg' };
+            : this.fallbackAvatar(profile);
         let payload = { from: fromImage, message: { type: "w", value: isTyping, from: profile.key } };
 
         this.mqttService.publish(this.url, JSON.stringify(payload));
