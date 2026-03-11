@@ -1,0 +1,132 @@
+<h1 mat-dialog-title>
+  <button mat-icon-button class="mat-cancel" (click)="back()">
+    <mat-icon>arrow_backward</mat-icon>
+  </button>
+  &nbsp;
+  <button mat-icon-button class="mat-close" (click)="onClick()">
+    <mat-icon>done</mat-icon>
+  </button>
+</h1>
+<mat-progress-bar
+  [mode]="progress.mode"
+  [value]="progress.value"
+  [color]="progress.color"
+></mat-progress-bar>
+<div mat-dialog-content class="mat-form">
+  <form default [formGroup]="formGroup">
+    <mat-accordion>
+      <mat-expansion-panel
+        formArrayName="slots"
+        *ngFor="let slot of formGroup.controls.slots['controls']; let i = index"
+      >
+        <mat-expansion-panel-header
+          btn-accordion
+          [style.background-color]="slot.valid ? 'yellowgreen' : '#f44336'"
+        >
+          <button
+            mat-mini-fab
+            color="accent"
+            (click)="removeSlot($event, i)"
+            *ngIf="slotsNum > 1"
+          >
+            <mat-icon>remove</mat-icon>
+          </button>
+          <mat-panel-title>{{
+            (slot.get('name').value !== null ? slot.get('name').value : '') +
+              ' - ' +
+              '(' +
+              (slot.get('range').get('start').value !== null
+                ? (slot.get('range').get('start').value | date: 'dd/MM/yyyy')
+                : '') +
+              '-' +
+              (slot.get('range').get('end').value !== null
+                ? (slot.get('range').get('end').value | date: 'dd/MM/yyyy')
+                : '') +
+              ')'
+          }}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div [formGroupName]="i">
+          <mat-form-field>
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type">
+              <mat-option *ngFor="let type of types" [value]="type.value">
+                {{ type.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Enter name</mat-label>
+            <input matInput [formControlName]="'name'" />
+            <mat-error *ngIf="slot.get('name').invalid"
+              >Name is required!</mat-error
+            >
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Reference link (Google etc.)</mat-label>
+            <input matInput formControlName="locationKey" />
+            <mat-error *ngIf="slot.get('locationKey').invalid"
+              >Address is required!</mat-error
+            >
+          </mat-form-field>
+          <fieldset [formGroupName]="'range'">
+            <legend>Time</legend>
+            <mat-form-field>
+              <mat-label>From</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerStart"
+                formControlName="start"
+                placeholder="Start date"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerStart"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerStart></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>From</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerEnd"
+                formControlName="end"
+                placeholder="end date"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerEnd"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerEnd></mat-datepicker>
+            </mat-form-field>
+            <mat-error *ngIf="slot.get('range').invalid"
+              >Invalid range!</mat-error
+            >
+          </fieldset>
+          <mat-form-field>
+            <mat-label>Enter role</mat-label>
+            <input matInput formControlName="role" />
+            <mat-error *ngIf="slot.get('role').invalid"
+              >Role is required!</mat-error
+            >
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
+</div>
+<div *ngIf="!isEdit" class="mat-fab-container">
+  <button
+    *ngFor="let action of actions; let idx = index"
+    mat-mini-fab
+    [color]="action.color ? action.color : 'primary'"
+    (click)="doAction($event, action, fileInput)"
+  >
+    <mat-icon>{{ action.icon }}</mat-icon>
+  </button>
+  <input
+    type="file"
+    #fileInput
+    class="file_button"
+    (change)="selectFile($event)"
+  />
+</div>

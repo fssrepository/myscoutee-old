@@ -1,0 +1,190 @@
+<h1 mat-dialog-title>
+  <button mat-icon-button class="mat-cancel" (click)="back()">
+    <mat-icon>arrow_backward</mat-icon>
+  </button>
+  &nbsp;
+  <button mat-icon-button class="mat-close" [style.background-color]="formGroup.valid ? 'yellowgreen' : '#f44336'"
+    (click)="onClick()">
+    <mat-icon>done</mat-icon>
+  </button>
+</h1>
+<mat-progress-bar [mode]="progress.mode" [value]="progress.value" [color]="progress.color"></mat-progress-bar>
+<div mat-dialog-content class="mat-form">
+  <form default [formGroup]="formGroup">
+    <mat-accordion>
+      <mat-expansion-panel formGroupName="data">
+        <mat-expansion-panel-header [style.background-color]="
+            formGroup.controls.data.valid ? 'yellowgreen' : '#f44336'
+          ">
+          <mat-panel-title>Info</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-form-field>
+          <mat-label>Type</mat-label>
+          <mat-select [formControlName]="'type'" (selectionChange)="onTypeChange($event)">
+            <mat-option *ngFor="let type of types" [value]="type.value">
+              {{ type.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Enter name</mat-label>
+          <input matInput [formControlName]="'name'" />
+          <mat-error *ngIf="formGroup.controls.data.get('name').invalid">Name is required!</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Category</mat-label>
+          <mat-select [formControlName]="'category'">
+            <mat-option *ngFor="let category of categories" [value]="category.value">
+              {{ category.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Visibility</mat-label>
+          <mat-select [formControlName]="'access'">
+            <mat-option *ngFor="let visibility of visibilities" [value]="visibility.value">
+              {{ visibility.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <fieldset>
+          <legend>Location</legend>
+          <!-- auto completer - enter name to get the position -->
+          <!--<mat-form-field>
+            <mat-label>Location</mat-label>
+            <input matInput [formControlName]="'position'" />
+            <mat-error *ngIf="formGroup.controls.data.get('position').invalid">Location is required!</mat-error>
+          </mat-form-field>-->
+          <mat-form-field>
+            <mat-label>Reference link (Google, Booking etc.)</mat-label>
+            <input matInput [formControlName]="'urlRef'" />
+            <mat-error *ngIf="formGroup.controls.data.get('urlRef').invalid">Address is required!</mat-error>
+          </mat-form-field>
+        </fieldset>
+        <fieldset formGroupName="range">
+          <legend>Time</legend>
+          <mat-form-field>
+            <mat-label>From</mat-label>
+            <input matInput formControlName="start" type="datetime-local" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>To</mat-label>
+            <input matInput formControlName="end" type="datetime-local" />
+          </mat-form-field>
+          <mat-error *ngIf="formGroup.controls.data.get('range').invalid">Invalid Range</mat-error>
+        </fieldset>
+        <mat-slide-toggle *ngIf="!isMain" [formControlName]="'optional'"
+          labelPosition="before">Optional</mat-slide-toggle>
+        <fieldset formGroupName="capacity" *ngIf="isMain || formGroup.controls.data.get('optional').value">
+          <legend>Capacity</legend>
+          <mat-form-field>
+            <mat-label>Min</mat-label>
+            <input matInput formControlName="min" type="number" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Max</mat-label>
+            <input matInput formControlName="max" type="number" />
+          </mat-form-field>
+          <mat-error *ngIf="formGroup.controls.data.get('capacity').invalid">Invalid Range</mat-error>
+        </fieldset>
+        <fieldset>
+          <legend>Description (min. 10, max. 160)</legend>
+          <div legend-right>
+            {{ formGroup.controls.data.get('desc').value.length }}
+          </div>
+          <mat-form-field>
+            <textarea matInput [formControlName]="'desc'" rows="5" maxlength="160"></textarea>
+            <mat-error *ngIf="formGroup.controls.data.get('desc').invalid">Description is required!</mat-error>
+          </mat-form-field>
+        </fieldset>
+        <mat-slide-toggle [formControlName]="'ticket'" labelPosition="before">Ticket</mat-slide-toggle>
+        <mat-slide-toggle [formControlName]="'discreet'" labelPosition="before">Discreet</mat-slide-toggle>
+        <mat-slide-toggle *ngIf="isPriority && isMain" [formControlName]="'autoInvite'" labelPosition="before">Auto
+          Invite</mat-slide-toggle>
+      </mat-expansion-panel>
+      <mat-expansion-panel formGroupName="rule" *ngIf="formGroup.controls.data.get('autoInvite').value">
+        <mat-expansion-panel-header [style.background-color]="
+            formGroup.controls.rule.valid ? 'yellowgreen' : '#f44336'
+          ">
+          <mat-panel-title>Rule</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div>
+          <mat-form-field>
+            <mat-label>Type</mat-label>
+            <mat-select [formControlName]="'type'">
+              <mat-option *ngFor="let ruleType of ruleTypes" [value]="ruleType.value">
+                {{ ruleType.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <fieldset>
+            <legend>Entry Criteria</legend>
+            <mat-form-field *ngIf="formGroup.controls.rule.get('type').value === 'p'">
+              <mat-label>Rate From</mat-label>
+              <input matInput [formControlName]="'rate'" />
+              <mat-error *ngIf="formGroup.controls.rule.get('rate').invalid">Rate From is required!</mat-error>
+            </mat-form-field>
+            <mat-slide-toggle *ngIf="formGroup.controls.rule.get('type').value === 'p'" [formControlName]="'balanced'" labelPosition="before">Balanced Female/Male
+              Ratio</mat-slide-toggle>
+            <mat-form-field *ngIf="formGroup.controls.rule.get('type').value === 'p' && formGroup.controls.data.get('access').value === 'F'">
+              <mat-label>Met After</mat-label>
+              <input matInput [matDatepicker]="pickerStart" formControlName="from" />
+              <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+              <mat-datepicker #pickerStart></mat-datepicker>
+            </mat-form-field>
+            <mat-slide-toggle *ngIf="formGroup.controls.rule.get('type').value === 'j'"
+              [formControlName]="'autoApprove'" labelPosition="before">Auto Approve</mat-slide-toggle>
+          </fieldset>
+          <fieldset>
+            <legend>Grace Period</legend>
+            <mat-form-field>
+              <mat-label>Event</mat-label>
+              <input matInput formControlName="eventGrace" type="number" />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Member</mat-label>
+              <input matInput formControlName="memberGrace" type="number" />
+            </mat-form-field>
+          </fieldset>
+          <fieldset>
+            <legend>Rank</legend>
+            <mat-form-field>
+              <mat-label>Rank Type</mat-label>
+              <mat-select [formControlName]="'rankType'">
+                <mat-option *ngFor="let rankType of rankTypes" [value]="rankType.value">
+                  {{ rankType.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-slide-toggle *ngIf="formGroup.controls.rule.get('rankType').value === 'rate'" [formControlName]="'mutual'" labelPosition="before">Mutual</mat-slide-toggle>
+          </fieldset>
+        </div>
+      </mat-expansion-panel>
+      <mat-expansion-panel formGroupName="expense">
+        <mat-expansion-panel-header [style.background-color]="
+            formGroup.controls.expense.valid ? 'yellowgreen' : '#f44336'
+          ">
+          <mat-panel-title>Expense</mat-panel-title>
+        </mat-expansion-panel-header>
+        <fieldset formGroupName="amount">
+          <legend>Amount</legend>
+          <mat-form-field>
+            <mat-label>eg. 12.34</mat-label>
+            <input matInput [formControlName]="'value'" />
+            <mat-error *ngIf="
+                formGroup.controls.expense.get('amount').get('value').invalid
+              ">Value is required!</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Currency</mat-label>
+            <mat-select [formControlName]="'currency'">
+              <mat-option *ngFor="let currency of currencies" [value]="currency.value">
+                {{ currency.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </fieldset>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
+</div>

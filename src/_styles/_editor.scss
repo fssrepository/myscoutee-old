@@ -1,0 +1,49 @@
+.editor {
+    display: grid;
+    max-height: calc( 100vmin - 48px );
+    width: calc( 100vmin - 48px);
+    align-items: center;
+    overflow: hidden;
+    background-color: black;
+    justify-content: center;
+}
+
+.editor .img {
+    grid-area: 1 / 1;
+    //width: 100%;
+    height: calc( 100vmin - 48px );
+    transform-origin: center;
+    transition: scale 0.8s translate 0.8s;
+}
+
+.qr {
+    display: grid;
+    height: calc( 100vmin - 48px );
+    width: calc( 100vmin - 48px);
+    align-items: center;
+    overflow: hidden;
+    background-color: black;
+    justify-items: center;
+    grid-template-columns: 100%;
+
+    .scanner {
+        grid-area: 1 / 1;
+    }
+
+    .code {
+        grid-area: 1 / 1;
+    }
+}
+
+/*.editor .hole {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    background: -webkit-radial-gradient(center center, circle farthest-corner, rgba(255, 255, 255, 0.0) 50%, rgba(0, 0, 0, 0.8) 55%);
+    pointer-events: none;
+}*/
+
+.file_button {
+    position: fixed;
+    top: -1000px;
+}

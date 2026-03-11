@@ -1,0 +1,16 @@
+<div class="f_panel">
+  <ms-frame
+    [type]="'path'"
+    class="f_hover f_hover_translated"
+    #hover
+    id="frame2"
+    (entered)="onEntered($event)"
+    (leaved)="onLeaved()"
+    [style.overflow]="'visible'"
+  ></ms-frame>
+</div>
+
+<div class="f_overlay" #overlay id="overlay"></div>
+<!--<div class="f_desc" #info></div>-->
+
+<!--<svg-load></svg-load>-->

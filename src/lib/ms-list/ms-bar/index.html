@@ -1,0 +1,6 @@
+<div class="bar_div">
+    <textarea class="bar_msg" rows="2" cols="30" (keyup)="msgChange($event.target.value)" [value]="message"></textarea>
+    <button mat-icon-button (click)="send()" [disabled]="btnDisabled">
+        <mat-icon>send</mat-icon>
+    </button>
+</div>

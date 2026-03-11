@@ -1,0 +1,77 @@
+.calendar {
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 1px rgba(0, 0, 0, 1);
+  border-radius: 5px;
+  text-align: center;
+  margin: 0.5vh 0.5vh 0.5vh 0.5vh;
+  width: calc(100vw - 6px);
+  height: 80vmax;
+
+  & .header {
+    background: whitesmoke;
+    height: 5%;
+
+    & .week {
+      display: flex;
+
+      & .day {
+        width: 100%;
+        font-size: 2vh;
+        height: 3vh;
+        line-height: 3vh;
+      }
+    }
+  }
+
+  & .body {
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+
+    & .cal_row {
+      position: relative;
+      display: flex;
+      flex: 1 1 auto;
+      align-items: flex-start;
+      justify-content: center;
+
+      & .cal_cell {
+        width: 100%;
+
+        & .value {
+            border: 0;
+            bottom: 2vh;
+            display: block;
+            border-radius: 50%;
+            width: 6vh;
+            height: 6vh;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 3vh;
+        }
+
+        & .highlighted {
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 1px rgba(0, 0, 0, 1);
+        }
+      }
+    }
+
+    & .item_row {
+      position: absolute;
+      top: 16px;
+      width: 100%;
+      height: calc(100% - 8px);
+
+      & .item_cell {
+        position: relative;
+        width: calc(100% / 7 * var(--width));
+        height: calc(25% - 4px);
+        margin-top: 2px;
+        margin-bottom: 2px;
+        background-color: var(--color);
+        line-height: 2vh;
+        font-size: 2vmax;
+        left: calc(100% / 7 * var(--pos));
+      }
+    }
+  }
+}

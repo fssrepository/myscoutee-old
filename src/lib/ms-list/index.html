@@ -1,0 +1,67 @@
+<mat-progress-bar
+  [mode]="progress.mode"
+  [value]="progress.value"
+  [color]="progress.color"
+  [bufferValue]="progress.bufferValue"
+></mat-progress-bar>
+<div class="avatar_bottom_bar" *ngIf="lWrites !== undefined">
+  <img *ngFor="let item of lWrites | keyvalue" class="avatar_bottom" [src]="item.value">
+</div>
+<div
+  class="int_scroll"
+  [ngClass]="{'snap' : !isLoading && !isRefreshed && isSelected}" [style]="mqtt !== undefined ? 'height: calc(100% - 48px);' : ''"
+>
+  <mat-icon *ngIf="filter" mat-group (click)="setting()">settings</mat-icon>
+  <div class="panel_t">
+    <div class="overlay" *ngIf="overlayData">
+      <ms-panel
+        [alias]="overlayData.id"
+        [data]="overlayData"
+        visible="true"
+        (msRemove)="onDelete($event)"
+        [removable]="overlayData.removable !== undefined ? overlayData.removable : true"
+      ></ms-panel>
+    </div>
+    <ng-container #items></ng-container>
+  </div>
+</div>
+<div class="mat-fab-container">
+  <ng-container *ngFor="let action of actions;let idx = index;">
+    <button
+      *ngIf="action.icon !== undefined"
+      mat-mini-fab
+      [color]="action.color ? action.color : 'primary'"
+      (click)="openDialog(idx)"
+    >
+      <mat-icon>{{action.icon}}</mat-icon>
+    </button>
+  </ng-container>
+</div>
+<div class="list_overlay" [style.visibility]="isOverlay ? 'visible' : 'hidden'">
+  <ms-panel class="oldPanel" #oldOverlay></ms-panel>
+  <ms-panel #overlay></ms-panel>
+</div>
+<!--https://coryrylan.com/blog/build-a-angular-modal-dialog-with-angular-animate-->
+<div class="mat-rate-bar" *ngIf="rate !== undefined">
+  <div *ngFor="let n of numSequence(10); let idx = index">
+    <div
+      mat-button
+      (click)="onRate(idx)"
+      [ngClass]="{'mat-button-active' : idx <= rate}"
+      matRipple
+    >
+      <mat-icon
+        mat-rate
+        [fontSet]="idx <= rate ? 'material-icons' : 'material-icons-outlined'"
+        >star_rate</mat-icon
+      >
+    </div>
+  </div>
+</div>
+<ms-bar *ngIf="mqtt !== undefined" (add)="addToList(1, $event, true);"></ms-bar>
+<ng-template #divider let-title="title">
+  <div class="mat-divider">&nbsp;&nbsp;{{title}}</div>
+</ng-template>
+<ng-template #calendar let-data="data">
+  <ms-calendar style="grid-column: 1 / span 2" [data]="data"></ms-calendar>
+</ng-template>

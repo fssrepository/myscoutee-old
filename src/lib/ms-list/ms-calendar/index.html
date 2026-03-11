@@ -1,0 +1,25 @@
+<div class="calendar">
+  <div class="header" *ngIf="id">
+    <div class="week">
+      <div *ngFor="let day of days" class="day">{{day}}</div>
+    </div>
+  </div>
+  <div class="body" *ngIf="id">
+    <div *ngFor="let row of rows; let idx = index" class="cal_row">
+      <div *ngFor="let cell of row" class="cal_cell">
+        <div *ngIf="cell">
+          {{cell.title}}
+          <div
+            *ngIf="cell.value"
+            class="value highlighted"
+            [style.background]="cell.value"
+          ></div>
+          <div *ngIf="!cell.value" class="value"></div>
+        </div>
+      </div>
+      <div *ngIf="items[idx]" class="item_row">
+        <div *ngFor="let item of items[idx]" class="item_cell" [style]="'--width:' + item.cal.width + ';--pos:' + item.cal.from + ';--color:' + item.color" matRipple (click)="onCellClick(item.id)">{{item.title}}</div>
+      </div>
+    </div>
+  </div>
+</div>
