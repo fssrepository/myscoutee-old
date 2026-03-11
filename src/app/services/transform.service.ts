@@ -4,6 +4,34 @@ import { environment } from 'src/environments/environment';
 import { NavigationService } from '../navigation.service';
 
 const physiques = { s: 'Slim', a: 'Average', sp: 'Sum plus', m: 'Muscular' };
+const DEFAULT_AVATAR_MAN = [
+  'https://randomuser.me/api/portraits/men/11.jpg',
+  'https://randomuser.me/api/portraits/men/23.jpg',
+  'https://randomuser.me/api/portraits/men/32.jpg',
+  'https://randomuser.me/api/portraits/men/41.jpg',
+  'https://randomuser.me/api/portraits/men/52.jpg',
+  'https://randomuser.me/api/portraits/men/55.jpg',
+  'https://randomuser.me/api/portraits/men/66.jpg',
+  'https://randomuser.me/api/portraits/men/71.jpg',
+  'https://randomuser.me/api/portraits/men/76.jpg',
+  'https://randomuser.me/api/portraits/men/82.jpg',
+  'https://randomuser.me/api/portraits/men/87.jpg',
+  'https://randomuser.me/api/portraits/men/94.jpg',
+];
+const DEFAULT_AVATAR_WOMAN = [
+  'https://randomuser.me/api/portraits/women/5.jpg',
+  'https://randomuser.me/api/portraits/women/12.jpg',
+  'https://randomuser.me/api/portraits/women/21.jpg',
+  'https://randomuser.me/api/portraits/women/33.jpg',
+  'https://randomuser.me/api/portraits/women/44.jpg',
+  'https://randomuser.me/api/portraits/women/50.jpg',
+  'https://randomuser.me/api/portraits/women/57.jpg',
+  'https://randomuser.me/api/portraits/women/65.jpg',
+  'https://randomuser.me/api/portraits/women/72.jpg',
+  'https://randomuser.me/api/portraits/women/77.jpg',
+  'https://randomuser.me/api/portraits/women/84.jpg',
+  'https://randomuser.me/api/portraits/women/91.jpg',
+];
 @Injectable({
   providedIn: 'any',
 })
@@ -199,14 +227,14 @@ export class TransformService {
     let lId = isChild ? id : value["eventId"];
 
     let image = item['from']
-      ? this.resolveMessageImage(item['from'])
-      : undefined;
+      ? this.resolveMessageImage(item['from'], item['gender'], value['from'] || id)
+      : this.resolveProfileFallback(undefined, value['from'] || id);
 
     let reads = (item['reads'] !== undefined
       ? (item['reads'] as Array<string>)
       : []
     ).map(
-      (readImage) => this.resolveMessageImage(readImage));
+      (readImage, idx) => this.resolveMessageImage(readImage, item['gender'], value['ref'] + ':' + idx));
 
     const profile = this.navService.user ? this.navService.user['profile'] : undefined;
     const data = {
@@ -224,13 +252,80 @@ export class TransformService {
     return data;
   }
 
-  private resolveMessageImage(image): string {
+  private resolveMessageImage(image, gender, seed): string {
     if (environment.mockUiData === true) {
-      return '../assets/img/man.svg';
+      return this.resolveProfileFallback(gender || (image ? image['gender'] : undefined), seed);
     }
 
     const imageName = image && image['name'] ? image['name'] : image;
+
+    if (imageName === undefined || imageName === null || imageName === '') {
+      return this.resolveProfileFallback(gender || (image ? image['gender'] : undefined), seed);
+    }
+
+    if (typeof imageName === 'string') {
+      if (
+        imageName.indexOf('assets/') === 0 ||
+        imageName.indexOf('http://') === 0 ||
+        imageName.indexOf('https://') === 0 ||
+        imageName.indexOf('data:') === 0
+      ) {
+        return imageName;
+      }
+    }
+
     return location.origin + '/backend/user/profile/images/' + imageName;
+  }
+
+  private resolveProfileFallback(gender, seed): string {
+    const normalized = (gender || '').toString().toLowerCase();
+    const pool = normalized === 'w' ||
+      normalized === 'f' ||
+      normalized === 'woman' ||
+      normalized === 'female'
+      ? DEFAULT_AVATAR_WOMAN
+      : DEFAULT_AVATAR_MAN;
+
+    if (seed === undefined || seed === null || seed === '') {
+      return pool[0];
+    }
+
+    const normalizedSeed = seed.toString();
+    let hash = 0;
+    for (let i = 0; i < normalizedSeed.length; i++) {
+      hash = (hash * 31 + normalizedSeed.charCodeAt(i)) >>> 0;
+    }
+    return pool[hash % pool.length];
+  }
+
+  private resolveProfileImage(itemUrl, profileKey, inList, image, refresh = false): string {
+    const imageName = image && image['name'] ? image['name'] : image;
+    const gender = image ? image['gender'] : undefined;
+
+    if (imageName === undefined || imageName === null || imageName === '') {
+      return this.resolveProfileFallback(gender, profileKey);
+    }
+
+    if (typeof imageName === 'string') {
+      if (
+        imageName.indexOf('assets/') === 0 ||
+        imageName.indexOf('http://') === 0 ||
+        imageName.indexOf('https://') === 0 ||
+        imageName.indexOf('data:') === 0
+      ) {
+        return imageName;
+      }
+    }
+
+    return (
+      location.origin +
+      '/backend' +
+      itemUrl +
+      (inList ? '/' + profileKey : '') +
+      '/images/' +
+      imageName +
+      (refresh ? '?' + Date.now() : '')
+    );
   }
 
   transformGroup(id, value, url, inList): any {
@@ -643,6 +738,7 @@ export class TransformService {
 
   transformMember(id, member, url, inList): any {
     const value = member['profile'];
+    value['type'] = 'P';
 
     let itemUrl = url.substring(1);
     itemUrl = itemUrl.substring(itemUrl.indexOf('/'));
@@ -693,6 +789,17 @@ export class TransformService {
       sub += ' \uD83D\uDC76';
     }
 
+    const imgs = (value['images'] !== undefined
+      ? (value['images'] as Array<string>)
+      : []
+    ).map(
+      (image) => this.resolveProfileImage(itemUrl, value['key'], inList, image)
+    );
+
+    if (imgs.length === 0) {
+      imgs.push(this.resolveProfileFallback(value['gender'], value['key'] || id));
+    }
+
     const data = {
       id,
       type: 'img',
@@ -701,18 +808,7 @@ export class TransformService {
         main,
         sub,
       },
-      imgs: (value['images'] !== undefined
-        ? (value['images'] as Array<string>)
-        : []
-      ).map(
-        (image) =>
-          location.origin +
-          '/backend' +
-          itemUrl +
-          (inList ? '/' + value['key'] : '') +
-          '/images/' +
-          image['name']
-      ),
+      imgs,
       value,
       url: url + '/' + id,
       rate: 0,
@@ -813,18 +909,11 @@ export class TransformService {
     const imgs = (
       value['images'] !== undefined ? (value['images'] as Array<string>) : []
     ).map(
-      (image) =>
-        location.origin +
-        '/backend' +
-        itemUrl +
-        (inList ? '/' + value['key'] : '') +
-        '/images/' +
-        image['name'] +
-        (refresh ? '?' + Date.now() : '')
+      (image) => this.resolveProfileImage(itemUrl, value['key'], inList, image, refresh)
     );
 
     if (imgs.length === 0) {
-      imgs.push('../assets/img/man.svg');
+      imgs.push(this.resolveProfileFallback(value['gender'], value['key'] || id));
     }
 
     let children = false;

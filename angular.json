@@ -17,13 +17,20 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["lodash", "dialog-polyfill"],
-            "outputPath": "dist/myscoutee",
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "dialog-polyfill"
+            ],
+            "outputPath": "docs",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/assets", "src/manifest.json", "src/manifest.webmanifest"],
+            "assets": [
+              "src/assets",
+              "src/manifest.json",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/_styles/styles.scss"
@@ -45,11 +52,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/app/services/mock-api.service.ts",
-                  "with": "src/app/services/mock-api.service.prod.ts"
+                  "with": "src/environments/environment.gh.ts"
                 }
               ],
               "optimization": true,
@@ -75,7 +78,9 @@
               "ngswConfigPath": "ngsw-config.json"
             },
             "development": {
-              "outputPath": "dev"
+              "outputPath": "dev",
+              "serviceWorker": true,
+              "ngswConfigPath": "ngsw-config.dev.json"
             },
             "github": {
               "outputPath": "docs",
@@ -120,7 +125,11 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": ["src/assets", "src/manifest.json", "src/manifest.webmanifest"],
+            "assets": [
+              "src/assets",
+              "src/manifest.json",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/_styles/styles.scss"

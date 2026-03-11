@@ -6,7 +6,7 @@
     "start": "ng serve --configuration development",
     "build": "ng build --configuration development",
     "build:prod": "ng build --configuration production",
-    "build:gh": "ng build --configuration production,github --base-href /myscoutee-old/",
+    "build:gh": "ng build --configuration production --base-href /myscoutee-old/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

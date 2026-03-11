@@ -22,6 +22,34 @@ export class MockApiService {
     'Skyler',
     'Quinn',
   ];
+  private readonly manImages = [
+    'https://randomuser.me/api/portraits/men/11.jpg',
+    'https://randomuser.me/api/portraits/men/23.jpg',
+    'https://randomuser.me/api/portraits/men/32.jpg',
+    'https://randomuser.me/api/portraits/men/41.jpg',
+    'https://randomuser.me/api/portraits/men/52.jpg',
+    'https://randomuser.me/api/portraits/men/55.jpg',
+    'https://randomuser.me/api/portraits/men/66.jpg',
+    'https://randomuser.me/api/portraits/men/71.jpg',
+    'https://randomuser.me/api/portraits/men/76.jpg',
+    'https://randomuser.me/api/portraits/men/82.jpg',
+    'https://randomuser.me/api/portraits/men/87.jpg',
+    'https://randomuser.me/api/portraits/men/94.jpg',
+  ];
+  private readonly womanImages = [
+    'https://randomuser.me/api/portraits/women/5.jpg',
+    'https://randomuser.me/api/portraits/women/12.jpg',
+    'https://randomuser.me/api/portraits/women/21.jpg',
+    'https://randomuser.me/api/portraits/women/33.jpg',
+    'https://randomuser.me/api/portraits/women/44.jpg',
+    'https://randomuser.me/api/portraits/women/50.jpg',
+    'https://randomuser.me/api/portraits/women/57.jpg',
+    'https://randomuser.me/api/portraits/women/65.jpg',
+    'https://randomuser.me/api/portraits/women/72.jpg',
+    'https://randomuser.me/api/portraits/women/77.jpg',
+    'https://randomuser.me/api/portraits/women/84.jpg',
+    'https://randomuser.me/api/portraits/women/91.jpg',
+  ];
 
   private readonly vehicleMakes = ['Toyota', 'Honda', 'Ford', 'BMW', 'Audi'];
 
@@ -226,16 +254,18 @@ export class MockApiService {
     } as any;
 
     if (url.indexOf('/channels/') !== -1 && url.indexOf('/items') !== -1) {
+      const sender = this.profile(idx);
+      const readBy = this.profile(idx + 1);
       return {
         ...base,
         name: this.firstNames[idx % this.firstNames.length],
-        from: { name: 'avatar-member-' + idx + '.jpg' },
-        reads: idx % 3 === 0 ? [{ name: 'avatar-member-read-' + idx + '.jpg' }] : [],
+        from: sender.images[0],
+        reads: idx % 3 === 0 ? [readBy.images[0]] : [],
         message: {
           key: this.id('msg-detail', idx),
           eventId: this.id('evt', 1),
           ref: this.id('ref', idx),
-          from: this.id('profile', idx % this.firstNames.length),
+          from: sender.key,
           type: 'p',
           value: 'Member message #' + (idx + 1) + ' in this channel',
           createdDate: new Date(Date.now() - idx * 60_000).toISOString(),
@@ -244,16 +274,17 @@ export class MockApiService {
     }
 
     if (url.indexOf('/channels') !== -1 && url.indexOf('/items') === -1) {
+      const sender = this.profile(idx + 10);
       return {
         ...base,
         name: 'Channel ' + (idx + 1),
-        from: { name: 'avatar-' + idx + '.jpg' },
+        from: sender.images[0],
         reads: [],
         message: {
           key: this.id('msg', idx),
           eventId: this.id('evt', Math.floor(idx / 2)),
           ref: this.id('ref', idx),
-          from: idx % 2 === 0 ? this.id('profile', 1) : this.id('profile', 2),
+          from: sender.key,
           type: 'p',
           value: 'Mock chat message #' + (idx + 1),
           createdDate: new Date(Date.now() - idx * 60_000).toISOString(),
@@ -423,9 +454,11 @@ export class MockApiService {
   }
 
   private profile(idx: number): any {
+    const gender = idx % 2 === 0 ? 'm' : 'w';
     return {
       key: this.id('profile', idx),
       firstName: this.firstNames[idx % this.firstNames.length],
+      gender,
       birthday: new Date(1990 + (idx % 12), idx % 12, 10).toISOString(),
       height: 158 + (idx % 30),
       physique: ['a', 's', 'm', 'sp'][idx % 4],
@@ -433,9 +466,14 @@ export class MockApiService {
       hasChild: idx % 6 === 0,
       marital: idx % 7 === 0 ? 't' : 's',
       status: ['A', 'F', 'I'][idx % 3],
-      images: [],
+      images: [this.avatarByGender(gender, idx)],
       createdDate: new Date(Date.now() - idx * 86_400_000).toISOString(),
     };
+  }
+
+  private avatarByGender(gender: string, idx: number): string {
+    const pool = gender === 'w' ? this.womanImages : this.manImages;
+    return pool[idx % pool.length];
   }
 
   private wrapWrite(urlPart: string, body: any, params: HttpParams = new HttpParams()): any {
