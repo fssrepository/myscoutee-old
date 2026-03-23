@@ -1,0 +1,181 @@
+<h1 mat-dialog-title>
+  <button mat-icon-button class="mat-cancel" (click)="back()">
+    <mat-icon>arrow_backward</mat-icon>
+  </button>
+  &nbsp;
+  <button
+    mat-icon-button
+    class="mat-close"
+    [style.background-color]="formGroup.valid ? 'yellowgreen' : '#f44336'"
+    (click)="onClick()"
+  >
+    <mat-icon>done</mat-icon>
+  </button>
+</h1>
+<mat-progress-bar
+  [mode]="progress.mode"
+  [value]="progress.value"
+  [color]="progress.color"
+></mat-progress-bar>
+<div mat-dialog-content class="mat-form">
+  <form default [formGroup]="formGroup">
+    <mat-accordion>
+      <mat-expansion-panel formGroupName="data">
+        <mat-expansion-panel-header
+          [style.background-color]="
+            formGroup.controls.data.valid ? 'yellowgreen' : '#f44336'
+          "
+        >
+          <mat-panel-title>{{ title }}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-form-field>
+          <mat-label>Enter name</mat-label>
+          <input matInput [formControlName]="'name'" />
+          <mat-error *ngIf="formGroup.controls.data.get('name').invalid"
+            >Name is required!</mat-error
+          >
+        </mat-form-field>
+        <fieldset formGroupName="range">
+          <legend>Time</legend>
+          <mat-form-field>
+            <mat-label>From</mat-label>
+            <input matInput formControlName="start" type="datetime-local" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>To</mat-label>
+            <input matInput formControlName="end" type="datetime-local" />
+          </mat-form-field>
+          <mat-error *ngIf="formGroup.controls.data.get('range').invalid"
+            >Invalid Range</mat-error
+          >
+        </fieldset>
+        <fieldset>
+          <legend>Template</legend>
+          <mat-form-field>
+            <mat-label>Type</mat-label>
+            <mat-select
+              [formControlName]="'type'"
+              (selectionChange)="onType($event)"
+            >
+              <mat-option *ngFor="let type of types" [value]="type.value">
+                {{ type.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div style="width: 100%" (click)="onTemplateSelect()">
+            <ng-container #templatePanel> </ng-container>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Group</legend>
+          <mat-form-field>
+            <mat-label>Group</mat-label>
+            <mat-select
+              [formControlName]="'groupType'"
+              (selectionChange)="onGroupType($event)"
+            >
+              <mat-option
+                *ngFor="let group of groupTypes"
+                [value]="group.value"
+              >
+                {{ group.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div style="width: 100%" (click)="onGroupSelect()">
+            <ng-container #groupPanel> </ng-container>
+          </div>
+        </fieldset>
+      </mat-expansion-panel>
+      <mat-expansion-panel *ngIf="slotsNum > 0">
+        <mat-expansion-panel-header
+          btn-accordion
+          [style.background-color]="
+            formGroup.controls.slots.valid ? 'yellowgreen' : '#f44336'
+          "
+        >
+          <button mat-mini-fab color="primary" (click)="addSlot($event)">
+            <mat-icon>add</mat-icon>
+          </button>
+          <mat-panel-title>Slots</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-accordion>
+          <mat-expansion-panel
+            formArrayName="slots"
+            *ngFor="
+              let slot of formGroup.controls.slots.controls;
+              let i = index
+            "
+          >
+            <mat-expansion-panel-header
+              btn-accordion
+              [style.background-color]="slot.valid ? 'yellowgreen' : '#f44336'"
+            >
+              <button
+                mat-mini-fab
+                color="accent"
+                (click)="removeSlot($event, i)" *ngIf="slotsNum > 1"
+              >
+                <mat-icon>remove</mat-icon>
+              </button>
+              <mat-panel-title>{{
+                (slot.get('range').get('start').value !== null
+                  ? (slot.get('range').get('start').value | date: 'dd/MM/yyyy')
+                  : '') +
+                  ' - ' +
+                  slot.get('numOfItems').value +
+                  ' / (' +
+                  slot.get('capacity').get('min').value +
+                  '-' +
+                  slot.get('capacity').get('max').value +
+                  ')'
+              }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div [formGroupName]="i">
+              <mat-form-field>
+                <mat-label>Number of Items</mat-label>
+                <input matInput formControlName="numOfItems" />
+                <mat-error *ngIf="slot.get('numOfItems').invalid"
+                  >Value is required!</mat-error
+                >
+              </mat-form-field>
+              <fieldset [formGroupName]="'capacity'">
+                <legend>Capacity</legend>
+                <mat-form-field>
+                  <mat-label>Min</mat-label>
+                  <input matInput formControlName="min" type="number" />
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Max</mat-label>
+                  <input matInput formControlName="max" type="number" />
+                </mat-form-field>
+                <mat-error *ngIf="slot.get('capacity').invalid"
+                  >Invalid Range</mat-error
+                >
+              </fieldset>
+              <fieldset [formGroupName]="'range'">
+                <legend>Time</legend>
+                <mat-form-field>
+                  <mat-label>From</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="pickerStart"
+                    formControlName="start"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="pickerStart"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #pickerStart></mat-datepicker>
+                </mat-form-field>
+                <mat-error *ngIf="slot.get('range').invalid"
+                    >Start date of the slot must be greater than the date of the promotion!</mat-error
+                  >
+              </fieldset>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
+</div>
