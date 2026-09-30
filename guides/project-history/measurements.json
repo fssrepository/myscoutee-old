@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "project_totals": {
+    "tasks": 5,
+    "tokens_estimate": 2665582,
+    "api_standard_usd_estimate": 4.1,
+    "allocated_hours_estimate": 0.16639174074596827,
+    "manual_effort_unknown": true,
+    "workstreams": {
+      "Legacy manual": {
+        "tokens": 0,
+        "api_equivalent_usd": 0,
+        "hours": 0
+      },
+      "Project administration (AI-assisted)": {
+        "tokens": 2665582,
+        "api_equivalent_usd": 4.1,
+        "hours": 0.16639174074596827
+      }
+    }
+  },
+  "account_control": {
+    "account_tokens": 38488016278,
+    "allocated_tokens_estimate": 37993843589,
+    "unassigned_tokens": 494172689
+  },
+  "valuation_date": "2026-10-01",
+  "rates_per_million": {
+    "gpt-5.2": [
+      1.75,
+      0.175,
+      14,
+      0
+    ],
+    "gpt-5.4": [
+      2.5,
+      0.25,
+      15,
+      0
+    ],
+    "gpt-5.5": [
+      5,
+      0.5,
+      30,
+      0
+    ],
+    "gpt-5.3-codex": [
+      1.75,
+      0.175,
+      14,
+      0
+    ],
+    "gpt-5.6-sol": [
+      4,
+      0.4,
+      20,
+      5
+    ],
+    "gpt-5.6-terra": [
+      2,
+      0.2,
+      12,
+      2.5
+    ],
+    "gpt-6-astra": [
+      10,
+      1,
+      50,
+      12.5
+    ],
+    "gpt-6-sol": [
+      2,
+      0.2,
+      10,
+      2.5
+    ],
+    "gpt-6-luna": [
+      0.1,
+      0.01,
+      0.5,
+      0.125
+    ]
+  },
+  "pricing_source": "https://developers.openai.com/api/docs/pricing",
+  "observed_token_mix": {
+    "input_tokens": 0.9963307585649178,
+    "cached_input_tokens": 0.9617906844276427,
+    "cache_write_input_tokens": 0.0,
+    "output_tokens": 0.0031954733323304777,
+    "reasoning_output_tokens": 0.0010898946512413721,
+    "total_tokens": 1.0
+  },
+  "tasks": [
+    {
+      "task_id": "MSC-OLD-1",
+      "tokens": null,
+      "api_standard_usd_estimate": null,
+      "active_hours": null,
+      "allocated_hours": null,
+      "manual_effort_unknown": true,
+      "token_basis": "Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained",
+      "duration_basis": "Unknown manual effort; commit spacing is not used as a time estimate",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {},
+      "repository_allocations": {}
+    },
+    {
+      "task_id": "MSC-OLD-2",
+      "tokens": null,
+      "api_standard_usd_estimate": null,
+      "active_hours": null,
+      "allocated_hours": null,
+      "manual_effort_unknown": true,
+      "token_basis": "Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained",
+      "duration_basis": "Unknown manual effort; commit spacing is not used as a time estimate",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {},
+      "repository_allocations": {}
+    },
+    {
+      "task_id": "MSC-OLD-3",
+      "tokens": null,
+      "api_standard_usd_estimate": null,
+      "active_hours": null,
+      "allocated_hours": null,
+      "manual_effort_unknown": true,
+      "token_basis": "Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained",
+      "duration_basis": "Unknown manual effort; commit spacing is not used as a time estimate",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {},
+      "repository_allocations": {}
+    },
+    {
+      "task_id": "MSC-OLD-4",
+      "tokens": null,
+      "api_standard_usd_estimate": null,
+      "active_hours": null,
+      "allocated_hours": null,
+      "manual_effort_unknown": true,
+      "token_basis": "Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained",
+      "duration_basis": "Unknown manual effort; commit spacing is not used as a time estimate",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {},
+      "repository_allocations": {}
+    },
+    {
+      "task_id": "MSC-OLD-5",
+      "tokens": 2665582,
+      "api_standard_usd_estimate": 4.1,
+      "active_hours": 0.166,
+      "allocated_hours": 0.16639174074596827,
+      "manual_effort_unknown": false,
+      "token_basis": "Measured maintenance-session tokens; estimated allocation by backup snapshot ownership (9:2:2:2 across four Projects)",
+      "duration_basis": "Measured active root intervals; same project allocation weights; includes tool/network waits, not human labor",
+      "allocated_time_basis": "Measured active root intervals; same project allocation weights; includes tool/network waits, not human labor",
+      "models": {
+        "gpt-6-astra|high": {
+          "input_tokens": 2649641.0666666664,
+          "cached_input_tokens": 2576571.7333333334,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 15941.333333333334,
+          "reasoning_output_tokens": 4857.6,
+          "total_tokens": 2665582.4
+        }
+      },
+      "repository_allocations": {
+        "myscoutee-old": {
+          "hours": 0.16639174074596827,
+          "tokens": 2665582.0,
+          "api_equivalent_usd": 4.1
+        }
+      }
+    }
+  ],
+  "maintenance_run": {
+    "cutoff_utc": "2026-09-30T23:16:07.594000+00:00",
+    "measured_tokens": 19991868,
+    "measured_active_hours": 1.2479380555947621,
+    "project_weights": {
+      "myscoutee": 0.6,
+      "myscoutee-old": 0.13333333333333333,
+      "e-kozig": 0.13333333333333333,
+      "math": 0.13333333333333333
+    },
+    "previous_msc108_tokens_removed": 8473514,
+    "previous_msc108_hours_removed": 0.46417527781592477,
+    "net_additional_account_allocation": 11518354,
+    "daily_attribution": "Not individually reconciled; allocated against remaining account allowance",
+    "models": {
+      "gpt-6-astra|high": {
+        "input_tokens": 19872308,
+        "cached_input_tokens": 19324288,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 119560,
+        "reasoning_output_tokens": 36432,
+        "total_tokens": 19991868
+      }
+    }
+  }
+}

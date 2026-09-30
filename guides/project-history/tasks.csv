@@ -1,0 +1,6 @@
+task_id,title,workstream,started,finished,tokens_million,api_equivalent_usd_estimate,active_hours,allocated_hours,models,reasoning,evidence
+MSC-OLD-1,Import the archived MyScoutee frontend prototype,Legacy manual,2026-03-11,2026-03-11,,,,,,,"Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained"
+MSC-OLD-2,fix: complete demo data and development cache handling,Legacy manual,2026-03-11,2026-03-11,,,,,,,"Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained"
+MSC-OLD-3,chore: archive campaign drafts and promotional videos,Legacy manual,2026-03-23,2026-03-24,,,,,,,"Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained"
+MSC-OLD-4,docs: update the UI prototype link,Legacy manual,2026-03-31,2026-03-31,,,,,,,"Primarily manual legacy work, confirmed by the creator; no attributable AI usage retained"
+MSC-OLD-5,Reconstruct the Project and preserve restorable Git records,Project administration (AI-assisted),2026-09-30,2026-10-01,2.67,4.1,0.166,0.17,gpt-6-astra,high,Measured maintenance-session tokens; estimated allocation by backup snapshot ownership (9:2:2:2 across four Projects)
