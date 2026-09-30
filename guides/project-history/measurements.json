@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "project_totals": {
-    "tasks": 5,
-    "tokens_estimate": 2665582,
-    "api_standard_usd_estimate": 4.1,
-    "allocated_hours_estimate": 0.16639174074596827,
+    "tasks": 6,
+    "tokens_estimate": 3428103,
+    "api_standard_usd_estimate": 5.43,
+    "allocated_hours_estimate": 0.21834174075391555,
     "manual_effort_unknown": true,
     "workstreams": {
       "Legacy manual": {
@@ -16,13 +16,18 @@
         "tokens": 2665582,
         "api_equivalent_usd": 4.1,
         "hours": 0.16639174074596827
+      },
+      "Documentation (AI-assisted)": {
+        "tokens": 762521,
+        "api_equivalent_usd": 1.33,
+        "hours": 0.051950000007947285
       }
     }
   },
   "account_control": {
     "account_tokens": 38488016278,
-    "allocated_tokens_estimate": 37993843589,
-    "unassigned_tokens": 494172689
+    "allocated_tokens_estimate": 37996385327,
+    "unassigned_tokens": 491630951
   },
   "valuation_date": "2026-10-01",
   "rates_per_million": {
@@ -169,6 +174,41 @@
           "tokens": 2665582.0,
           "api_equivalent_usd": 4.1
         }
+      }
+    },
+    {
+      "task_id": "MSC-OLD-6",
+      "tokens": 762521,
+      "api_standard_usd_estimate": 1.33,
+      "active_hours": 0.051950000007947285,
+      "allocated_hours": 0.051950000007947285,
+      "manual_effort_unknown": false,
+      "token_basis": "Measured shared documentation-session tokens; estimated allocation 60% E-Kozig, 30% MyScoutee Old, 10% math",
+      "duration_basis": "Observed active session window, including tool waits; estimated project split, not human labor",
+      "allocated_time_basis": "Observed active session window, including tool waits; estimated project split, not human labor",
+      "models": {
+        "gpt-6-astra|high": {
+          "input_tokens": 756993.9,
+          "cached_input_tokens": 724224.0,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 5527.5,
+          "reasoning_output_tokens": 1912.5,
+          "total_tokens": 762521.4
+        }
+      },
+      "repository_allocations": {
+        "myscoutee-old": {
+          "hours": 0.051950000007947285,
+          "tokens": 762521,
+          "api_equivalent_usd": 1.33
+        }
+      },
+      "frozen_phase": {
+        "start_utc": "2026-09-30T23:34:24.557000+00:00",
+        "cutoff_utc": "2026-09-30T23:44:47.957000+00:00",
+        "shared_tokens": 2541738,
+        "shared_hours": 0.1731666666931576,
+        "allocation_share": 0.3
       }
     }
   ],

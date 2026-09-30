@@ -68,5 +68,19 @@
     "models": "gpt-6-astra",
     "reasoning": "high",
     "evidence": "Measured maintenance-session tokens; estimated allocation by backup snapshot ownership (9:2:2:2 across four Projects)"
+  },
+  {
+    "task_id": "MSC-OLD-6",
+    "title": "Document the original project and its evolution into MyScoutee",
+    "workstream": "Documentation (AI-assisted)",
+    "started": "2026-10-01",
+    "finished": "2026-10-01",
+    "tokens_million": 0.76,
+    "api_equivalent_usd_estimate": 1.33,
+    "active_hours": 0.051950000007947285,
+    "allocated_hours": 0.05,
+    "models": "gpt-6-astra",
+    "reasoning": "high",
+    "evidence": "Measured shared documentation-session tokens; estimated allocation 60% E-Kozig, 30% MyScoutee Old, 10% math"
   }
 ]

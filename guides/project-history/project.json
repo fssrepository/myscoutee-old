@@ -10,8 +10,8 @@
     "title": "MyScoutee Old",
     "url": "https://github.com/users/fssrepository/projects/3",
     "public": true,
-    "shortDescription": "5 tasks \u00b7 2.7M tokens \u00b7 0.2h AI activity \u00b7 API equivalent $4 (estimates) \u00b7 legacy manual effort unknown",
-    "readme": "# MyScoutee Old\n\n5 retrospective tasks. This Project is separate from the other portfolio Projects.\n\n[Complete Git backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/myscoutee-old) \u00b7 [Measurement method](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nPrimarily manual legacy development. Original working time is unknown; import dates are archival evidence. AI assistance with GitHub may have occurred, but unsupported tokens, models, costs and time remain blank.\n\n## Budget by workstream\n\n| Workstream | Tokens (M) | Allocated activity (h) | API equivalent (USD) |\n| --- | ---: | ---: | ---: |\n| Legacy manual | Unknown | Unknown | Unknown |\n| Project administration (AI-assisted) | 2.67 | 0.17 | $4.10 |\n\n## Repositories\n\n- [myscoutee-old](https://github.com/fssrepository/myscoutee-old)\n- [myscoutee-roadmap](https://github.com/fssrepository/myscoutee-roadmap)\n"
+    "shortDescription": "6 tasks \u00b7 3.4M tokens \u00b7 0.2h AI activity \u00b7 API equivalent $5 (estimates) \u00b7 legacy manual effort unknown",
+    "readme": "# MyScoutee Old\n\n6 retrospective tasks. This Project is separate from the other portfolio Projects.\n\n[Complete Git backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/myscoutee-old) \u00b7 [Measurement method](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nPrimarily manual legacy development. Original working time is unknown; import dates are archival evidence. AI assistance with GitHub may have occurred, but unsupported tokens, models, costs and time remain blank.\n\n## Budget by workstream\n\n| Workstream | Tokens (M) | Allocated activity (h) | API equivalent (USD) |\n| --- | ---: | ---: | ---: |\n| Legacy manual | Unknown | Unknown | Unknown |\n| Project administration (AI-assisted) | 2.67 | 0.17 | $4.10 |\n| Documentation (AI-assisted) | 0.76 | 0.05 | $1.33 |\n\n## Repositories\n\n- [myscoutee-old](https://github.com/fssrepository/myscoutee-old)\n- [myscoutee-roadmap](https://github.com/fssrepository/myscoutee-roadmap)\n"
   },
   "fields": [
     {
@@ -235,6 +235,33 @@
         "Models": "gpt-6-astra",
         "Reasoning": "high",
         "Evidence": "Measured run; estimated project split",
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "MSC-OLD-6",
+      "title": "MSC-OLD-6: Document the original project and its evolution into MyScoutee",
+      "body": "Expand the README with the creator-reported 2016 origin, approximately 1.5 years of research/development and a later half-year refactor. Explain the recalled backend clone and subsequent AI-assisted rewrite, preserve uncertainty about the lost standalone backend, and display project-specific metrics without inventing historical human hours.\n\n| Metric | Value |\n| --- | ---: |\n| Allocated tokens | 0.763 M |\n| Allocated activity | 0.052 h |\n| Standard API equivalent | $1.33 USD |\n| Model / reasoning | gpt-6-astra / high |\n\nThe shared documentation window recorded 2,541,738 tokens from 2026-09-30T23:34:24.557000+00:00 to 2026-09-30T23:44:47.957000+00:00. Its effort is split once across EKO-16 (60%), MSC-OLD-6 (30%) and MATH-18 (10%); these are estimated shares of one measured session, not independent measurements. The bounded cutoff excludes the final publishing/accounting tail. Token components, model and reasoning come from the local session records. The allocation reserves part of the portfolio's previously unassigned allowance, without claiming exact reconciliation to the earlier account-wide daily snapshot. API equivalent is a list-price comparison, not an invoice or credits paid.\n\nValidation: documentation links, original Hungarian asset preservation, SVG text positions and PNG preview, and offline restore/checksum checks. No application behavior changed.\n\nProject: https://github.com/users/fssrepository/projects/3\n\nRelated documentation tasks (separately allocated effort):\n- [EKO-16](https://github.com/fssrepository/myscoutee-roadmap/issues/146)\n- [MATH-18](https://github.com/fssrepository/myscoutee-roadmap/issues/148)\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 147,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/147",
+        "node_id": "I_kwDOU1_9-s8AAAABUQlPDA"
+      },
+      "values": {
+        "Task ID": "MSC-OLD-6",
+        "Workstream": "Documentation (AI-assisted)",
+        "Started": "2026-10-01",
+        "Finished": "2026-10-01",
+        "Tokens M": 0.763,
+        "API equiv USD": 1.33,
+        "Active h": 0.052,
+        "Allocated h": 0.052,
+        "Models": "gpt-6-astra",
+        "Reasoning": "high",
+        "Evidence": "Measured session; estimated project split",
         "Status": "Done"
       }
     }
