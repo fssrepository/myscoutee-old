@@ -64,7 +64,7 @@ repository administration explicitly.
 - The earlier Angular frontend in `src/`.
 - Its published UI snapshot in `docs/`.
 - Archived materials in `backup/`.
-- [Restorable Project records](guides/project-history/README.md), including task descriptions, commit references and measurement notes.
+- [Restorable Project records](guides/statistics/README.md), including task descriptions, commit references and measurement notes.
 
 <!-- project-effort-summary -->
 
@@ -72,7 +72,7 @@ repository administration explicitly.
 
 ## Project effort and delivery
 
-[View tasks and AI usage](https://github.com/users/fssrepository/projects/3) · [Restorable records and methodology](guides/project-history/README.md)
+[View tasks and AI usage](https://github.com/users/fssrepository/projects/3) · [Restorable records and methodology](guides/statistics/README.md)
 
 | Measure | This project |
 | --- | ---: |
@@ -91,3 +91,9 @@ shared work is split rather than counted in full more than once.
 The numeric AI figures cover the recent archive and documentation work. They
 do not measure the original manual development or convert the recalled
 research and refactoring phases into hours.
+
+## Versioned source release
+
+Release `v1.5.0` provides a source archive and SHA-256 checksum through GitHub
+Releases. The archive is built directly from the version tag. This remains an
+archived frontend; the release does not restore its missing backend.

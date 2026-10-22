@@ -1,0 +1,28 @@
+name: Release versioned source
+
+on:
+  push:
+    tags: ['v[0-9]*.[0-9]*.[0-9]*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Verify version and publish source archive
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(cat VERSION)"
+          [[ "$GITHUB_REF_NAME" == "v$version" ]]
+          name="${GITHUB_REPOSITORY#*/}"
+          archive="$RUNNER_TEMP/$name-$version.tar.gz"
+          git archive --format=tar.gz --prefix="$name-$version/" -o "$archive" HEAD
+          (cd "$RUNNER_TEMP" && sha256sum "$(basename "$archive")") > "$RUNNER_TEMP/SHA256SUMS"
+          printf 'MSC-127: versioned source release **%s**.\n\nSource: `%s`.\n\nSee the repository README for the supported entry points. This source release does not claim additional runtime qualification.\n' "$version" "$GITHUB_SHA" > "$RUNNER_TEMP/release-notes.md"
+          gh release create "$GITHUB_REF_NAME" "$archive" "$RUNNER_TEMP/SHA256SUMS" --verify-tag --title "$name $version" --notes-file "$RUNNER_TEMP/release-notes.md"
