@@ -1,0 +1,10 @@
+# Shared steps are pinned by the lab bootstrap; project settings stay here.
+include:
+  - project: "$LAB_CI_PATH"
+    ref: "$LAB_CI_REF"
+    file: /ci/project.gitlab-ci.yml
+variables:
+  LAB_APPLICATION: "false"
+  LAB_FRONTEND: "false"
+  LAB_GITHUB_REPOSITORY: "fssrepository/myscoutee-old"
+  LAB_HEAVY_BUILD: "false"

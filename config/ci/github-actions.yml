@@ -1,0 +1,202 @@
+# Presentation conversion: install explicitly; not executed or separately qualified.
+name: MyScoutee laboratory
+on:
+  push:
+    branches: [master, 'feature/**']
+  repository_dispatch:
+    types: [myscoutee-dependency-release]
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        options: [candidate, build, test, deb, kvm, infra_start, cluster, release, downstream, deploy, verify, pages]
+        required: true
+      candidate:
+        description: Existing candidate GitHub run ID (blank for a new candidate)
+        type: string
+      level:
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      target:
+        type: choice
+        options: [none, kvm, vmware, monolith, netcup, github-pages]
+        default: none
+permissions:
+  contents: read
+concurrency:
+  group: lab-${{ github.repository_id }}-${{ inputs.candidate || github.run_id }}
+  cancel-in-progress: false
+jobs:
+  candidate:
+    if: github.event_name != 'workflow_dispatch' || inputs.action == 'candidate'
+    runs-on: [self-hosted, lab-build]
+    env:
+      GH_TOKEN: ${{ secrets.LAB_GITHUB_TOKEN }}
+      LAB_RELEASE_TOKEN: ${{ secrets.LAB_RELEASE_TOKEN }}
+      GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+      LAB_CANDIDATE_ROOT: ${{ vars.LAB_CANDIDATE_ROOT }}
+      LAB_GROUP_PATH: ${{ vars.LAB_GROUP_PATH }}
+      LAB_GITLAB_URL: ${{ vars.LAB_GITLAB_URL }}
+      LAB_NPM_REGISTRY: ${{ vars.LAB_NPM_REGISTRY }}
+      LAB_IMAGE_NAMESPACE: ${{ vars.LAB_IMAGE_NAMESPACE }}
+      LAB_DOCKER_BUILD_NETWORK: ${{ vars.LAB_DOCKER_BUILD_NETWORK }}
+      LAB_TERRAFORM_BACKEND: ${{ vars.LAB_TERRAFORM_BACKEND }}
+      LAB_TERRAFORM_STATE_NAME: ${{ vars.LAB_TERRAFORM_STATE_NAME }}
+      LAB_MONOLITH_MODE: ${{ vars.LAB_MONOLITH_MODE }}
+      LAB_KVM_STATE_ROOT: ${{ vars.LAB_KVM_STATE_ROOT }}
+      LAB_KVM_HTTP_PORT: ${{ vars.LAB_KVM_HTTP_PORT }}
+      LAB_KVM_GRAFANA_PORT: ${{ vars.LAB_KVM_GRAFANA_PORT }}
+      LAB_KVM_PROMETHEUS_PORT: ${{ vars.LAB_KVM_PROMETHEUS_PORT }}
+      LAB_MONOLITH_HTTP_PORT: ${{ vars.LAB_MONOLITH_HTTP_PORT }}
+      LAB_MONOLITH_HTTPS_PORT: ${{ vars.LAB_MONOLITH_HTTPS_PORT }}
+      LAB_MONOLITH_STUN_PORT: ${{ vars.LAB_MONOLITH_STUN_PORT }}
+      GRADLE_OPTS: ${{ vars.GRADLE_OPTS }}
+      LAB_MICROSERVICES_REVISION: ${{ vars.LAB_MICROSERVICES_REVISION }}
+      LAB_FIXTURES: ${{ vars.LAB_FIXTURES }}
+      LAB_TRUSTED_KEY_FINGERPRINT: ${{ vars.LAB_TRUSTED_KEY_FINGERPRINT }}
+      LAB_DEPLOY_FORMAT: ${{ vars.LAB_DEPLOY_FORMAT }}
+      LAB_PARTIAL_SERVICES: ${{ vars.LAB_PARTIAL_SERVICES }}
+      LAB_EXISTING_INSTALLATION: ${{ vars.LAB_EXISTING_INSTALLATION }}
+      LAB_PREPARE_HOST: ${{ vars.LAB_PREPARE_HOST }}
+      LAB_VERIFY_URL: ${{ vars.LAB_VERIFY_URL }}
+      LAB_PARTIAL_DATA: ${{ vars.LAB_PARTIAL_DATA }}
+      LAB_NPMRC_CONTENT: ${{ secrets.LAB_NPMRC }}
+      LAB_GRADLE_PROPERTIES_CONTENT: ${{ secrets.LAB_GRADLE_PROPERTIES }}
+      LAB_DOCKER_CONFIG_CONTENT: ${{ secrets.LAB_DOCKER_CONFIG }}
+      LAB_SIGNING_KEY_CONTENT: ${{ secrets.LAB_SIGNING_KEY }}
+      LAB_KAS_ADDRESS: ${{ vars.LAB_KAS_ADDRESS }}
+      LAB_KUBE_AGENT_TOKEN_CONTENT: ${{ secrets.LAB_KUBE_AGENT_TOKEN }}
+      LAB_KVM_RUNTIME_CONFIG_CONTENT: ${{ secrets.LAB_KVM_RUNTIME_CONFIG }}
+      LAB_INSTALL_CONFIG_CONTENT: ${{ secrets.LAB_INSTALL_CONFIG }}
+      LAB_SSH_PRIVATE_KEY_CONTENT: ${{ secrets.LAB_SSH_PRIVATE_KEY }}
+      LAB_SSH_KNOWN_HOSTS_CONTENT: ${{ secrets.LAB_SSH_KNOWN_HOSTS }}
+      NODE_EXTRA_CA_CERTS_CONTENT: ${{ secrets.NODE_EXTRA_CA_CERTS }}
+      LAB_FORWARD_PORTS: ${{ vars.LAB_FORWARD_PORTS }}
+      LAB_TRUSTED_PUBLIC_KEY_CONTENT: ${{ secrets.LAB_TRUSTED_PUBLIC_KEY }}
+      LAB_RELEASE_LEVEL: ${{ inputs.level || 'patch' }}
+    steps:
+      - name: Checkout the source revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          path: source
+      - name: Load pinned shared CI implementation
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.LAB_CI_REPOSITORY }}
+          ref: ${{ vars.LAB_CI_REF }}
+          token: ${{ secrets.LAB_GITHUB_TOKEN }}
+          persist-credentials: false
+          path: library
+      - name: Reserve persistent candidate
+        id: candidate
+        run: python3 library/scripts/github.py init
+      - name: Plan major, minor or patch version
+        run: python3 library/scripts/github.py prepare
+      - name: Resolve pinned release dependencies
+        run: python3 library/scripts/github.py dependencies
+      - name: Build normal candidate
+        if: steps.candidate.outputs.heavy == 'false'
+        run: python3 library/scripts/github.py build
+      - name: Package candidate in the pipeline workspace
+        if: steps.candidate.outputs.heavy == 'false'
+        run: python3 library/scripts/github.py package
+  manual:
+    if: github.event_name == 'workflow_dispatch' && inputs.action != 'candidate'
+    environment: ${{ inputs.action == 'release' && 'release' || inputs.target }}
+    runs-on: [self-hosted, lab-build]
+    env:
+      GH_TOKEN: ${{ secrets.LAB_GITHUB_TOKEN }}
+      LAB_RELEASE_TOKEN: ${{ secrets.LAB_RELEASE_TOKEN }}
+      GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+      LAB_CANDIDATE_ROOT: ${{ vars.LAB_CANDIDATE_ROOT }}
+      LAB_GROUP_PATH: ${{ vars.LAB_GROUP_PATH }}
+      LAB_GITLAB_URL: ${{ vars.LAB_GITLAB_URL }}
+      LAB_NPM_REGISTRY: ${{ vars.LAB_NPM_REGISTRY }}
+      LAB_IMAGE_NAMESPACE: ${{ vars.LAB_IMAGE_NAMESPACE }}
+      LAB_DOCKER_BUILD_NETWORK: ${{ vars.LAB_DOCKER_BUILD_NETWORK }}
+      LAB_TERRAFORM_BACKEND: ${{ vars.LAB_TERRAFORM_BACKEND }}
+      LAB_TERRAFORM_STATE_NAME: ${{ vars.LAB_TERRAFORM_STATE_NAME }}
+      LAB_MONOLITH_MODE: ${{ vars.LAB_MONOLITH_MODE }}
+      LAB_KVM_STATE_ROOT: ${{ vars.LAB_KVM_STATE_ROOT }}
+      LAB_KVM_HTTP_PORT: ${{ vars.LAB_KVM_HTTP_PORT }}
+      LAB_KVM_GRAFANA_PORT: ${{ vars.LAB_KVM_GRAFANA_PORT }}
+      LAB_KVM_PROMETHEUS_PORT: ${{ vars.LAB_KVM_PROMETHEUS_PORT }}
+      LAB_MONOLITH_HTTP_PORT: ${{ vars.LAB_MONOLITH_HTTP_PORT }}
+      LAB_MONOLITH_HTTPS_PORT: ${{ vars.LAB_MONOLITH_HTTPS_PORT }}
+      LAB_MONOLITH_STUN_PORT: ${{ vars.LAB_MONOLITH_STUN_PORT }}
+      GRADLE_OPTS: ${{ vars.GRADLE_OPTS }}
+      LAB_MICROSERVICES_REVISION: ${{ vars.LAB_MICROSERVICES_REVISION }}
+      LAB_FIXTURES: ${{ vars.LAB_FIXTURES }}
+      LAB_TRUSTED_KEY_FINGERPRINT: ${{ vars.LAB_TRUSTED_KEY_FINGERPRINT }}
+      LAB_DEPLOY_FORMAT: ${{ vars.LAB_DEPLOY_FORMAT }}
+      LAB_PARTIAL_SERVICES: ${{ vars.LAB_PARTIAL_SERVICES }}
+      LAB_EXISTING_INSTALLATION: ${{ vars.LAB_EXISTING_INSTALLATION }}
+      LAB_PREPARE_HOST: ${{ vars.LAB_PREPARE_HOST }}
+      LAB_VERIFY_URL: ${{ vars.LAB_VERIFY_URL }}
+      LAB_PARTIAL_DATA: ${{ vars.LAB_PARTIAL_DATA }}
+      LAB_NPMRC_CONTENT: ${{ secrets.LAB_NPMRC }}
+      LAB_GRADLE_PROPERTIES_CONTENT: ${{ secrets.LAB_GRADLE_PROPERTIES }}
+      LAB_DOCKER_CONFIG_CONTENT: ${{ secrets.LAB_DOCKER_CONFIG }}
+      LAB_SIGNING_KEY_CONTENT: ${{ secrets.LAB_SIGNING_KEY }}
+      LAB_KAS_ADDRESS: ${{ vars.LAB_KAS_ADDRESS }}
+      LAB_KUBE_AGENT_TOKEN_CONTENT: ${{ secrets.LAB_KUBE_AGENT_TOKEN }}
+      LAB_KVM_RUNTIME_CONFIG_CONTENT: ${{ secrets.LAB_KVM_RUNTIME_CONFIG }}
+      LAB_INSTALL_CONFIG_CONTENT: ${{ secrets.LAB_INSTALL_CONFIG }}
+      LAB_SSH_PRIVATE_KEY_CONTENT: ${{ secrets.LAB_SSH_PRIVATE_KEY }}
+      LAB_SSH_KNOWN_HOSTS_CONTENT: ${{ secrets.LAB_SSH_KNOWN_HOSTS }}
+      NODE_EXTRA_CA_CERTS_CONTENT: ${{ secrets.NODE_EXTRA_CA_CERTS }}
+      LAB_FORWARD_PORTS: ${{ vars.LAB_FORWARD_PORTS }}
+      LAB_TRUSTED_PUBLIC_KEY_CONTENT: ${{ secrets.LAB_TRUSTED_PUBLIC_KEY }}
+      LAB_CANDIDATE: ${{ inputs.candidate }}
+      LAB_TARGET: ${{ inputs.target }}
+    steps:
+      - name: Load pinned shared CI implementation
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.LAB_CI_REPOSITORY }}
+          ref: ${{ vars.LAB_CI_REF }}
+          token: ${{ secrets.LAB_GITHUB_TOKEN }}
+          persist-credentials: false
+          path: library
+      - name: Require an existing candidate
+        shell: bash
+        run: 'test -n "$LAB_CANDIDATE"'
+      - name: Manual DEB recipe build
+        if: inputs.action == 'build'
+        run: python3 library/scripts/github.py build
+      - name: Stage the same build locally
+        if: inputs.action == 'build'
+        run: python3 library/scripts/github.py package
+      - name: Optional tests
+        if: inputs.action == 'test'
+        run: python3 library/scripts/github.py test
+      - name: Manual full DEB packaging
+        if: inputs.action == 'deb'
+        run: python3 library/scripts/github.py deb
+      - name: Manual KVM image assembly
+        if: inputs.action == 'kvm'
+        run: python3 library/scripts/github.py kvm
+      - name: Manual release and publish to GitHub Packages and GHCR
+        if: inputs.action == 'release'
+        run: python3 library/scripts/github.py release
+      - name: Trigger consumers only after successful publication
+        if: inputs.action == 'release' || inputs.action == 'downstream'
+        run: python3 library/scripts/github.py downstream
+      - name: Manual deployment, independent of publication
+        if: inputs.action == 'deploy'
+        run: python3 library/scripts/github.py deploy
+      - name: Optional deployment verification
+        if: inputs.action == 'verify'
+        run: python3 library/scripts/github.py verify
+      - name: Manual Pages publication of prebuilt documentation
+        if: inputs.action == 'pages'
+        run: python3 library/scripts/github.py pages
+      - name: Optional infrastructure preparation and VM startup
+        if: inputs.action == 'infra_start'
+        run: python3 library/scripts/github.py infra_start
+      - name: Manual GitLab Kubernetes agent connection
+        if: inputs.action == 'cluster'
+        run: python3 library/scripts/github.py cluster

@@ -1,0 +1,10 @@
+{
+  "project": "myscoutee-old",
+  "type": "legacy-source",
+  "depends_on": [],
+  "variables": {
+    "LAB_GITHUB_REPOSITORY": "fssrepository/myscoutee-old"
+  },
+  "release_notes": "guides/releases/v{version}.md",
+  "release_name": "MyScoutee Old"
+}
